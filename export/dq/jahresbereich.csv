@@ -1,2 +1,2 @@
-"snapshot","jahr_von","jahr_bis","modus","unfaelle_jahr_max","unfaelle_n_neuestes","unfaelle_n_vorjahr","teiljahr_ausgeschlossen","begrenzt_durch","bev_jahr_max"
-"2026-11-08",2011,2024,"auto",2024,4993,5234,FALSE,"",2025
+"snapshot","jahr_von","jahr_bis","modus","unfaelle_jahr_max","unfaelle_n_neuestes","unfaelle_n_vorjahr","teiljahr_ausgeschlossen","ausgeschlossene_jahre","begrenzt_durch","bev_jahr_max"
+"2026-11-08",2011,2024,"auto",2024,4993,5234,FALSE,"","",2025
