@@ -144,6 +144,55 @@ check_snapshot_delta <- function(con, history_file, snapshot_date) {
   )
 }
 
+# Published year range (R/years.R) against the committed range history. The range is part of the
+# release: a smaller range than the previous snapshot publishes less than before, so it stops.
+#  DQ-S03 WARN  newest accident year looked partial (< 80 % of the year before) and was excluded
+#  DQ-S04 STOP  resolved range shrank against the previous snapshot (coverage never goes backwards)
+#  DQ-S05 WARN  a per-year source (meteo, luft) ends before the newest complete accident year
+# The history row of a run that violates DQ-S04 is NOT written, so a rerun cannot "heal" the
+# comparison by comparing against the shrunken range.
+check_year_range <- function(years_info, range_file, snapshot_date) {
+  cur <- years_info
+  cur$snapshot <- as.character(snapshot_date)
+  cur$begrenzt_durch[is.na(cur$begrenzt_durch)] <- ""   # an all-empty CSV column reads back as NA
+  hist <- if (file.exists(range_file)) utils::read.csv(range_file, stringsAsFactors = FALSE) else cur[0, ]
+  prev_dates <- unique(hist$snapshot)
+  prev_dates <- prev_dates[prev_dates < cur$snapshot]
+  prev <- if (length(prev_dates)) hist[hist$snapshot == max(prev_dates), , drop = FALSE][1, ] else NULL
+  shrunk <- !is.null(prev) && (cur$jahr_bis < prev$jahr_bis || cur$jahr_von > prev$jahr_von)
+  detail_s04 <- if (is.null(prev)) {
+    "erster Snapshot – Referenz angelegt"
+  } else {
+    sprintf("jetzt %d–%d, vorher %d–%d (%s)", cur$jahr_von, cur$jahr_bis, prev$jahr_von, prev$jahr_bis, prev$snapshot)
+  }
+  if (!shrunk) {
+    keep <- names(cur)
+    hist <- rbind(hist[hist$snapshot != cur$snapshot, keep, drop = FALSE], cur[, keep])
+    dir.create(dirname(range_file), recursive = TRUE, showWarnings = FALSE)
+    utils::write.csv(hist, range_file, row.names = FALSE)
+  }
+  limited <- nzchar(cur$begrenzt_durch)
+  rbind(
+    result_row("DQ-S03", "unfaelle", "Vollständigkeit", "WARN",
+               "Das neueste Unfalljahr ist vollständig (mindestens 80 % des Vorjahres) und wird veröffentlicht",
+               "The newest accident year is complete (at least 80 % of the year before) and is published",
+               1, as.integer(isTRUE(cur$teiljahr_ausgeschlossen)), 0,
+               sprintf("%d: %s Unfälle, %d: %s", cur$unfaelle_jahr_max, cur$unfaelle_n_neuestes,
+                       cur$unfaelle_jahr_max - 1L, cur$unfaelle_n_vorjahr),
+               art = "Historie"),
+    result_row("DQ-S04", "unfaelle", "Stabilität", "STOP",
+               "Der veröffentlichte Jahresbereich ist gegenüber dem letzten Snapshot nicht kleiner geworden",
+               "The published year range has not become smaller than in the previous snapshot",
+               1, as.integer(shrunk), 0, detail_s04, art = "Historie"),
+    result_row("DQ-S05", "unfaelle", "Aktualität", "WARN",
+               "Alle Quellen reichen bis zum neuesten vollständigen Unfalljahr",
+               "All sources reach the newest complete accident year",
+               1, as.integer(limited), 0,
+               if (limited) sprintf("begrenzt durch: %s", cur$begrenzt_durch) else "keine Quelle begrenzt den Bereich",
+               art = "Historie")
+  )
+}
+
 check_freshness <- function(manifest, cfg) {
   src <- unique(manifest[, c("source", "source_modified")])
   rows <- lapply(seq_len(nrow(src)), function(i) {
@@ -160,7 +209,8 @@ check_freshness <- function(manifest, cfg) {
   do.call(rbind, rows)
 }
 
-run_dq <- function(db_path, manifest, cfg, check_files, contract_files, history_file, report_dir) {
+run_dq <- function(db_path, manifest, cfg, check_files, contract_files, history_file, report_dir,
+                   years_info, range_file) {
   con <- db_connect(db_path, read_only = TRUE)
   on.exit(DBI::dbDisconnect(con, shutdown = TRUE))
   params <- list(year_from = cfg$years$from, year_to = cfg$years$to, station = cfg$params$station)
@@ -169,6 +219,7 @@ run_dq <- function(db_path, manifest, cfg, check_files, contract_files, history_
     run_contracts(con, contract_files, report_dir),
     run_sql_checks(con, check_files, params),
     check_snapshot_delta(con, history_file, snapshot_date),
+    check_year_range(years_info, range_file, snapshot_date),
     check_freshness(manifest, cfg)
   )
   res$run_utc <- format(Sys.time(), "%Y-%m-%dT%H:%M:%SZ", tz = "UTC")

@@ -71,16 +71,28 @@ digest_sha256 <- function(path) {
 
 # Download all sources into data/raw/<date>/. Reuses an existing complete
 # snapshot of the same day (idempotent reruns, no hammering of the portal).
+# Order matters: single-file sources first, because the year range (years.to = auto) is resolved
+# from the accident file, the population file and the per-year resources listed in CKAN; only then
+# are the per-year files (meteo, luft) downloaded. The range is stored in years.csv and in the
+# year_from / year_to columns of the manifest.
 fetch_all <- function(cfg, snapshot_date, root = "data/raw") {
   dir <- file.path(root, snapshot_date)
   manifest_file <- file.path(dir, "manifest.csv")
-  if (file.exists(manifest_file)) {
+  if (file.exists(manifest_file) && file.exists(file.path(dir, "years.csv"))) {
     return(utils::read.csv(manifest_file, stringsAsFactors = FALSE))
   }
-  years <- seq(cfg$years$from, cfg$years$to)
-  manifest <- do.call(rbind, lapply(names(cfg$sources), function(key) {
-    fetch_source(cfg, key, dir, years = years)
-  }))
+  keys <- names(cfg$sources)
+  per_year <- vapply(cfg$sources, function(s) !is.null(s[["resource_pattern"]]), logical(1))
+  fixed <- do.call(rbind, lapply(keys[!per_year], function(key) fetch_source(cfg, key, dir)))
+  res <- resolve_snapshot_years(cfg, fixed)
+  years <- seq(res$year_from, res$year_to)
+  dated <- do.call(rbind, lapply(keys[per_year], function(key) fetch_source(cfg, key, dir, years = years)))
+  manifest <- rbind(fixed, dated)
+  manifest <- manifest[order(match(manifest$source, keys)), ]
+  manifest$year_from <- res$year_from
+  manifest$year_to <- res$year_to
+  rownames(manifest) <- NULL
+  utils::write.csv(years_row(res, snapshot_date), file.path(dir, "years.csv"), row.names = FALSE)
   utils::write.csv(manifest, manifest_file, row.names = FALSE)
   manifest
 }

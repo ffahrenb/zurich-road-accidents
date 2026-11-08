@@ -25,6 +25,9 @@ GROUP BY ALL
 ORDER BY ALL;
 
 -- Rates per 1000 inhabitants: accidents of a year divided by population at year end.
+-- If the population file lags behind the accident years (automatic year range), the newest
+-- available population year is carried forward instead of leaving the rate empty; einwohner_jahr
+-- records which year the figure is from and DQ-B03 reports every carried-forward quarter-year.
 CREATE OR REPLACE TABLE mart_quartier AS
 WITH unf AS (
     SELECT
@@ -35,6 +38,10 @@ WITH unf AS (
     FROM mart_unfaelle
     WHERE quartier_nr IS NOT NULL
     GROUP BY ALL
+),
+
+bev_letztes AS (
+    SELECT max(jahr) AS jahr FROM stg_bevoelkerung
 )
 
 SELECT
@@ -43,14 +50,16 @@ SELECT
     q.kreis_nr,
     unf.jahr,
     b.einwohner,
+    b.jahr AS einwohner_jahr,
     coalesce(unf.unfaelle, 0) AS unfaelle,
     coalesce(unf.mit_personenschaden, 0) AS mit_personenschaden,
     round(1000.0 * coalesce(unf.mit_personenschaden, 0) / b.einwohner, 2)
         AS personenschaden_pro_1000
 FROM stg_quartiere AS q
 INNER JOIN unf ON q.quartier_nr = unf.quartier_nr
+CROSS JOIN bev_letztes AS bl
 LEFT JOIN stg_bevoelkerung AS b
-    ON unf.quartier_nr = b.quartier_nr AND unf.jahr = b.jahr;
+    ON unf.quartier_nr = b.quartier_nr AND least(unf.jahr, bl.jahr) = b.jahr;
 
 CREATE OR REPLACE TABLE mart_tempo AS
 SELECT

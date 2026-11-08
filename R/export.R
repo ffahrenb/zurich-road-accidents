@@ -128,7 +128,9 @@ export_dq <- function(dq_results, manifest, out_dir = "export/dq") {
   cols <- c("run_utc", "snapshot", "check_id", "status", "n_tested", "n_failed")
   hist <- rbind(hist[, cols, drop = FALSE], dq_results[, cols])
   hist <- hist[!duplicated(hist[, c("snapshot", "check_id")], fromLast = TRUE), ]
-  pub_manifest <- manifest[, c("source", "file", "bytes", "sha256", "source_modified", "retrieved_utc", "licence")]
+  pub_cols <- c("source", "file", "bytes", "sha256", "source_modified", "retrieved_utc", "licence",
+                "year_from", "year_to")
+  pub_manifest <- manifest[, intersect(pub_cols, names(manifest))]
   c(
     write_csv(dq_all, res_file),
     write_csv(hist, hist_file),

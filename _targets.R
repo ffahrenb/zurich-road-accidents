@@ -14,6 +14,9 @@ list(
 
   # --- 1 ingest: official APIs -> dated snapshot + manifest -----------------
   tar_target(manifest, fetch_all(cfg, snapshot_date)),
+  # resolved year range (years.to = auto): everything downstream uses cfg_run, never cfg$years
+  tar_target(years_info, read_years(manifest)),
+  tar_target(cfg_run, apply_years(cfg, years_info)),
 
   # --- 2 warehouse: raw -> staging -> mart (SQL) ----------------------------
   tar_files_input(sql_files, list.files(c("sql/raw", "sql/staging", "sql/mart"), "\\.sql$", full.names = TRUE)),
@@ -21,7 +24,7 @@ list(
   tar_target(private_path, Sys.getenv("ZH_PRIVATE_ACCIDENTS"), cue = tar_cue(mode = "always")),
   tar_target(
     warehouse,
-    build_warehouse(manifest, cfg, sql_files, "data/warehouse.duckdb",
+    build_warehouse(manifest, cfg_run, sql_files, "data/warehouse.duckdb",
                     private_path = private_path),
     format = "file"
   ),
@@ -31,9 +34,10 @@ list(
   tar_files_input(dq_contract_files, list.files("dq/contracts", "\\.yml$", full.names = TRUE)),
   tar_target(
     dq_results,
-    run_dq(warehouse, manifest, cfg, dq_check_files, dq_contract_files,
+    run_dq(warehouse, manifest, cfg_run, dq_check_files, dq_contract_files,
            history_file = "export/dq/snapshot_history.csv",
-           report_dir = "export/dq")
+           report_dir = "export/dq", years_info = years_info,
+           range_file = "export/dq/jahresbereich.csv")
   ),
   tar_target(dq_passed, dq_gate(dq_results)),
 
@@ -74,7 +78,7 @@ list(
   }, format = "file"),
   tar_target(dcat_file, {
     dq_passed
-    build_dcat(export_cfg, cfg, export_public_files,
+    build_dcat(export_cfg, cfg_run, export_public_files,
                site_url = "https://ffahrenb.github.io/zurich-road-accidents/")
   }, format = "file")
 )
