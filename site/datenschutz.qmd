@@ -1,0 +1,45 @@
+---
+title: "Datenschutz"
+subtitle: "Privacy by Design: Was veröffentlicht wird, was nicht, und wie das automatisch geprüft wird"
+---
+
+## Diese Website
+
+- **Keine Cookies, kein Tracking, keine Statistik-Werkzeuge.** Es gibt kein Analytics, keine Werbung, keine Einbettungen von Dritten ausser der Kartengrundlage.
+- **Keine Web-Schriften.** Die Seiten verwenden die Schrift Ihres Geräts; es wird nichts von Google Fonts oder ähnlichen Diensten geladen.
+- **Einzige Verbindung zu Dritten:** Auf der Seite [Karte](karte.qmd) lädt Ihr Browser die Kartenkacheln (Hintergrundkarte Positron bzw. Dark Matter) von **CARTO**. Dabei sieht CARTO technisch bedingt Ihre IP-Adresse und den angezeigten Kartenausschnitt. Nur wer die Kartenseite öffnet, löst diese Anfrage aus. Die Daten © OpenStreetMap-Mitwirkende, © CARTO.
+- Die Website liegt bei **GitHub Pages**. GitHub kann beim Abruf technische Zugriffsdaten (zum Beispiel IP-Adresse) verarbeiten; darauf haben wir keinen Einfluss. Die Website selbst speichert nichts über Sie.
+- Ihre Einstellung für helles oder dunkles Design wird, falls überhaupt, nur in Ihrem Browser gespeichert.
+
+## Die Daten
+
+Die offenen Unfalldaten enthalten **nur Jahr, Monat, Wochentag und Stunde**, nie ein Datum. Das ist Absicht und bleibt so.
+
+Es gibt zusätzlich eine **nicht öffentliche Datei der Stadt Zürich mit exakten Unfallzeitpunkten**. Mit ihr lässt sich der Einfluss des Wetters Stunde für Stunde statt nur monatlich schätzen. Das Risiko: Würde man daraus Zeilen, Datums- oder Stundenwerte veröffentlichen, könnte man jede öffentliche Unfallzeile über Jahr, Monat, Wochentag und Stunde einem genauen Datum zuordnen und so Unfälle bestimmten Personen oder Ereignissen zuordnen (Re-Identifikation).
+
+Deshalb gibt es **zwei Datenpfade**:
+
+- **Öffentlicher Pfad:** nur offene Quellen, vollständig in der automatischen Pipeline reproduzierbar.
+- **Privater Pfad:** die Datei mit den genauen Zeitpunkten wird nur lokal und nur lesend eingebunden. Sie liegt nie im Repository, nie im Container-Image und nie in der automatischen Pipeline. **Veröffentlicht werden nur Modellergebnisse:** Koeffizienten und grobe Klassen (Regen × Temperaturbereich) mit mindestens 10 Fällen, keine Einzeldaten, keine Datumsangaben, keine Zeitreihen pro Stunde.
+
+## Mehrere Schutzschichten
+
+Jede Schicht darf einzeln ausfallen, die anderen halten.
+
+1. Die private Datei liegt **ausserhalb** des Repositorys und ist per `.gitignore` gesperrt.
+2. Ein **Pre-Commit-Hook** blockiert verbotene Dateien und Inhalte schon beim Speichern ins Repository.
+3. Eine **Allowlist** legt fest, welche Tabellen und Spalten den Export überhaupt verlassen dürfen.
+4. **Mindestzellgrösse 10:** Klassen mit weniger als 10 Unfällen oder Stunden werden nicht veröffentlicht.
+5. **Nur Koeffizienten, keine Modelle:** Gefittete Modelle würden Trainingsdaten enthalten.
+6. **Grobe Klassen statt Werte:** Wetter wird nur als Regenklasse × Temperaturklasse veröffentlicht.
+7. **Automatischer Datenschutz-Test** in jedem Lauf, der **im Zweifel scheitert** (fail-closed).
+
+Der Test prüft unter anderem: Jede exportierte Datei ist ausdrücklich erlaubt; Kartenpunkte tragen nur Jahr, Schwere und Beteiligung; nirgends erscheinen genaue Zeitstempel oder Datumsangaben; und es gibt keinen **Join-Angriff**: Keine Wetter-Datei hat eine Spalte (Jahr, Monat, Wochentag, Stunde, Koordinate, Quartier), über die man sie mit den öffentlichen Zeilen verknüpfen könnte. Der Test **testet sich selbst**: Er muss bei 15 absichtlich eingebauten Verstössen scheitern.
+
+Wetter wird ausserdem **nie mit Unfällen mit Todesfolge** verknüpft ausgewertet.
+
+## Restrisiken
+
+Die Tests erkennen bekannte Muster, nicht jede denkbare Offenlegung. Neue Auswertungen aus dem privaten Pfad brauchen deshalb eine bewusste Prüfung, bevor sie veröffentlicht werden. Die Karte zeigt Unfallorte mit Jahr und Schwere; die Orte stammen aus den offenen Daten der Stadt Zürich.
+
+Fragen oder Hinweise: [Issues im Repository](https://github.com/ffahrenb/zurich-road-accidents/issues).
