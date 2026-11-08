@@ -80,7 +80,7 @@ A <- tibble::tribble(
   "0002", "0002-targets.md", "{targets} als Orchestrierung", "Inkrementelle, reproduzierbare Läufe; das Qualitäts-Gate ist ein Knoten im Graph.",
   "0003", "0003-schichten-raw-staging-mart.md", "Schichten raw, staging, mart", "Fehler dort finden, wo sie entstehen; nur geprüfte Marts werden exportiert.",
   "0004", "0004-zwei-datenpfade-datenschutz.md", "Zwei Datenpfade und Datenschutz", "Öffentlicher Pfad vollständig in CI; privater Pfad nur lokal, nur Modellergebnisse werden veröffentlicht.",
-  "0005", "0005-datenqualitaet-als-freigabe.md", "Datenqualität als Freigabe-Gate", "STOP bricht ab, WARN macht sichtbar; erkennen, reparieren, verifizieren."),
+  "0005", "0005-datenqualitaet-als-freigabe.md", "Datenqualität als Freigabe-Gate", "STOP bricht ab, WARN macht sichtbar; erkennen, reparieren, verifizieren.",
   "0006", "0006-automatische-aktualisierung-und-persistenz.md", "Automatische Aktualisierung und Persistenz", "Jahresbereich aus den Quellen, nie rückwärts; der monatliche Lauf schreibt export/ ins Repository zurück."
 )
 tags$div(class = "dl", lapply(seq_len(nrow(A)), function(i)

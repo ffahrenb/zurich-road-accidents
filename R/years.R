@@ -2,7 +2,7 @@
 # The published range ends at the latest year for which ALL required inputs exist. Pure functions
 # on plain inputs, so the logic is unit-tested without network (tests/testthat/test-years.R).
 
-min_year_ratio <- 0.8   # newest accident year below 80 % of the year before = partial, excluded
+min_year_ratio <- 0.8   # trailing accident year below 80 % of the year before = partial, excluded (iteratively)
 
 # Years found in resource names such as "ugz_ogd_meteo_h1_2024.csv" for a "..._{year}.csv" pattern.
 years_from_names <- function(names, pattern) {
@@ -32,8 +32,21 @@ resolve_year_range <- function(from, to, acc, avail, pop_max = NA_integer_) {
   n_prev <- n_of(newest - 1L)
   ratio <- n_newest / n_prev
   mode <- if (identical(to, "auto")) "auto" else "fest"
-  partial <- mode == "auto" && !is.na(ratio) && ratio < min_year_ratio
-  acc_to <- if (mode == "fest") as.integer(to) else if (partial) newest - 1L else newest
+  if (mode == "fest") {
+    acc_to <- as.integer(to)
+  } else {
+    # accident years must be contiguous from `from`; then trailing years below 80 % of the year
+    # before are dropped one by one. An NA/NaN ratio (no usable predecessor) fails closed.
+    acc_to <- contiguous_to(acc$jahr, from)
+    if (is.na(acc_to)) stop("no accident rows for ", from, " (first year missing)", call. = FALSE)
+    while (acc_to > from) {
+      r <- n_of(acc_to) / n_of(acc_to - 1L)
+      if (!is.na(r) && r >= min_year_ratio) break
+      acc_to <- acc_to - 1L
+    }
+  }
+  excluded <- if (mode == "auto") acc$jahr[acc$jahr > acc_to] else integer()
+  partial <- length(excluded) > 0
   src_to <- vapply(avail, contiguous_to, integer(1), from = from)
   if (mode == "auto") {
     if (anyNA(src_to)) {
@@ -50,7 +63,8 @@ resolve_year_range <- function(from, to, acc, avail, pop_max = NA_integer_) {
   list(
     year_from = as.integer(from), year_to = as.integer(year_to), mode = mode,
     accident_max = as.integer(newest), accident_to = as.integer(acc_to),
-    partial_excluded = partial, n_newest = n_newest, n_prev = n_prev, ratio = ratio,
+    partial_excluded = partial, excluded_years = as.integer(excluded),
+    n_newest = n_newest, n_prev = n_prev, ratio = ratio,
     limited_by = limited_by, source_max = src_to, pop_max = as.integer(pop_max)
   )
 }
@@ -61,6 +75,7 @@ years_row <- function(res, snapshot) {
     snapshot = as.character(snapshot), jahr_von = res$year_from, jahr_bis = res$year_to, modus = res$mode,
     unfaelle_jahr_max = res$accident_max, unfaelle_n_neuestes = res$n_newest, unfaelle_n_vorjahr = res$n_prev,
     teiljahr_ausgeschlossen = res$partial_excluded,
+    ausgeschlossene_jahre = paste(res$excluded_years, collapse = ","),
     begrenzt_durch = paste(res$limited_by, collapse = ","),
     bev_jahr_max = res$pop_max,
     stringsAsFactors = FALSE

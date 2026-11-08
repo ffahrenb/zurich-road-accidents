@@ -37,6 +37,43 @@ test_that("partial newest accident year (< 80 % of the year before) is excluded"
   expect_equal(r$ratio, 2000 / 5200)
 })
 
+test_that("a sparse future year without its predecessor is not published (fail closed)", {
+  acc <- rbind(acc_counts(2024), data.frame(jahr = 2026, n = 3))
+  r <- resolve_year_range(2011, "auto", acc, avail_to(2026))
+  expect_equal(r$year_to, 2024L)
+  expect_true(r$partial_excluded)
+  expect_equal(r$excluded_years, 2026L)
+})
+
+test_that("several trailing partial years are dropped iteratively", {
+  acc <- data.frame(jahr = 2011:2026, n = c(rep(5200, 14), 2000, 30))
+  r <- resolve_year_range(2011, "auto", acc, avail_to(2026))
+  expect_equal(r$year_to, 2024L)
+  expect_equal(r$excluded_years, c(2025L, 2026L))
+  expect_equal(r$accident_max, 2026L)
+  # a partial year followed by a complete-looking one is still dropped only from the end
+  acc2 <- data.frame(jahr = 2011:2026, n = c(rep(5200, 14), 2000, 5000))
+  expect_equal(resolve_year_range(2011, "auto", acc2, avail_to(2026))$year_to, 2026L)
+})
+
+test_that("a gap in the accident years ends the range before the gap and is reported", {
+  acc <- data.frame(jahr = c(2011:2017, 2019:2024), n = 5200)
+  r <- resolve_year_range(2011, "auto", acc, avail_to(2026))
+  expect_equal(r$year_to, 2017L)
+  expect_equal(r$excluded_years, 2019:2024)
+  expect_true(r$partial_excluded)
+  res <- check_year_range(years_row(r, "2026-01-01"), withr::local_tempfile(fileext = ".csv"), "2026-01-01")
+  expect_equal(status_of(res, "DQ-S03"), "WARN")
+  expect_match(res$detail[res$check_id == "DQ-S03"], "2019, 2020")
+})
+
+test_that("DQ-S03 detail names every excluded year", {
+  acc <- data.frame(jahr = 2011:2026, n = c(rep(5200, 14), 2000, 30))
+  r <- resolve_year_range(2011, "auto", acc, avail_to(2026))
+  res <- check_year_range(years_row(r, "2026-01-01"), withr::local_tempfile(fileext = ".csv"), "2026-01-01")
+  expect_match(res$detail[res$check_id == "DQ-S03"], "ausgelassen: 2025, 2026")
+})
+
 test_that("the 80 % limit is inclusive: exactly 80 % is published", {
   r <- resolve_year_range(2011, "auto", acc_counts(2025, n_last = 4160), avail_to(2026))
   expect_false(r$partial_excluded)
