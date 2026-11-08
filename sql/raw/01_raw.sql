@@ -1,5 +1,5 @@
 -- RAW layer: 1:1 copies of the downloaded files. No cleaning, no renaming.
--- File lists are injected by the pipeline ({{...}} placeholders).
+-- File lists are injected by the pipeline (double-brace placeholders).
 
 CREATE OR REPLACE TABLE raw_unfaelle AS
 SELECT * FROM read_parquet({{unfaelle}});

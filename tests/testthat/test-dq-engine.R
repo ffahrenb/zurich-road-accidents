@@ -103,6 +103,34 @@ test_that("small drift (5 %) warns (S01) but does not stop (S02)", {
   expect_equal(status_of(res, "DQ-S02"), "PASS")
 })
 
+test_that("second run on the same snapshot date still compares with the previous date (DQ-S02 stays live)", {
+  con <- fixture_con()
+  load_clean_fixtures(con)             # 20 rows
+  h <- withr::local_tempfile(fileext = ".csv")
+  write_history(h, 100, 100, snapshot = "2026-01-01")        # previous snapshot: 200 rows
+  res1 <- check_snapshot_delta(con, h, "2026-02-01")
+  expect_equal(status_of(res1, "DQ-S02"), "STOP")
+  res2 <- check_snapshot_delta(con, h, "2026-02-01")         # same date again
+  expect_equal(status_of(res2, "DQ-S02"), "STOP")            # not downgraded to "first snapshot"
+  expect_equal(status_of(res2, "DQ-S01"), "WARN")
+  hist <- utils::read.csv(h)
+  expect_equal(sort(unique(hist$snapshot)), c("2026-01-01", "2026-02-01"))
+  expect_false(anyDuplicated(hist[, c("jahr", "snapshot")]) > 0)   # no duplicate rows for the date
+  expect_equal(nrow(hist), 4)
+})
+
+test_that("snapshot reference is the latest strictly earlier date, never a later or equal one", {
+  con <- fixture_con()
+  load_clean_fixtures(con)             # 10 + 10 rows
+  h <- withr::local_tempfile(fileext = ".csv")
+  write_history(h, 10, 10, snapshot = "2026-01-01")
+  hist <- utils::read.csv(h)
+  hist <- rbind(hist, data.frame(jahr = c(2020L, 2021L), n = 500L, snapshot = "2026-03-01"))
+  utils::write.csv(hist, h, row.names = FALSE)
+  res <- check_snapshot_delta(con, h, "2026-02-01")          # 2026-03-01 is in the future: ignore
+  expect_true(all(res$status == "PASS"))
+})
+
 # --- gate and status logic ----------------------------------------------------
 
 gate_row <- function(status) {
@@ -115,6 +143,15 @@ test_that("dq_gate errors on STOP and passes on WARN/PASS", {
   expect_error(dq_gate(rbind(gate_row("PASS"), gate_row("STOP"))), "1 STOP")
   expect_true(dq_gate(gate_row("WARN")))
   expect_true(dq_gate(gate_row("PASS")))
+})
+
+test_that("dq_gate treats an NA status as failing at the check's severity", {
+  na_stop <- cbind(gate_row(NA_character_), schwere = "STOP")
+  na_warn <- cbind(gate_row(NA_character_), schwere = "WARN")
+  expect_error(dq_gate(na_stop), "1 STOP")
+  expect_error(dq_gate(rbind(cbind(gate_row("PASS"), schwere = "WARN"), na_stop)), "1 STOP")
+  expect_true(dq_gate(na_warn))
+  expect_error(dq_gate(gate_row(NA_character_)), "STOP")      # unknown severity -> strictest
 })
 
 test_that("check_status honours tolerance and treats an unrunnable check as failed", {

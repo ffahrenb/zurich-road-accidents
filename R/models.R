@@ -22,7 +22,8 @@ fit_weather <- function(db_path) {
   d$regen <- factor(ifelse(d$regen_min > 0, "Regen", "trocken"), levels = c("trocken", "Regen"))
   d$temperatur <- stats::relevel(temp_bin(d$temperatur_c), ref = "10–15")
   d$tagesstunde <- interaction(d$stunde, d$wochentag >= 6)
-  d$monat <- factor(d$monat); d$jahr <- factor(d$jahr)
+  d$monat <- factor(d$monat)
+  d$jahr <- factor(d$jahr)
 
   outcomes <- c(
     unfaelle = "Alle Unfälle", mit_personenschaden = "Unfälle mit Personenschaden",
@@ -72,7 +73,8 @@ fit_severity <- function(db_path, seed = 2026) {
 
   set.seed(seed)
   split <- rsample::initial_split(d, prop = 0.8, strata = personenschaden)
-  train <- rsample::training(split); test <- rsample::testing(split)
+  train <- rsample::training(split)
+  test <- rsample::testing(split)
   folds <- rsample::vfold_cv(train, v = 5, strata = personenschaden)
   rec <- recipes::recipe(personenschaden ~ ., data = train) |>
     recipes::step_dummy(recipes::all_nominal_predictors()) |>
@@ -91,7 +93,8 @@ fit_severity <- function(db_path, seed = 2026) {
     cvm <- tune::collect_metrics(cv)
     # Permutation importance is costly: compute it on the final fit only, not in every CV fold.
     if (nm == "Random Forest") {
-      wf <- workflows::workflow(rec, parsnip::set_engine(specs[[nm]], "ranger", importance = "permutation", seed = seed))
+      rf_spec <- parsnip::set_engine(specs[[nm]], "ranger", importance = "permutation", seed = seed)
+      wf <- workflows::workflow(rec, rf_spec)
     }
     fit <- parsnip::fit(wf, train)
     pred <- stats::predict(fit, test, type = "prob")
@@ -128,7 +131,8 @@ fit_severity <- function(db_path, seed = 2026) {
   or$ci_high <- exp(-or$estimate + z * or$std.error)
   or <- or[or$term != "(Intercept)", c("term", "odds_ratio", "ci_low", "ci_high", "p.value")]
   names(or) <- c("term", "odds_ratio", "ci_low", "ci_high", "p_value")
-  or[, 2:4] <- round(or[, 2:4], 3); or$p_value <- signif(or$p_value, 3)
+  or[, 2:4] <- round(or[, 2:4], 3)
+  or$p_value <- signif(or$p_value, 3)
 
   # Permutation importance of the random forest.
   rf <- workflows::extract_fit_engine(res[["Random Forest"]]$fit)

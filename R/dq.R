@@ -15,6 +15,7 @@ parse_check_header <- function(path) {
 
 check_status <- function(n_tested, n_failed, severity, tolerance_pct) {
   if (is.na(n_failed)) return(severity)          # a check that cannot run is not a pass
+  if (is.na(tolerance_pct)) tolerance_pct <- 0
   if (n_failed == 0) return("PASS")
   pct <- if (is.na(n_tested) || n_tested == 0) 100 else 100 * n_failed / n_tested
   if (pct <= tolerance_pct) "PASS" else severity
@@ -62,11 +63,17 @@ run_contracts <- function(con, files, report_dir) {
       agent <- pointblank::col_exists(agent, columns = col$name)
       if (!col$name %in% present) next
       if (isTRUE(col$not_null)) agent <- pointblank::col_vals_not_null(agent, columns = col$name)
-      if (!is.null(col$in_set)) agent <- pointblank::col_vals_in_set(agent, columns = col$name, set = unlist(col$in_set))
-      if (!is.null(col$between)) agent <- pointblank::col_vals_between(agent, columns = col$name, left = col$between[[1]], right = col$between[[2]])
+      if (!is.null(col$in_set)) {
+        agent <- pointblank::col_vals_in_set(agent, columns = col$name, set = unlist(col$in_set))
+      }
+      if (!is.null(col$between)) {
+        agent <- pointblank::col_vals_between(agent, columns = col$name,
+                                              left = col$between[[1]], right = col$between[[2]])
+      }
     }
     agent <- pointblank::interrogate(agent, progress = FALSE)
-    pointblank::export_report(agent, filename = file.path(report_dir, paste0("vertrag_", ct$quelle, ".html")), quiet = TRUE)
+    pointblank::export_report(agent, quiet = TRUE,
+                              filename = file.path(report_dir, paste0("vertrag_", ct$quelle, ".html")))
     vs <- agent$validation_set
     n_steps <- nrow(vs)
     failed_steps <- vs[!vs$all_passed %in% TRUE, ]
@@ -74,7 +81,9 @@ run_contracts <- function(con, files, report_dir) {
       paste(sprintf("%s(%s): %s Fehler", failed_steps$assertion_type,
                     vapply(failed_steps$column, function(x) paste(unlist(x), collapse = ","), ""),
                     failed_steps$n_failed), collapse = "; ")
-    } else NA_character_
+    } else {
+      NA_character_
+    }
     result_row(
       paste0("DQ-C-", toupper(substr(ct$quelle, 1, 3))), ct$quelle, "Schema & Vertrag", ct$schwere,
       paste0("Datenvertrag eingehalten: Spalten, Pflichtfelder, Wertelisten (", n_steps, " Regeln)"),
@@ -88,28 +97,40 @@ run_contracts <- function(con, files, report_dir) {
 # Compares per-year accident counts with the previous snapshot.
 # A publisher silently deleting or rewriting history is caught here.
 check_snapshot_delta <- function(con, history_file, snapshot_date) {
-  cur <- DBI::dbGetQuery(con, "SELECT AccidentYear::INTEGER AS jahr, count(*)::INTEGER AS n FROM raw_unfaelle GROUP BY 1 ORDER BY 1")
+  cur <- DBI::dbGetQuery(con, paste(
+    "SELECT AccidentYear::INTEGER AS jahr, count(*)::INTEGER AS n",
+    "FROM raw_unfaelle GROUP BY 1 ORDER BY 1"))
   cur$snapshot <- as.character(snapshot_date)
   hist <- if (file.exists(history_file)) utils::read.csv(history_file, stringsAsFactors = FALSE) else cur[0, ]
-  prev_dates <- setdiff(unique(hist$snapshot), cur$snapshot[1])
-  detail <- NA_character_; n_failed <- 0; n_tested <- nrow(cur)
+  # Reference = latest entry dated strictly before today's snapshot. Re-running the same snapshot
+  # date neither becomes its own reference nor appends a second block of rows.
+  prev_dates <- unique(hist$snapshot)
+  prev_dates <- prev_dates[prev_dates < cur$snapshot[1]]
+  detail <- NA_character_
+  n_failed <- 0
+  n_tested <- nrow(cur)
   if (length(prev_dates)) {
     prev <- hist[hist$snapshot == max(prev_dates), c("jahr", "n")]
     cmp <- merge(prev, cur[, c("jahr", "n")], by = "jahr", suffixes = c("_vorher", "_jetzt"))
     cmp$delta <- cmp$n_jetzt / cmp$n_vorher - 1
     bad <- cmp[abs(cmp$delta) > 0.01, ]
-    n_failed <- nrow(bad); n_tested <- nrow(cmp)
+    n_failed <- nrow(bad)
+    n_tested <- nrow(cmp)
     if (n_failed) detail <- paste(sprintf("%d: %+.1f %%", bad$jahr, 100 * bad$delta), collapse = "; ")
   } else {
     detail <- "erster Snapshot – Referenz angelegt"
   }
-  hist <- rbind(hist[hist$snapshot != cur$snapshot[1], ], cur)
+  # same date = overwrite, never duplicate
+  keep <- c("jahr", "n", "snapshot")
+  hist <- rbind(hist[hist$snapshot != cur$snapshot[1], keep], cur[, keep])
   dir.create(dirname(history_file), recursive = TRUE, showWarnings = FALSE)
   utils::write.csv(hist, history_file, row.names = FALSE)
   # >10 % shrink of total history = STOP (the 2023 "180k -> 55k" case)
   total_drop <- if (length(prev_dates)) {
     1 - sum(cur$n) / sum(hist$n[hist$snapshot == max(prev_dates)])
-  } else 0
+  } else {
+    0
+  }
   rbind(
     result_row("DQ-S01", "unfaelle", "Stabilität", "WARN",
                "Unfallzahlen je Jahr weichen höchstens 1 % vom letzten Snapshot ab",
@@ -157,7 +178,11 @@ run_dq <- function(db_path, manifest, cfg, check_files, contract_files, history_
 
 # The release gate: refuses to continue when any STOP check failed.
 dq_gate <- function(dq_results) {
-  stops <- dq_results[dq_results$status == "STOP", ]
+  # NA status counts as failing at the check's own severity (STOP if that is unknown too)
+  sev <- if ("schwere" %in% names(dq_results)) dq_results$schwere else rep(NA_character_, nrow(dq_results))
+  sev[is.na(sev)] <- "STOP"
+  eff <- ifelse(is.na(dq_results$status), sev, dq_results$status)
+  stops <- dq_results[eff == "STOP", , drop = FALSE]
   if (nrow(stops)) {
     stop("Datenqualität: ", nrow(stops), " STOP-Prüfung(en) verletzt – keine Veröffentlichung.\n",
          paste(sprintf("  %s %s (%s)", stops$check_id, stops$titel_de, stops$detail), collapse = "\n"),
