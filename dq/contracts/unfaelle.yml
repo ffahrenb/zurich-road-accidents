@@ -1,0 +1,18 @@
+# Data contract: what we expect from the publisher. Violations are DQ findings.
+table: raw_unfaelle
+quelle: unfaelle
+schwere: STOP
+columns:
+  - {name: AccidentUID, not_null: true}
+  - {name: AccidentSeverityCategory, not_null: true, in_set: [as1, as2, as3, as4]}
+  - {name: AccidentType, not_null: true}
+  - {name: AccidentInvolvingPedestrian, not_null: true}
+  - {name: AccidentInvolvingBicycle, not_null: true}
+  - {name: AccidentInvolvingMotorcycle, not_null: true}
+  - {name: RoadType, not_null: true}
+  - {name: AccidentLocation_CHLV95_E, not_null: true, between: [2600000, 2800000]}
+  - {name: AccidentLocation_CHLV95_N, not_null: true, between: [1100000, 1300000]}
+  - {name: AccidentYear, not_null: true, between: [2011, 2100]}
+  - {name: AccidentMonth, not_null: true, between: [1, 12]}
+  - {name: AccidentWeekDay, not_null: true, in_set: [aw401, aw402, aw403, aw404, aw405, aw406, aw407]}
+  - {name: AccidentHour, not_null: true, between: [0, 23]}

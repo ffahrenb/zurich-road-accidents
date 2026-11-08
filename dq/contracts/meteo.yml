@@ -1,0 +1,9 @@
+table: raw_meteo
+quelle: meteo
+schwere: STOP
+columns:
+  - {name: Datum, not_null: true}
+  - {name: Standort, not_null: true}
+  - {name: Parameter, not_null: true, in_set: [T, Hr, RainDur, WD, WVs, WVv, StrGlo, p]}
+  - {name: Intervall, not_null: true, in_set: [h1]}
+  - {name: Status, not_null: true, in_set: [bereinigt, provisorisch]}

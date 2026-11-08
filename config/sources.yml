@@ -1,0 +1,63 @@
+# Data sources — single source of truth for ingestion.
+# Every source is fetched from the official publisher, never from a copy.
+ckan_base: https://data.stadt-zuerich.ch/api/3/action
+wfs_base: https://www.ogd.stadt-zuerich.ch/wfs/geoportal
+years: {from: 2011, to: 2024}
+
+sources:
+  unfaelle:
+    title_de: Strassenverkehrsunfälle mit Personen- und Sachschaden
+    publisher: Bundesamt für Strassen ASTRA / Stadt Zürich
+    licence: CC BY 4.0
+    ckan_id: sid_dav_strassenverkehrsunfallorte
+    resource: RoadTrafficAccidentLocations.parquet
+    cadence_days: 400          # yearly update
+  meteo:
+    title_de: Meteodaten, Stundenmittelwerte (Umwelt- und Gesundheitsschutz Zürich)
+    publisher: Stadt Zürich, UGZ
+    licence: CC0
+    ckan_id: ugz_meteodaten_stundenmittelwerte
+    resource_pattern: "ugz_ogd_meteo_h1_{year}.csv"
+    cadence_days: 2            # hourly, files updated daily
+  luft:
+    title_de: Luftschadstoffmessungen, Stundenwerte
+    publisher: Stadt Zürich, UGZ
+    licence: CC0
+    ckan_id: ugz_luftschadstoffmessung_stundenwerte
+    resource_pattern: "ugz_ogd_air_h1_{year}.csv"
+    cadence_days: 2
+  bevoelkerung:
+    title_de: Bevölkerung nach Stadtquartier
+    publisher: Stadt Zürich, Statistik Stadt Zürich
+    licence: CC0
+    ckan_id: bev_bestand_jahr_quartier_od3240
+    resource: BEV324OD3240.csv
+    cadence_days: 400
+  quartiere:
+    title_de: Statistische Quartiere
+    publisher: Stadt Zürich, Geomatik + Vermessung
+    licence: CC0
+    ckan_id: geo_statistische_quartiere
+    wfs: {service: Statistische_Quartiere, layer: adm_statistische_quartiere_map}
+    cadence_days: 400
+  schulen:
+    title_de: Schulanlagen (Volksschule)
+    publisher: Stadt Zürich, Schul- und Sportdepartement
+    licence: CC0
+    ckan_id: geo_schulanlagen
+    wfs: {service: Schulanlagen, layer: poi_volksschule_view}
+    cadence_days: 400
+  tempo:
+    title_de: Signalisierte Geschwindigkeiten
+    publisher: Stadt Zürich, Dienstabteilung Verkehr
+    licence: CC0
+    ckan_id: geo_signalisierte_geschwindigkeiten
+    wfs: {service: Signalisierte_Geschwindigkeiten, layer: view_geoserver_tempo_ist}
+    cadence_days: 400
+
+params:
+  station: Zch_Stampfenbachstrasse   # reference station (central, complete series)
+  school_radius_m: 200
+  tempo_radius_m: 25
+  x_from: "2011-01-01 00:00:00"      # Track X hourly series, UTC
+  x_to: "2021-12-31 22:00:00"

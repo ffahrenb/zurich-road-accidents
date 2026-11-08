@@ -1,0 +1,32 @@
+# Reproducible runtime for the whole pipeline: R 4.5.1 + DuckDB + Quarto + sqlfluff.
+# Base image pinned by digest (mutable tags are not trusted).
+FROM docker.io/rocker/geospatial:4.5.1@sha256:3c1eba8663ca573b540486769c665b5c5217035de7477d05e485d738edcfd582
+
+# CRAN snapshot is fixed by the base image (Posit Package Manager, dated snapshot).
+ENV CRAN_SNAPSHOT=https://p3m.dev/cran/__linux__/noble/2025-10-30
+
+# R packages: installed at build time from the dated snapshot -> identical on every machine.
+COPY docker/packages.txt /tmp/packages.txt
+RUN Rscript -e 'options(repos = c(CRAN = Sys.getenv("CRAN_SNAPSHOT"))); \
+      pk <- readLines("/tmp/packages.txt"); pk <- pk[nzchar(pk) & !startsWith(pk, "#")]; \
+      install.packages(pk, Ncpus = 8); \
+      missing <- setdiff(pk, rownames(installed.packages())); \
+      if (length(missing)) stop("not installed: ", paste(missing, collapse = ", "))'
+
+# DuckDB core extensions (spatial, icu) installed at build time; runtime never downloads code.
+ENV DUCKDB_EXTENSION_DIR=/opt/duckdb_extensions
+RUN mkdir -p $DUCKDB_EXTENSION_DIR && Rscript -e ' \
+      con <- DBI::dbConnect(duckdb::duckdb()); \
+      DBI::dbExecute(con, "SET extension_directory = \"/opt/duckdb_extensions\""); \
+      for (e in c("spatial", "icu")) { DBI::dbExecute(con, paste("INSTALL", e)); DBI::dbExecute(con, paste("LOAD", e)) }; \
+      DBI::dbDisconnect(con, shutdown = TRUE)' \
+    && chmod -R a+rX $DUCKDB_EXTENSION_DIR
+
+# SQL linter, pinned, isolated venv.
+RUN apt-get update && apt-get install -y --no-install-recommends python3-venv \
+    && rm -rf /var/lib/apt/lists/* \
+    && python3 -m venv /opt/sqlfluff \
+    && /opt/sqlfluff/bin/pip install --no-cache-dir sqlfluff==3.4.2 \
+    && ln -s /opt/sqlfluff/bin/sqlfluff /usr/local/bin/sqlfluff
+
+WORKDIR /work

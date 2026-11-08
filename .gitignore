@@ -1,0 +1,28 @@
+# --- private / reference material: never commit ---
+upstream/
+ffahrenb-copy/
+private/
+PLAN.md
+*unfaelle*.csv
+
+# --- data & pipeline state (rebuildable) ---
+data/
+_targets/
+*.duckdb
+*.duckdb.wal
+*.rds
+
+# --- site build ---
+site/_site/
+site/_freeze/
+site/.quarto/
+/.quarto/
+
+# --- R / editor ---
+.Rproj.user/
+.Rhistory
+.RData
+renv/library/
+renv/staging/
+renv/local/
+.DS_Store

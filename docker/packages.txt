@@ -1,0 +1,21 @@
+# pipeline
+targets
+tarchetypes
+# data quality
+pointblank
+# modelling
+rsample
+recipes
+parsnip
+workflows
+yardstick
+tune
+ranger
+# visualisation
+ggiraph
+mapgl
+patchwork
+scales
+gt
+# quality of code
+lintr

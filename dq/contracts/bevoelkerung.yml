@@ -1,0 +1,8 @@
+table: raw_bevoelkerung
+quelle: bevoelkerung
+schwere: STOP
+columns:
+  - {name: StichtagDatJahr, not_null: true, between: [1900, 2100]}
+  - {name: QuarSort, not_null: true}
+  - {name: QuarLang, not_null: true}
+  - {name: AnzBestWir, not_null: true, between: [0, 100000]}
