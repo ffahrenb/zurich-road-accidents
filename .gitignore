@@ -26,3 +26,4 @@ renv/library/
 renv/staging/
 renv/local/
 .DS_Store
+.claude/
