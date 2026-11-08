@@ -97,15 +97,40 @@ export_trackx <- function(wx, export_cfg, out_dir = "export/trackx") {
   )
 }
 
+# Private-track checks (source "privat") only run when the private file is mounted. A public-only
+# run (CI) carries the rows of the last private run over from the committed file, marked in
+# `lauf`, so the published scorecard keeps all checks. Carried rows are informational: the DQ
+# gate sees only dq_results, i.e. checks that actually ran.
+lauf_aktuell <- "aktuell"
+lauf_privat <- "letzter privater Lauf"
+
+carry_over_private <- function(dq_results, old) {
+  dq_results$lauf <- lauf_aktuell
+  if (is.null(old) || any(dq_results$quelle == "privat")) return(dq_results)
+  carried <- old[old$quelle == "privat" & !old$check_id %in% dq_results$check_id, , drop = FALSE]
+  if (nrow(carried) == 0) return(dq_results)
+  carried$lauf <- lauf_privat
+  carried <- carried[, names(dq_results), drop = FALSE]
+  # keep the position of the private block: before the first fresh row that followed it before
+  after <- which(match(dq_results$check_id, old$check_id) > min(match(carried$check_id, old$check_id)))
+  at <- if (length(after)) min(after) else nrow(dq_results) + 1
+  rbind(dq_results[seq_len(at - 1), , drop = FALSE], carried,
+        dq_results[seq_len(nrow(dq_results)) >= at, , drop = FALSE])
+}
+
 export_dq <- function(dq_results, manifest, out_dir = "export/dq") {
+  res_file <- file.path(out_dir, "dq_ergebnisse.csv")
+  old <- if (file.exists(res_file)) utils::read.csv(res_file, stringsAsFactors = FALSE) else NULL
+  dq_all <- carry_over_private(dq_results, old)
   hist_file <- file.path(out_dir, "dq_verlauf.csv")
+  # History is append-only per (snapshot, check_id): a public run never drops private-track rows.
   hist <- if (file.exists(hist_file)) utils::read.csv(hist_file, stringsAsFactors = FALSE) else NULL
   cols <- c("run_utc", "snapshot", "check_id", "status", "n_tested", "n_failed")
   hist <- rbind(hist[, cols, drop = FALSE], dq_results[, cols])
   hist <- hist[!duplicated(hist[, c("snapshot", "check_id")], fromLast = TRUE), ]
   pub_manifest <- manifest[, c("source", "file", "bytes", "sha256", "source_modified", "retrieved_utc", "licence")]
   c(
-    write_csv(dq_results, file.path(out_dir, "dq_ergebnisse.csv")),
+    write_csv(dq_all, res_file),
     write_csv(hist, hist_file),
     write_csv(pub_manifest, file.path(out_dir, "manifest.csv"))
   )
