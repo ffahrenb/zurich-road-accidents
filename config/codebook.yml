@@ -1,0 +1,27 @@
+# Machine-readable codebook (DE/EN) for all published columns.
+unfall_id: {de: "Eindeutige Unfall-ID (ASTRA, MISTRA)", en: "Unique accident ID (ASTRA, MISTRA)"}
+jahr: {de: "Unfalljahr", en: "Year of accident"}
+monat: {de: "Unfallmonat (1–12)", en: "Month of accident (1–12)"}
+wochentag: {de: "Wochentag (1 = Montag … 7 = Sonntag)", en: "Weekday (1 = Monday … 7 = Sunday)"}
+stunde: {de: "Stunde (Lokalzeit, 0–23)", en: "Hour (local time, 0–23)"}
+schwere_kurz: {de: "Schwerste Unfallfolge: Sachschaden, Leichtverletzte, Schwerverletzte, Getötete", en: "Most severe outcome: property damage, light injury, severe injury, fatality"}
+personenschaden: {de: "Mindestens eine Person verletzt oder getötet", en: "At least one person injured or killed"}
+typ: {de: "Unfalltyp (Konfliktsituation)", en: "Accident type (conflict situation)"}
+strassenart: {de: "Strassenart", en: "Road type"}
+mit_fussgaenger: {de: "Fussgänger:in beteiligt", en: "Pedestrian involved"}
+mit_velo: {de: "Velo/E-Bike beteiligt", en: "Bicycle/e-bike involved"}
+mit_motorrad: {de: "Motorrad beteiligt", en: "Motorcycle involved"}
+quartier_nr: {de: "Nummer des statistischen Quartiers (räumlich zugeordnet)", en: "Statistical quarter number (spatially joined)"}
+quartier: {de: "Name des statistischen Quartiers", en: "Statistical quarter name"}
+kreis_nr: {de: "Stadtkreis", en: "City district"}
+nahe_schule: {de: "Volksschule im Umkreis von 200 m", en: "Public school within 200 m"}
+tempo_klasse: {de: "Signalisierte Geschwindigkeit des nächsten Strassenabschnitts (≤ 25 m)", en: "Speed limit of nearest road section (≤ 25 m)"}
+lon: {de: "Längengrad WGS84", en: "Longitude WGS84"}
+lat: {de: "Breitengrad WGS84", en: "Latitude WGS84"}
+unfaelle: {de: "Anzahl Unfälle", en: "Number of accidents"}
+mit_personenschaden: {de: "Anzahl Unfälle mit Personenschaden", en: "Number of injury accidents"}
+einwohner: {de: "Wirtschaftliche Wohnbevölkerung am Jahresende", en: "Resident population at year end"}
+personenschaden_pro_1000: {de: "Unfälle mit Personenschaden pro 1000 Einwohner:innen", en: "Injury accidents per 1000 inhabitants"}
+anteil_personenschaden_pct: {de: "Anteil Unfälle mit Personenschaden in %", en: "Share of injury accidents in %"}
+temperatur_c: {de: "Mittlere Lufttemperatur °C (Station Stampfenbachstrasse)", en: "Mean air temperature °C (Stampfenbachstrasse station)"}
+regenstunden: {de: "Stunden mit Niederschlag im Monat", en: "Hours with precipitation in month"}

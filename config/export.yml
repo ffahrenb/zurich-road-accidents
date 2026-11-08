@@ -1,0 +1,49 @@
+# Export allowlist. ONLY what is listed here leaves the warehouse.
+# Every published file is declared with its columns; the privacy gate
+# (tests/testthat/test-privacy.R) fails if a file or column is not listed.
+public:
+  unfaelle:
+    table: mart_unfaelle
+    title_de: Strassenverkehrsunfälle Stadt Zürich, angereichert
+    title_en: Road traffic accidents City of Zurich, enriched
+    formats: [csv, parquet]
+    columns: [unfall_id, jahr, monat, wochentag, stunde, schwere_kurz, personenschaden,
+              typ, strassenart, mit_fussgaenger, mit_velo, mit_motorrad,
+              quartier_nr, quartier, kreis_nr, nahe_schule, tempo_klasse, lon, lat]
+  jahr:
+    table: mart_jahr
+    title_de: Unfälle pro Jahr und Schwere
+    title_en: Accidents per year and severity
+    formats: [csv]
+    columns: [jahr, schwere_kurz, unfaelle, mit_velo, mit_fussgaenger, mit_motorrad]
+  zeitmuster:
+    table: mart_zeitmuster
+    title_de: Unfälle nach Wochentag und Stunde
+    title_en: Accidents by weekday and hour
+    formats: [csv]
+    columns: [wochentag, stunde, unfaelle, mit_personenschaden, mit_velo, mit_fussgaenger]
+  quartier:
+    table: mart_quartier
+    title_de: Unfälle und Rate pro 1000 Einwohner nach Quartier und Jahr
+    title_en: Accidents and rate per 1000 inhabitants by quarter and year
+    formats: [csv]
+    columns: [quartier_nr, quartier, kreis_nr, jahr, einwohner, unfaelle,
+              mit_personenschaden, personenschaden_pro_1000]
+  tempo:
+    table: mart_tempo
+    title_de: Unfälle nach signalisierter Geschwindigkeit
+    title_en: Accidents by speed limit
+    formats: [csv]
+    columns: [tempo_klasse, unfaelle, mit_personenschaden, anteil_personenschaden_pct]
+  wetter_monat:
+    table: mart_wetter_monat
+    title_de: Unfälle und Wetter pro Monat
+    title_en: Accidents and weather per month
+    formats: [csv]
+    columns: [jahr, monat, unfaelle, mit_personenschaden, mit_velo, temperatur_c, regenstunden]
+
+# Files derived from the private exact-date data: model results and coarse
+# aggregates only, minimum cell size enforced.
+trackx:
+  min_cell: 10
+  files: [wetter_effekt.csv, wetter_klassen.csv, wetter_modell.json]
