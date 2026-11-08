@@ -38,6 +38,7 @@ D <- tibble::tribble(
   "Qualität", "dq/dq_ergebnisse.csv", "Alle Datenqualitäts-Prüfungen des letzten Laufs",
   "Qualität", "dq/dq_verlauf.csv", "Verlauf der Prüfergebnisse je Lauf",
   "Qualität", "dq/snapshot_history.csv", "Unfälle je Jahr pro Snapshot (Stabilitätsprüfung)",
+  "Qualität", "dq/jahresbereich.csv", "Veröffentlichter Jahresbereich je Snapshot (Prüfung DQ-S04: nie kleiner als zuvor)",
   "Qualität", "dq/manifest.csv", "Quelldateien mit SHA-256-Prüfsumme",
   "Qualität", "dq/vertrag_unfaelle.html", "Datenvertrag Unfälle (pointblank-Bericht)",
   "Qualität", "dq/vertrag_meteo.html", "Datenvertrag Meteo (pointblank-Bericht)",

@@ -56,13 +56,15 @@ ld <- list(
   citation = "Quelle: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0",
   distribution = dists
 )
+# Quarto variables ({{< var yr_span >}}) for the titles in front matter and _quarto.yml.
+writeLines(sprintf("yr_span: \"%d–%d\"", yrs[1], yrs[2]), file.path(site, "_variables.yml"), useBytes = TRUE)
 writeLines(c('<script type="application/ld+json">', toJSON(ld, auto_unbox = TRUE, pretty = TRUE), "</script>"),
            file.path(site, "_dataset-jsonld.html"), useBytes = TRUE)
 
 # ---- llms.txt ----
 files <- list.files(dst, recursive = TRUE)
 llms <- c(
-  "# Unfälle Zürich – Strassenverkehrsunfälle 2011–2024",
+  sprintf("# Unfälle Zürich – Strassenverkehrsunfälle %d–%d", yrs[1], yrs[2]),
   "",
   sprintf(paste0("> Offene Auswertung von %s Strassenverkehrsunfällen der Stadt Zürich (%d–%d). ",
                  "R+SQL-Pipeline (DuckDB), %d automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, ",

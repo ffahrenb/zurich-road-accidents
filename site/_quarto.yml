@@ -18,7 +18,7 @@ website:
   title: "Unfälle Zürich"
   site-url: "https://ffahrenb.github.io/zurich-road-accidents/"
   repo-url: "https://github.com/ffahrenb/zurich-road-accidents"
-  description: "Strassenverkehrsunfälle der Stadt Zürich 2011–2024 – offene Daten, automatisch geprüfte Datenqualität, nachvollziehbare Methode."
+  description: "Strassenverkehrsunfälle der Stadt Zürich {{< var yr_span >}} – offene Daten, automatisch geprüfte Datenqualität, nachvollziehbare Methode."
   back-to-top-navigation: false
   page-footer:
     border: false

@@ -15,6 +15,15 @@ rd <- function(p) {
   suppressMessages(read_csv(file.path(export_dir, p), show_col_types = FALSE, progress = FALSE,
                             locale = locale(encoding = "UTF-8")))
 }
+# ---------- published year range, derived from the export (never hardcode years in page text) ----------
+yr_all <- rd("data/jahr.csv")$jahr
+yr_from <- min(yr_all)
+yr_to <- max(yr_all)
+yr_span <- sprintf("%d–%d", yr_from, yr_to)
+yr_span_bis <- sprintf("%d bis %d", yr_from, yr_to)
+yr_q <- sprintf("2015–%d", yr_to)        # quarter rates start 2015 (structural break), end with the range
+yr_q_bis <- sprintf("2015 bis %d", yr_to)
+col_faelle_q <- paste("Unfälle mit Personenschaden", yr_q)
 site_url <- "https://ffahrenb.github.io/zurich-road-accidents/"
 repo_url <- "https://github.com/ffahrenb/zurich-road-accidents"
 

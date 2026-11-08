@@ -1,5 +1,5 @@
 ---
-title: "Road accidents in Zurich 2011–2024"
+title: "Road accidents in Zurich {{< var yr_span >}}"
 subtitle: "English summary. The full site is in German; all data files and the data catalogue are bilingual."
 lang: en
 pagetitle: "Zurich road accidents – English summary"
@@ -25,10 +25,10 @@ en <- function(x) gsub("’", ",", x)
 
 ```{r}
 tiles(
-  tile(en(fi(tot)), "accidents 2011–2024", "road traffic accidents in the City of Zurich"),
+  tile(en(fi(tot)), paste("accidents", yr_span), "road traffic accidents in the City of Zurich"),
   tile(en(fi(inj)), "with injured or killed", sprintf("%s %% of all accidents", fdec(100 * inj / tot, 1))),
   tile(fatal, "fatal accidents", "at least one person killed"),
-  tile(n_chk, "automated checks", sprintf("%d violated STOP checks, %d warning", 0, n_warn))
+  tile(n_chk, "automated checks", sprintf("%d violated STOP checks, %d %s", 0, n_warn, if (n_warn == 1) "warning" else "warnings"))
 )
 ```
 
@@ -37,7 +37,7 @@ This site turns the open road-accident data of the City of Zurich and the Swiss 
 ## Key findings
 
 ::: {.findings-en}
-- **Data quality is a release condition.** `r n_chk` automated checks (`r n_stop` with STOP effect, which would abort the pipeline) ran on the latest snapshot; none is violated. One warning remains visible on purpose: the **structural break of 2015**. The number of recorded accidents jumps by +`r ch("n", 2015)` % that year, while accidents with injuries rise by only +`r ch("i", 2015)` % and property-damage-only accidents by +`r ch("s", 2015)` %. This reflects a change in recording practice, not a real increase on the roads. Time series across 2015 must be read with that caveat. [German page: Datenqualität](../datenqualitaet.qmd)
+- **Data quality is a release condition.** `r n_chk` automated checks (`r n_stop` with STOP effect, which would abort the pipeline) ran on the latest snapshot; none is violated. `r if (n_warn == 1) "One warning remains" else "Warnings remain"` visible on purpose: the **structural break of 2015**`r if (n_warn == 1) "" else " is one of them"`. The number of recorded accidents jumps by +`r ch("n", 2015)` % that year, while accidents with injuries rise by only +`r ch("i", 2015)` % and property-damage-only accidents by +`r ch("s", 2015)` %. This reflects a change in recording practice, not a real increase on the roads. Time series across 2015 must be read with that caveat. [German page: Datenqualität](../datenqualitaet.qmd)
 - **Detect, repair, verify.** Errors are never silently corrected: a check finds them (e.g. 9 invalid geometries, 40 impossible weather readings), a documented repair in the staging layer fixes them (`ST_MakeValid`; setting impossible values to NULL), and a second STOP check on the cleaned data proves the repair worked.
 - **When.** On weekdays accidents peak in the morning and late afternoon commute; after midnight there are fewer accidents but a larger share involves injuries. [Wann](../wann.qmd)
 - **Weather.** In rain there are about **+`r round(100 * (ra$irr - 1))` % more accidents per hour** (95 % CI +`r round(100 * (ra$ci_low - 1))` % to +`r round(100 * (ra$ci_high - 1))` %), +`r round(100 * (ri$irr - 1))` % for accidents with injuries, at the same time of day, season and temperature (negative-binomial model, incident rate ratios). For bicycle accidents there is no detectable rain effect (IRR `r fdec(rv$irr, 2)`, CI includes 1). Warmth goes with many more bicycle accidents. This is per hour, not per trip: exposure (traffic volume) is unknown. [Wetter](../wetter.qmd)

@@ -38,8 +38,8 @@ plot_heat <- function(v) {
 }
 chart(plot_heat,
   headline = sprintf("Werktags häufen sich die Unfälle am Morgen um %d Uhr und am Nachmittag um %d Uhr.", h_morgen, h_abend),
-  alt = sprintf("Heatmap der Unfälle nach Wochentag und Stunde, 2011 bis 2024. Dunkle Felder bei Werktagen um %d Uhr und %d Uhr, am Wochenende weniger Unfälle und später am Tag.", h_morgen, h_abend),
-  caption = "Anzahl Unfälle 2011–2024, summiert über alle Jahre. Dunkler = mehr Unfälle. Fahrten und Verkehrsmenge pro Stunde sind nicht bekannt, die Zahlen zeigen also nicht das Risiko pro Fahrt.",
+  alt = sprintf("Heatmap der Unfälle nach Wochentag und Stunde, %s. Dunkle Felder bei Werktagen um %d Uhr und %d Uhr, am Wochenende weniger Unfälle und später am Tag.", yr_span_bis, h_morgen, h_abend),
+  caption = paste0("Anzahl Unfälle ", yr_span, ", summiert über alle Jahre. Dunkler = mehr Unfälle. Fahrten und Verkehrsmenge pro Stunde sind nicht bekannt, die Zahlen zeigen also nicht das Risiko pro Fahrt."),
   tbl = html_table(zm |> mutate(Wochentag = WT[wochentag]) |>
                      select(Wochentag, Stunde = stunde, Unfälle = unfaelle, `mit Personenschaden` = mit_personenschaden), label = "Unfälle nach Wochentag und Stunde"),
   h = 3.6)
@@ -74,7 +74,7 @@ plot_hs <- function(v) {
 chart(plot_hs,
   headline = sprintf("In den Stunden nach Mitternacht (0–4 Uhr) enden %s der Unfälle mit Verletzten, tagsüber (8–19 Uhr) %s.", fp(h_night), fp(h_day)),
   alt = sprintf("Liniendiagramm: Anteil der Unfälle mit Personenschaden je Stunde. Höchster Wert um %d Uhr, tiefster um %d Uhr.", h_hi, h_lo),
-  caption = "Anteil der Unfälle, bei denen mindestens eine Person verletzt oder getötet wurde, je Stunde des Tages, 2011–2024. Nachts gibt es wenige Unfälle, die Werte schwanken daher stärker.",
+  caption = paste0("Anteil der Unfälle, bei denen mindestens eine Person verletzt oder getötet wurde, je Stunde des Tages, ", yr_span, ". Nachts gibt es wenige Unfälle, die Werte schwanken daher stärker."),
   tbl = html_table(hs |> select(Stunde = stunde, Unfälle = n, `mit Personenschaden` = inj, `Anteil %` = anteil), label = "Anteil mit Personenschaden je Stunde"),
   h = 3.4)
 ```
@@ -107,7 +107,7 @@ plot_js <- function(v) {
     geom_point_interactive(aes(tooltip = tip, data_id = paste(schwere, jahr)), size = 1.8) +
     facet_wrap(~schwere, scales = "free_y", ncol = 2) +
     scale_colour_manual(values = pal) +
-    scale_x_continuous(breaks = c(2011, 2015, 2019, 2023)) +
+    scale_x_continuous(breaks = seq(yr_from, yr_to, 4)) +
     scale_y_continuous(limits = c(0, NA), labels = label_number(big.mark = "’")) +
     labs(x = NULL, y = "Unfälle pro Jahr") +
     theme_zh(v)
@@ -115,7 +115,7 @@ plot_js <- function(v) {
 chart(plot_js,
   headline = sprintf("Der Sprung 2015 steckt fast nur im Sachschaden (%s %%); Unfälle mit Verletzten stiegen um %s %%.",
                      paste0("+", round(sach_ch)), paste0("+", round(inj_ch))),
-  alt = "Vier Liniendiagramme mit eigener Skala: Unfälle pro Jahr nach Schwere, 2011 bis 2024. Sachschaden springt 2015 deutlich nach oben, Leichtverletzte, Schwerverletzte und Getötete bewegen sich ruhig.",
+  alt = paste0("Vier Liniendiagramme mit eigener Skala: Unfälle pro Jahr nach Schwere, ", yr_span_bis, ". Sachschaden springt 2015 deutlich nach oben, Leichtverletzte, Schwerverletzte und Getötete bewegen sich ruhig."),
   caption = "Unfälle pro Jahr nach schwerster Folge. Jede Teilgrafik hat ihre eigene Skala. Gestrichelte Linie: 2015, Änderung der Erfassungspraxis (Prüfung DQ-U07, siehe Datenqualität).",
   tbl = html_table(jr |> rename(Jahr = jahr), label = "Unfälle pro Jahr nach Schwere"),
   h = 4.6)
@@ -134,7 +134,7 @@ md <- jahr |> group_by(jahr) |>
   pivot_longer(-jahr, names_to = "modus", values_to = "n") |>
   mutate(modus = factor(modus, levels = c("Velo", "Fussgänger", "Motorrad")),
          tip = sprintf("%d, Unfälle mit %s: %s", jahr, modus, fi(n)))
-v11 <- md$n[md$modus == "Velo" & md$jahr == 2011]; v24 <- md$n[md$modus == "Velo" & md$jahr == max(md$jahr)]
+v11 <- md$n[md$modus == "Velo" & md$jahr == yr_from]; v24 <- md$n[md$modus == "Velo" & md$jahr == yr_to]
 ```
 
 ```{r}
@@ -148,15 +148,15 @@ plot_md <- function(v) {
     geom_point_interactive(aes(tooltip = tip, data_id = paste(modus, jahr)), size = 1.8) +
     geom_text(data = lab, aes(label = modus), hjust = 0, nudge_x = 0.35, size = 3.4, show.legend = FALSE) +
     scale_colour_manual(values = pal) +
-    scale_x_continuous(breaks = c(2011, 2015, 2019, 2023), expand = expansion(mult = c(0.02, 0.2))) +
+    scale_x_continuous(breaks = seq(yr_from, yr_to, 4), expand = expansion(mult = c(0.02, 0.2))) +
     scale_y_continuous(limits = c(0, NA), labels = label_number(big.mark = "’")) +
     labs(x = NULL, y = "Unfälle mit Beteiligung") +
     theme_zh(v)
 }
 chart(plot_md,
-  headline = sprintf("Unfälle mit Velo-Beteiligung haben sich von %s (2011) auf %s (%d) verdoppelt; Fussgänger- und Motorradunfälle blieben ähnlich.",
-                     fi(v11), fi(v24), max(md$jahr)),
-  alt = "Liniendiagramm: Unfälle mit Beteiligung von Velo, Fussgängern und Motorrädern pro Jahr, 2011 bis 2024. Die Velo-Linie steigt deutlich, die anderen beiden bleiben ungefähr flach.",
+  headline = sprintf("Unfälle mit Velo-Beteiligung haben sich von %s (%d) auf %s (%d) verdoppelt; Fussgänger- und Motorradunfälle blieben ähnlich.",
+                     fi(v11), yr_from, fi(v24), yr_to),
+  alt = paste0("Liniendiagramm: Unfälle mit Beteiligung von Velo, Fussgängern und Motorrädern pro Jahr, ", yr_span_bis, ". Die Velo-Linie steigt deutlich, die anderen beiden bleiben ungefähr flach."),
   caption = "Ein Unfall kann mehrere Gruppen betreffen und zählt dann mehrfach. Die Zunahme bei Velos spiegelt auch mehr Velo- und E-Bike-Verkehr und die Erfassungsänderung 2015; die gefahrenen Kilometer sind nicht bekannt, ein Risiko lässt sich daraus nicht berechnen.",
   tbl = html_table(md |> select(Jahr = jahr, Gruppe = modus, Unfälle = n), label = "Unfälle mit Beteiligung nach Gruppe und Jahr"),
   h = 3.6)

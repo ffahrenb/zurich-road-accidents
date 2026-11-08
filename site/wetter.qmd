@@ -155,12 +155,12 @@ plot_wz <- function(v) {
     geom_point_interactive(aes(tooltip = tip, data_id = paste(panel, t)), size = 1.1) +
     facet_wrap(~panel, ncol = 1, scales = "free_y") +
     scale_colour_manual(values = setNames(v$cat[c(2, 1)], levels(wl$panel))) +
-    scale_x_continuous(breaks = seq(2011, 2024, 3)) +
+    scale_x_continuous(breaks = seq(yr_from, yr_to, 3)) +
     labs(x = NULL, y = NULL) + theme_zh(v) + theme(legend.position = "none")
 }
 chart(plot_wz,
   headline = "Temperatur und Unfälle mit Verletzten schwingen im Jahresrhythmus mit, die Unfälle etwas flacher.",
-  alt = "Zwei übereinander stehende Liniendiagramme mit eigener Skala: oben die mittlere Monatstemperatur 2011 bis 2024 mit klarem Sommer-Winter-Muster, unten die monatlichen Unfälle mit Personenschaden mit schwächerem Muster.",
+  alt = paste0("Zwei übereinander stehende Liniendiagramme mit eigener Skala: oben die mittlere Monatstemperatur ", yr_span_bis, " mit klarem Sommer-Winter-Muster, unten die monatlichen Unfälle mit Personenschaden mit schwächerem Muster."),
   caption = "Oben die mittlere Monatstemperatur, unten die Unfälle mit Personenschaden pro Monat. Zwei getrennte Felder statt einer Grafik mit zwei Skalen, damit nichts durch die Wahl der Achsen suggeriert wird.",
   tbl = html_table(w |> transmute(Jahr = jahr, Monat = monat, `Temperatur °C` = temperatur_c, Regenstunden = regenstunden, `Unfälle mit Personenschaden` = mit_personenschaden, `Unfälle mit Velo` = mit_velo), digits = 1, tall = TRUE, label = "Monatswerte"),
   h = 4.2)
@@ -190,7 +190,7 @@ plot_ws <- function(v) {
 chart(plot_ws,
   headline = sprintf("Pro 10 °C wärmer: rund %s Velo-Unfälle und %s Unfälle mit Personenschaden mehr pro Monat.", round(10 * fit_v), round(10 * fit_i)),
   alt = "Streudiagramm: Monatstemperatur gegen Unfälle pro Monat, für Unfälle mit Personenschaden und für Velo-Unfälle, mit Trendgerade. Beide Punktwolken steigen mit der Temperatur, die Velo-Wolke steiler im Verhältnis.",
-  caption = sprintf("Jeder Punkt ist ein Monat 2011–2024 (n = %d). Gerade: lineare Anpassung. Korrelation Temperatur und Unfälle mit Personenschaden: r = %s. Reine Monatswerte, nicht um die Erfassungsänderung 2015 bereinigt; für Unfälle mit Personenschaden ist sie klein.", nrow(wm), fdec(cor_inj, 2)),
+  caption = sprintf("Jeder Punkt ist ein Monat %s (n = %d). Gerade: lineare Anpassung. Korrelation Temperatur und Unfälle mit Personenschaden: r = %s. Reine Monatswerte, nicht um die Erfassungsänderung 2015 bereinigt; für Unfälle mit Personenschaden ist sie klein.", yr_span, nrow(wm), fdec(cor_inj, 2)),
   tbl = html_table(w |> transmute(Monat = mon, `Temperatur °C` = temperatur_c, `Unfälle mit Personenschaden` = mit_personenschaden, `Unfälle mit Velo` = mit_velo), digits = 1, tall = TRUE, label = "Monatswerte"),
   h = 3.8)
 ```
