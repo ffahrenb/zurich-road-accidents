@@ -6,7 +6,7 @@ public:
     table: mart_unfaelle
     title_de: Strassenverkehrsunfälle Stadt Zürich, angereichert
     title_en: Road traffic accidents City of Zurich, enriched
-    formats: [csv, parquet]
+    formats: [parquet]   # no CSV: pre-commit hook blocks *unfaelle*.csv by name (privacy guard)
     columns: [unfall_id, jahr, monat, wochentag, stunde, schwere_kurz, personenschaden,
               typ, strassenart, mit_fussgaenger, mit_velo, mit_motorrad,
               quartier_nr, quartier, kreis_nr, nahe_schule, tempo_klasse, lon, lat]
