@@ -1,0 +1,40 @@
+"modell","split","kandidat","penalty","mixture","mtry","min_n","tree_depth","learn_rate","loss_reduction","sample_size","brier_cv","log_loss_cv","n_resamples","gewaehlt"
+"Elastic Net","zeitlich","pre0_mod01_post0",0,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod02_post0",0,0.5,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod03_post0",0,1,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod04_post0",0,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod05_post0",0,0.5,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod06_post0",0,1,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod07_post0",0,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod08_post0",0,0.5,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod09_post0",0,1,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod10_post0",0,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod11_post0",0,0.5,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod12_post0",0,1,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod13_post0",2e-04,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod14_post0",2e-04,0.5,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod15_post0",2e-04,1,,,,,,,0.0931,0.3084,4,FALSE
+"Elastic Net","zeitlich","pre0_mod16_post0",6e-04,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod17_post0",6e-04,0.5,,,,,,,0.093,0.3082,4,FALSE
+"Elastic Net","zeitlich","pre0_mod18_post0",6e-04,1,,,,,,,0.093,0.3081,4,FALSE
+"Elastic Net","zeitlich","pre0_mod19_post0",0.0022,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod20_post0",0.0022,0.5,,,,,,,0.0929,0.3079,4,FALSE
+"Elastic Net","zeitlich","pre0_mod21_post0",0.0022,1,,,,,,,0.0928,0.3077,4,FALSE
+"Elastic Net","zeitlich","pre0_mod22_post0",0.0077,0,,,,,,,0.0935,0.312,4,FALSE
+"Elastic Net","zeitlich","pre0_mod23_post0",0.0077,0.5,,,,,,,0.0927,0.3089,4,FALSE
+"Elastic Net","zeitlich","pre0_mod24_post0",0.0077,1,,,,,,,0.0926,0.3098,4,TRUE
+"Elastic Net","zeitlich","pre0_mod25_post0",0.0278,0,,,,,,,0.094,0.3147,4,FALSE
+"Elastic Net","zeitlich","pre0_mod26_post0",0.0278,0.5,,,,,,,0.0941,0.3203,4,FALSE
+"Elastic Net","zeitlich","pre0_mod27_post0",0.0278,1,,,,,,,0.0959,0.3299,4,FALSE
+"Elastic Net","zeitlich","pre0_mod28_post0",0.1,0,,,,,,,0.101,0.3408,4,FALSE
+"Elastic Net","zeitlich","pre0_mod29_post0",0.1,0.5,,,,,,,0.1115,0.3799,4,FALSE
+"Elastic Net","zeitlich","pre0_mod30_post0",0.1,1,,,,,,,0.1292,0.4272,4,FALSE
+"Random Forest","zeitlich","pre0_mod03_post0",,,5,144,,,,,0.0851,0.2821,4,TRUE
+"Random Forest","zeitlich","pre0_mod05_post0",,,7,104,,,,,0.0852,0.2833,4,FALSE
+"Random Forest","zeitlich","pre0_mod08_post0",,,10,113,,,,,0.0855,0.2856,4,FALSE
+"XGBoost","zeitlich","pre0_mod01_post0",,,0.3081,25,6,0.0844,0.2787,0.947,0.0854,0.284,4,TRUE
+"XGBoost","zeitlich","pre0_mod06_post0",,,0.7087,49,6,0.1583,3.7821,0.83,0.0857,0.2848,4,FALSE
+"XGBoost","zeitlich","pre0_mod08_post0",,,0.8554,6,3,0.0312,5e-04,0.7642,0.0855,0.2846,4,FALSE
+"XGBoost","zeitlich","pre0_mod09_post0",,,0.919,19,4,0.0477,0.7939,0.6613,0.0855,0.2848,4,FALSE
+"XGBoost","zeitlich","pre0_mod10_post0",,,0.944,38,5,0.0651,0.0132,0.8576,0.0858,0.2852,4,FALSE
+"Random Forest","zufaellig","pre0_mod03_post0",,,5,144,,,,,0.0899,0.2949,5,TRUE
