@@ -49,8 +49,7 @@ Jeder Punkt ist ein Unfall mit seiner Koordinate aus der offenen Quelle. Die Kar
 ```{r}
 tags$div(class = "map-wrap", id = "zmap", role = "region",
   `aria-label` = "Interaktive Karte der Strassenverkehrsunfälle in Zürich. Als Alternative steht unterhalb eine Tabelle der Quartier-Raten.",
-  maplibre(style = carto_style("positron"), center = c(8.5417, 47.3769), zoom = 11.3, height = "100%") |>
-    add_navigation_control(show_compass = FALSE, position = "top-right"))
+  maplibre(style = carto_style("positron"), center = c(8.5417, 47.3769), zoom = 11.3, height = "100%"))
 ```
 
 ```{=html}

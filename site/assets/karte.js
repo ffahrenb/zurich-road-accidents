@@ -81,9 +81,9 @@
       layout: { visibility: state.qrt ? 'visible' : 'none' } });
     var heatColor = ['interpolate', ['linear'], ['heatmap-density'], 0, P.heat[0], 0.1, P.heat[1], 0.3, P.heat[2], 0.5, P.heat[3], 0.75, P.heat[4], 1, P.heat[5]];
     map.addLayer({ id: 'heat', type: 'heatmap', source: 'unf', maxzoom: 17,
-      paint: { 'heatmap-weight': 1,
-        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 10, 0.5, 15, 2.2],
-        'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 3, 13, 10, 16, 26],
+      paint: { 'heatmap-weight': 0.06,
+        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 10, 0.6, 13, 1, 16, 2.5],
+        'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 10, 4, 13, 9, 16, 20],
         'heatmap-color': heatColor,
         'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 14, 0.9, 16.5, 0.15] } });
     map.addLayer({ id: 'pts', type: 'circle', source: 'unf',
@@ -102,7 +102,9 @@
     var heatOn = state.view === 'heat';
     map.setLayoutProperty('heat', 'visibility', heatOn ? 'visible' : 'none');
     map.setLayoutProperty('pts', 'visibility', 'visible');
-    map.setPaintProperty('pts', 'circle-opacity', heatOn ? ['interpolate', ['linear'], ['zoom'], 13.5, 0, 15, 0.9] : 0.9);
+    var ptsOpacity = heatOn ? ['interpolate', ['linear'], ['zoom'], 13.5, 0, 15, 0.9] : 0.9;
+    map.setPaintProperty('pts', 'circle-opacity', ptsOpacity);
+    map.setPaintProperty('pts', 'circle-stroke-opacity', ptsOpacity);
     var vis = state.qrt ? 'visible' : 'none';
     map.setLayoutProperty('qrt-fill', 'visibility', vis); map.setLayoutProperty('qrt-line', 'visibility', vis);
     count(); legend();
@@ -160,18 +162,19 @@
   function start(widgetEl) {
     map = widgetEl.map;
     var init = function () {
+      if (!map.__znav) { map.addControl(new maplibregl.NavigationControl({ showCompass: false }), 'top-right'); map.__znav = true; }
       addAll(); interactions(); wire();
       new MutationObserver(function () {
         var want = pal().style;
         if (map.__zstyle === want) return;
         map.__zstyle = want;
-        map.setStyle(want);
         map.once('style.load', addAll);
+        map.setStyle(want, { diff: false });
       }).observe(document.body, { attributes: true, attributeFilter: ['class'] });
     };
     // switch to the dark basemap right away when the theme is dark
     var want = pal().style; map.__zstyle = want;
-    var go = function () { if (isDark()) { map.setStyle(want); map.once('style.load', init); } else init(); };
+    var go = function () { if (isDark()) { map.once('style.load', init); map.setStyle(want, { diff: false }); } else init(); };
     if (map.loaded()) go(); else map.once('load', go);
   }
 
