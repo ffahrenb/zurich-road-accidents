@@ -1,5 +1,5 @@
-# Export of the severity ladder (the old schwere_*.csv stay until the site page is switched over).
-# Schemas are frozen; tests/testthat/test-models-export.R lists them again, independently.
+# Export of the severity ladder.
+# Schemas are frozen; tests/testthat/test-models-ladder.R lists them again, independently.
 ladder_schema <- list(
   schwere_vergleich = c("modell", "stufe", "split", "auswertung", "metrik", "wert", "ki_low", "ki_high", "n"),
   schwere_differenzen = c("modell", "referenz", "split", "auswertung", "metrik", "differenz", "ki_low", "ki_high"),
