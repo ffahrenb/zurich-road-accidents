@@ -16,17 +16,10 @@ export_public <- function(db_path, export_cfg, out_dir = "export/data") {
       files <- c(files, path)
     }
   }
-  # Map layers (WGS84, rounded to ~1 m).
+  # Map layer (WGS84, 5 decimals = ~1 m). Compact on purpose: one MultiPoint feature per distinct
+  # (j, s, v, f, m) combination instead of 66k single-point features, no ids, no whitespace.
   pts <- file.path(out_dir, "unfaelle_punkte.geojson")
-  DBI::dbExecute(con, sprintf("
-    COPY (
-      SELECT jahr AS j,
-             CASE schwere_kurz WHEN 'Sachschaden' THEN 0 WHEN 'Leichtverletzte' THEN 1
-                               WHEN 'Schwerverletzte' THEN 2 ELSE 3 END AS s,
-             mit_velo::INT AS v, mit_fussgaenger::INT AS f, mit_motorrad::INT AS m,
-             st_point(round(lon, 5), round(lat, 5)) AS geom
-      FROM mart_unfaelle
-    ) TO '%s' WITH (FORMAT gdal, DRIVER 'GeoJSON', LAYER_CREATION_OPTIONS 'COORDINATE_PRECISION=5')", pts))
+  write_point_geojson(con, pts)
   qrt <- file.path(out_dir, "quartiere.geojson")
   DBI::dbExecute(con, sprintf("
     COPY (
@@ -39,6 +32,26 @@ export_public <- function(db_path, export_cfg, out_dir = "export/data") {
       GROUP BY ALL
     ) TO '%s' WITH (FORMAT gdal, DRIVER 'GeoJSON', LAYER_CREATION_OPTIONS 'COORDINATE_PRECISION=5')", qrt))
   c(files, pts, qrt)
+}
+
+write_point_geojson <- function(con, path) {
+  groups <- DBI::dbGetQuery(con, "
+    SELECT jahr AS j,
+           CASE schwere_kurz WHEN 'Sachschaden' THEN 0 WHEN 'Leichtverletzte' THEN 1
+                             WHEN 'Schwerverletzte' THEN 2 ELSE 3 END AS s,
+           mit_velo::INT AS v, mit_fussgaenger::INT AS f, mit_motorrad::INT AS m,
+           string_agg(printf('[%.5f,%.5f]', lon, lat), ',' ORDER BY lon, lat) AS coords
+    FROM mart_unfaelle
+    GROUP BY ALL
+    ORDER BY ALL")
+  features <- sprintf(
+    paste0('{"type":"Feature","properties":{"j":%d,"s":%d,"v":%d,"f":%d,"m":%d},',
+           '"geometry":{"type":"MultiPoint","coordinates":[%s]}}'),
+    groups$j, groups$s, groups$v, groups$f, groups$m, groups$coords)
+  writeLines(c('{"type":"FeatureCollection","features":[',
+               paste0(features, c(rep(",", length(features) - 1), "")), "]}"),
+             path, useBytes = TRUE)
+  path
 }
 
 write_csv <- function(x, path) {
@@ -72,12 +85,15 @@ export_trackx <- function(wx, export_cfg, out_dir = "export/trackx") {
     zeitraum = paste(wx$period, collapse = "–"),
     n_stunden = wx$n_hours,
     referenzstation = "Zch_Stampfenbachstrasse",
-    datenschutz = sprintf("Nur Modellkoeffizienten und Klassen mit mindestens %d Fällen; keine Einzeldaten, keine Datumsangaben.", k)
+    datenschutz = sprintf(
+      "Nur Modellkoeffizienten und Klassen mit mindestens %d Fällen; keine Einzeldaten, keine Datumsangaben.", k)
   )
+  meta_path <- file.path(out_dir, "wetter_modell.json")
+  jsonlite::write_json(meta, meta_path, auto_unbox = TRUE, pretty = TRUE)
   c(
     write_csv(wx$irr, file.path(out_dir, "wetter_effekt.csv")),
     write_csv(bins, file.path(out_dir, "wetter_klassen.csv")),
-    { p <- file.path(out_dir, "wetter_modell.json"); jsonlite::write_json(meta, p, auto_unbox = TRUE, pretty = TRUE); p }
+    meta_path
   )
 }
 
