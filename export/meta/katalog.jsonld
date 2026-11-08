@@ -1,0 +1,801 @@
+{
+  "@context": {
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "schema": "http://schema.org/"
+  },
+  "@type": "dcat:Catalog",
+  "dct:title": [
+    {
+      "@value": "Strassenverkehrsunfälle Zürich – Datenkatalog",
+      "@language": "de"
+    },
+    {
+      "@value": "Zurich road accidents – data catalogue",
+      "@language": "en"
+    }
+  ],
+  "dct:publisher": {
+    "@type": "foaf:Agent",
+    "foaf:name": "Florian Fahrenbach"
+  },
+  "dcat:dataset": [
+    {
+      "@type": "dcat:Dataset",
+      "dct:identifier": "zurich-road-accidents-unfaelle@ffahrenb",
+      "dct:title": [
+        {
+          "@value": "Strassenverkehrsunfälle Stadt Zürich, angereichert",
+          "@language": "de"
+        },
+        {
+          "@value": "Road traffic accidents City of Zurich, enriched",
+          "@language": "en"
+        }
+      ],
+      "dct:description": [
+        {
+          "@value": "Strassenverkehrsunfälle Stadt Zürich, angereichert. Abgeleitet aus offenen Daten der Stadt Zürich und des ASTRA; automatisch erzeugt und qualitätsgeprüft (19 Spalten, siehe Datenwörterbuch).",
+          "@language": "de"
+        },
+        {
+          "@value": "Road traffic accidents City of Zurich, enriched. Derived from open data of the City of Zurich and FEDRO; generated automatically and quality-checked.",
+          "@language": "en"
+        }
+      ],
+      "dct:publisher": {
+        "@type": "foaf:Agent",
+        "foaf:name": "Florian Fahrenbach"
+      },
+      "dcat:contactPoint": {
+        "@type": "vcard:Organization",
+        "vcard:fn": "Florian Fahrenbach",
+        "vcard:hasURL": {
+          "@id": "https://github.com/ffahrenb/zurich-road-accidents/issues"
+        }
+      },
+      "dcat:theme": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/TRAN"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@value": "Verkehrsunfall",
+          "@language": "de"
+        },
+        {
+          "@value": "Verkehrssicherheit",
+          "@language": "de"
+        },
+        {
+          "@value": "road safety",
+          "@language": "en"
+        }
+      ],
+      "dct:accessRights": {
+        "@id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "dct:spatial": {
+        "@id": "https://ld.geo.admin.ch/boundaries/municipality/261"
+      },
+      "dct:temporal": {
+        "@type": "dct:PeriodOfTime",
+        "dcat:startDate": "2011-01-01",
+        "dcat:endDate": "2024-12-31"
+      },
+      "dct:accrualPeriodicity": {
+        "@id": "http://publications.europa.eu/resource/authority/frequency/ANNUAL"
+      },
+      "dct:issued": "2026-11-08T11:14:39Z",
+      "dct:modified": "2026-11-08T11:14:39Z",
+      "prov:wasDerivedFrom": [
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/sid_dav_strassenverkehrsunfallorte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_meteodaten_stundenmittelwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_luftschadstoffmessung_stundenwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_od3240"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_statistische_quartiere"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_schulanlagen"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_signalisierte_geschwindigkeiten"
+        }
+      ],
+      "dcat:landingPage": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/"
+      },
+      "foaf:page": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv"
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:identifier": "unfaelle.parquet",
+          "dct:title": [
+            {
+              "@value": "Strassenverkehrsunfälle Stadt Zürich, angereichert PARQUET",
+              "@language": "de"
+            }
+          ],
+          "dcat:accessURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/daten.html"
+          },
+          "dcat:downloadURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/data/unfaelle.parquet"
+          },
+          "dct:format": {
+            "@id": "http://publications.europa.eu/resource/authority/file-type/PARQUET"
+          },
+          "dcat:mediaType": {
+            "@id": "https://www.iana.org/assignments/media-types/application/vnd.apache.parquet"
+          },
+          "dcat:byteSize": 1601212,
+          "dct:license": {
+            "@id": "http://dcat-ap.ch/vocabulary/licenses/terms_by"
+          },
+          "dct:issued": "2026-11-08T11:14:39Z",
+          "dct:modified": "2026-11-08T11:14:39Z"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "dct:identifier": "zurich-road-accidents-jahr@ffahrenb",
+      "dct:title": [
+        {
+          "@value": "Unfälle pro Jahr und Schwere",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents per year and severity",
+          "@language": "en"
+        }
+      ],
+      "dct:description": [
+        {
+          "@value": "Unfälle pro Jahr und Schwere. Abgeleitet aus offenen Daten der Stadt Zürich und des ASTRA; automatisch erzeugt und qualitätsgeprüft (6 Spalten, siehe Datenwörterbuch).",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents per year and severity. Derived from open data of the City of Zurich and FEDRO; generated automatically and quality-checked.",
+          "@language": "en"
+        }
+      ],
+      "dct:publisher": {
+        "@type": "foaf:Agent",
+        "foaf:name": "Florian Fahrenbach"
+      },
+      "dcat:contactPoint": {
+        "@type": "vcard:Organization",
+        "vcard:fn": "Florian Fahrenbach",
+        "vcard:hasURL": {
+          "@id": "https://github.com/ffahrenb/zurich-road-accidents/issues"
+        }
+      },
+      "dcat:theme": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/TRAN"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@value": "Verkehrsunfall",
+          "@language": "de"
+        },
+        {
+          "@value": "Verkehrssicherheit",
+          "@language": "de"
+        },
+        {
+          "@value": "road safety",
+          "@language": "en"
+        }
+      ],
+      "dct:accessRights": {
+        "@id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "dct:spatial": {
+        "@id": "https://ld.geo.admin.ch/boundaries/municipality/261"
+      },
+      "dct:temporal": {
+        "@type": "dct:PeriodOfTime",
+        "dcat:startDate": "2011-01-01",
+        "dcat:endDate": "2024-12-31"
+      },
+      "dct:accrualPeriodicity": {
+        "@id": "http://publications.europa.eu/resource/authority/frequency/ANNUAL"
+      },
+      "dct:issued": "2026-11-08T11:14:39Z",
+      "dct:modified": "2026-11-08T11:14:39Z",
+      "prov:wasDerivedFrom": [
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/sid_dav_strassenverkehrsunfallorte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_meteodaten_stundenmittelwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_luftschadstoffmessung_stundenwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_od3240"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_statistische_quartiere"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_schulanlagen"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_signalisierte_geschwindigkeiten"
+        }
+      ],
+      "dcat:landingPage": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/"
+      },
+      "foaf:page": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv"
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:identifier": "jahr.csv",
+          "dct:title": [
+            {
+              "@value": "Unfälle pro Jahr und Schwere CSV",
+              "@language": "de"
+            }
+          ],
+          "dcat:accessURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/daten.html"
+          },
+          "dcat:downloadURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/data/jahr.csv"
+          },
+          "dct:format": {
+            "@id": "http://publications.europa.eu/resource/authority/file-type/CSV"
+          },
+          "dcat:mediaType": {
+            "@id": "https://www.iana.org/assignments/media-types/text/csv"
+          },
+          "dcat:byteSize": 1843,
+          "dct:license": {
+            "@id": "http://dcat-ap.ch/vocabulary/licenses/terms_by"
+          },
+          "dct:issued": "2026-11-08T11:14:39Z",
+          "dct:modified": "2026-11-08T11:14:39Z"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "dct:identifier": "zurich-road-accidents-zeitmuster@ffahrenb",
+      "dct:title": [
+        {
+          "@value": "Unfälle nach Wochentag und Stunde",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents by weekday and hour",
+          "@language": "en"
+        }
+      ],
+      "dct:description": [
+        {
+          "@value": "Unfälle nach Wochentag und Stunde. Abgeleitet aus offenen Daten der Stadt Zürich und des ASTRA; automatisch erzeugt und qualitätsgeprüft (6 Spalten, siehe Datenwörterbuch).",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents by weekday and hour. Derived from open data of the City of Zurich and FEDRO; generated automatically and quality-checked.",
+          "@language": "en"
+        }
+      ],
+      "dct:publisher": {
+        "@type": "foaf:Agent",
+        "foaf:name": "Florian Fahrenbach"
+      },
+      "dcat:contactPoint": {
+        "@type": "vcard:Organization",
+        "vcard:fn": "Florian Fahrenbach",
+        "vcard:hasURL": {
+          "@id": "https://github.com/ffahrenb/zurich-road-accidents/issues"
+        }
+      },
+      "dcat:theme": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/TRAN"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@value": "Verkehrsunfall",
+          "@language": "de"
+        },
+        {
+          "@value": "Verkehrssicherheit",
+          "@language": "de"
+        },
+        {
+          "@value": "road safety",
+          "@language": "en"
+        }
+      ],
+      "dct:accessRights": {
+        "@id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "dct:spatial": {
+        "@id": "https://ld.geo.admin.ch/boundaries/municipality/261"
+      },
+      "dct:temporal": {
+        "@type": "dct:PeriodOfTime",
+        "dcat:startDate": "2011-01-01",
+        "dcat:endDate": "2024-12-31"
+      },
+      "dct:accrualPeriodicity": {
+        "@id": "http://publications.europa.eu/resource/authority/frequency/ANNUAL"
+      },
+      "dct:issued": "2026-11-08T11:14:39Z",
+      "dct:modified": "2026-11-08T11:14:39Z",
+      "prov:wasDerivedFrom": [
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/sid_dav_strassenverkehrsunfallorte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_meteodaten_stundenmittelwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_luftschadstoffmessung_stundenwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_od3240"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_statistische_quartiere"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_schulanlagen"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_signalisierte_geschwindigkeiten"
+        }
+      ],
+      "dcat:landingPage": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/"
+      },
+      "foaf:page": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv"
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:identifier": "zeitmuster.csv",
+          "dct:title": [
+            {
+              "@value": "Unfälle nach Wochentag und Stunde CSV",
+              "@language": "de"
+            }
+          ],
+          "dcat:accessURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/daten.html"
+          },
+          "dcat:downloadURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/data/zeitmuster.csv"
+          },
+          "dct:format": {
+            "@id": "http://publications.europa.eu/resource/authority/file-type/CSV"
+          },
+          "dcat:mediaType": {
+            "@id": "https://www.iana.org/assignments/media-types/text/csv"
+          },
+          "dcat:byteSize": 3000,
+          "dct:license": {
+            "@id": "http://dcat-ap.ch/vocabulary/licenses/terms_by"
+          },
+          "dct:issued": "2026-11-08T11:14:39Z",
+          "dct:modified": "2026-11-08T11:14:39Z"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "dct:identifier": "zurich-road-accidents-quartier@ffahrenb",
+      "dct:title": [
+        {
+          "@value": "Unfälle und Rate pro 1000 Einwohner nach Quartier und Jahr",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents and rate per 1000 inhabitants by quarter and year",
+          "@language": "en"
+        }
+      ],
+      "dct:description": [
+        {
+          "@value": "Unfälle und Rate pro 1000 Einwohner nach Quartier und Jahr. Abgeleitet aus offenen Daten der Stadt Zürich und des ASTRA; automatisch erzeugt und qualitätsgeprüft (8 Spalten, siehe Datenwörterbuch).",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents and rate per 1000 inhabitants by quarter and year. Derived from open data of the City of Zurich and FEDRO; generated automatically and quality-checked.",
+          "@language": "en"
+        }
+      ],
+      "dct:publisher": {
+        "@type": "foaf:Agent",
+        "foaf:name": "Florian Fahrenbach"
+      },
+      "dcat:contactPoint": {
+        "@type": "vcard:Organization",
+        "vcard:fn": "Florian Fahrenbach",
+        "vcard:hasURL": {
+          "@id": "https://github.com/ffahrenb/zurich-road-accidents/issues"
+        }
+      },
+      "dcat:theme": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/TRAN"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@value": "Verkehrsunfall",
+          "@language": "de"
+        },
+        {
+          "@value": "Verkehrssicherheit",
+          "@language": "de"
+        },
+        {
+          "@value": "road safety",
+          "@language": "en"
+        }
+      ],
+      "dct:accessRights": {
+        "@id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "dct:spatial": {
+        "@id": "https://ld.geo.admin.ch/boundaries/municipality/261"
+      },
+      "dct:temporal": {
+        "@type": "dct:PeriodOfTime",
+        "dcat:startDate": "2011-01-01",
+        "dcat:endDate": "2024-12-31"
+      },
+      "dct:accrualPeriodicity": {
+        "@id": "http://publications.europa.eu/resource/authority/frequency/ANNUAL"
+      },
+      "dct:issued": "2026-11-08T11:14:39Z",
+      "dct:modified": "2026-11-08T11:14:39Z",
+      "prov:wasDerivedFrom": [
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/sid_dav_strassenverkehrsunfallorte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_meteodaten_stundenmittelwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_luftschadstoffmessung_stundenwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_od3240"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_statistische_quartiere"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_schulanlagen"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_signalisierte_geschwindigkeiten"
+        }
+      ],
+      "dcat:landingPage": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/"
+      },
+      "foaf:page": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv"
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:identifier": "quartier.csv",
+          "dct:title": [
+            {
+              "@value": "Unfälle und Rate pro 1000 Einwohner nach Quartier und Jahr CSV",
+              "@language": "de"
+            }
+          ],
+          "dcat:accessURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/daten.html"
+          },
+          "dcat:downloadURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/data/quartier.csv"
+          },
+          "dct:format": {
+            "@id": "http://publications.europa.eu/resource/authority/file-type/CSV"
+          },
+          "dcat:mediaType": {
+            "@id": "https://www.iana.org/assignments/media-types/text/csv"
+          },
+          "dcat:byteSize": 17907,
+          "dct:license": {
+            "@id": "http://dcat-ap.ch/vocabulary/licenses/terms_by"
+          },
+          "dct:issued": "2026-11-08T11:14:39Z",
+          "dct:modified": "2026-11-08T11:14:39Z"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "dct:identifier": "zurich-road-accidents-tempo@ffahrenb",
+      "dct:title": [
+        {
+          "@value": "Unfälle nach signalisierter Geschwindigkeit",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents by speed limit",
+          "@language": "en"
+        }
+      ],
+      "dct:description": [
+        {
+          "@value": "Unfälle nach signalisierter Geschwindigkeit. Abgeleitet aus offenen Daten der Stadt Zürich und des ASTRA; automatisch erzeugt und qualitätsgeprüft (4 Spalten, siehe Datenwörterbuch).",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents by speed limit. Derived from open data of the City of Zurich and FEDRO; generated automatically and quality-checked.",
+          "@language": "en"
+        }
+      ],
+      "dct:publisher": {
+        "@type": "foaf:Agent",
+        "foaf:name": "Florian Fahrenbach"
+      },
+      "dcat:contactPoint": {
+        "@type": "vcard:Organization",
+        "vcard:fn": "Florian Fahrenbach",
+        "vcard:hasURL": {
+          "@id": "https://github.com/ffahrenb/zurich-road-accidents/issues"
+        }
+      },
+      "dcat:theme": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/TRAN"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@value": "Verkehrsunfall",
+          "@language": "de"
+        },
+        {
+          "@value": "Verkehrssicherheit",
+          "@language": "de"
+        },
+        {
+          "@value": "road safety",
+          "@language": "en"
+        }
+      ],
+      "dct:accessRights": {
+        "@id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "dct:spatial": {
+        "@id": "https://ld.geo.admin.ch/boundaries/municipality/261"
+      },
+      "dct:temporal": {
+        "@type": "dct:PeriodOfTime",
+        "dcat:startDate": "2011-01-01",
+        "dcat:endDate": "2024-12-31"
+      },
+      "dct:accrualPeriodicity": {
+        "@id": "http://publications.europa.eu/resource/authority/frequency/ANNUAL"
+      },
+      "dct:issued": "2026-11-08T11:14:39Z",
+      "dct:modified": "2026-11-08T11:14:39Z",
+      "prov:wasDerivedFrom": [
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/sid_dav_strassenverkehrsunfallorte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_meteodaten_stundenmittelwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_luftschadstoffmessung_stundenwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_od3240"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_statistische_quartiere"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_schulanlagen"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_signalisierte_geschwindigkeiten"
+        }
+      ],
+      "dcat:landingPage": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/"
+      },
+      "foaf:page": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv"
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:identifier": "tempo.csv",
+          "dct:title": [
+            {
+              "@value": "Unfälle nach signalisierter Geschwindigkeit CSV",
+              "@language": "de"
+            }
+          ],
+          "dcat:accessURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/daten.html"
+          },
+          "dcat:downloadURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/data/tempo.csv"
+          },
+          "dct:format": {
+            "@id": "http://publications.europa.eu/resource/authority/file-type/CSV"
+          },
+          "dcat:mediaType": {
+            "@id": "https://www.iana.org/assignments/media-types/text/csv"
+          },
+          "dcat:byteSize": 180,
+          "dct:license": {
+            "@id": "http://dcat-ap.ch/vocabulary/licenses/terms_by"
+          },
+          "dct:issued": "2026-11-08T11:14:39Z",
+          "dct:modified": "2026-11-08T11:14:39Z"
+        }
+      ]
+    },
+    {
+      "@type": "dcat:Dataset",
+      "dct:identifier": "zurich-road-accidents-wetter_monat@ffahrenb",
+      "dct:title": [
+        {
+          "@value": "Unfälle und Wetter pro Monat",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents and weather per month",
+          "@language": "en"
+        }
+      ],
+      "dct:description": [
+        {
+          "@value": "Unfälle und Wetter pro Monat. Abgeleitet aus offenen Daten der Stadt Zürich und des ASTRA; automatisch erzeugt und qualitätsgeprüft (7 Spalten, siehe Datenwörterbuch).",
+          "@language": "de"
+        },
+        {
+          "@value": "Accidents and weather per month. Derived from open data of the City of Zurich and FEDRO; generated automatically and quality-checked.",
+          "@language": "en"
+        }
+      ],
+      "dct:publisher": {
+        "@type": "foaf:Agent",
+        "foaf:name": "Florian Fahrenbach"
+      },
+      "dcat:contactPoint": {
+        "@type": "vcard:Organization",
+        "vcard:fn": "Florian Fahrenbach",
+        "vcard:hasURL": {
+          "@id": "https://github.com/ffahrenb/zurich-road-accidents/issues"
+        }
+      },
+      "dcat:theme": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/data-theme/TRAN"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@value": "Verkehrsunfall",
+          "@language": "de"
+        },
+        {
+          "@value": "Verkehrssicherheit",
+          "@language": "de"
+        },
+        {
+          "@value": "road safety",
+          "@language": "en"
+        }
+      ],
+      "dct:accessRights": {
+        "@id": "http://publications.europa.eu/resource/authority/access-right/PUBLIC"
+      },
+      "dct:spatial": {
+        "@id": "https://ld.geo.admin.ch/boundaries/municipality/261"
+      },
+      "dct:temporal": {
+        "@type": "dct:PeriodOfTime",
+        "dcat:startDate": "2011-01-01",
+        "dcat:endDate": "2024-12-31"
+      },
+      "dct:accrualPeriodicity": {
+        "@id": "http://publications.europa.eu/resource/authority/frequency/ANNUAL"
+      },
+      "dct:issued": "2026-11-08T11:14:39Z",
+      "dct:modified": "2026-11-08T11:14:39Z",
+      "prov:wasDerivedFrom": [
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/sid_dav_strassenverkehrsunfallorte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_meteodaten_stundenmittelwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/ugz_luftschadstoffmessung_stundenwerte"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/bev_bestand_jahr_quartier_od3240"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_statistische_quartiere"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_schulanlagen"
+        },
+        {
+          "@id": "https://data.stadt-zuerich.ch/dataset/geo_signalisierte_geschwindigkeiten"
+        }
+      ],
+      "dcat:landingPage": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/"
+      },
+      "foaf:page": {
+        "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv"
+      },
+      "dcat:distribution": [
+        {
+          "@type": "dcat:Distribution",
+          "dct:identifier": "wetter_monat.csv",
+          "dct:title": [
+            {
+              "@value": "Unfälle und Wetter pro Monat CSV",
+              "@language": "de"
+            }
+          ],
+          "dcat:accessURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/daten.html"
+          },
+          "dcat:downloadURL": {
+            "@id": "https://ffahrenb.github.io/zurich-road-accidents/export/data/wetter_monat.csv"
+          },
+          "dct:format": {
+            "@id": "http://publications.europa.eu/resource/authority/file-type/CSV"
+          },
+          "dcat:mediaType": {
+            "@id": "https://www.iana.org/assignments/media-types/text/csv"
+          },
+          "dcat:byteSize": 4607,
+          "dct:license": {
+            "@id": "http://dcat-ap.ch/vocabulary/licenses/terms_by"
+          },
+          "dct:issued": "2026-11-08T11:14:39Z",
+          "dct:modified": "2026-11-08T11:14:39Z"
+        }
+      ]
+    }
+  ]
+}
