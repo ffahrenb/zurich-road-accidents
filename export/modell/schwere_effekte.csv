@@ -1,0 +1,283 @@
+"modell","split","merkmal","wert","pdp","n_zeilen"
+"Regel (verletzliche Gruppen)","zeitlich","mit_fussgaenger","0",0.23841,2000
+"Regel (verletzliche Gruppen)","zeitlich","mit_fussgaenger","1",0.81027,2000
+"Regel (verletzliche Gruppen)","zeitlich","mit_velo","0",0.1684,2000
+"Regel (verletzliche Gruppen)","zeitlich","mit_velo","1",0.79616,2000
+"Regel (verletzliche Gruppen)","zeitlich","mit_motorrad","0",0.22154,2000
+"Regel (verletzliche Gruppen)","zeitlich","mit_motorrad","1",0.80685,2000
+"LR ohne Unfalltyp","zeitlich","stunde","0",0.2431,2000
+"LR ohne Unfalltyp","zeitlich","stunde","1",0.24295,2000
+"LR ohne Unfalltyp","zeitlich","stunde","2",0.24279,2000
+"LR ohne Unfalltyp","zeitlich","stunde","3",0.24263,2000
+"LR ohne Unfalltyp","zeitlich","stunde","4",0.24247,2000
+"LR ohne Unfalltyp","zeitlich","stunde","5",0.24231,2000
+"LR ohne Unfalltyp","zeitlich","stunde","6",0.24215,2000
+"LR ohne Unfalltyp","zeitlich","stunde","7",0.242,2000
+"LR ohne Unfalltyp","zeitlich","stunde","8",0.24184,2000
+"LR ohne Unfalltyp","zeitlich","stunde","9",0.24168,2000
+"LR ohne Unfalltyp","zeitlich","stunde","10",0.24152,2000
+"LR ohne Unfalltyp","zeitlich","stunde","11",0.24136,2000
+"LR ohne Unfalltyp","zeitlich","stunde","12",0.24121,2000
+"LR ohne Unfalltyp","zeitlich","stunde","13",0.24105,2000
+"LR ohne Unfalltyp","zeitlich","stunde","14",0.24089,2000
+"LR ohne Unfalltyp","zeitlich","stunde","15",0.24073,2000
+"LR ohne Unfalltyp","zeitlich","stunde","16",0.24058,2000
+"LR ohne Unfalltyp","zeitlich","stunde","17",0.24042,2000
+"LR ohne Unfalltyp","zeitlich","stunde","18",0.24026,2000
+"LR ohne Unfalltyp","zeitlich","stunde","19",0.24011,2000
+"LR ohne Unfalltyp","zeitlich","stunde","20",0.23995,2000
+"LR ohne Unfalltyp","zeitlich","stunde","21",0.23979,2000
+"LR ohne Unfalltyp","zeitlich","stunde","22",0.23964,2000
+"LR ohne Unfalltyp","zeitlich","stunde","23",0.23948,2000
+"LR ohne Unfalltyp","zeitlich","monat","1",0.24186,2000
+"LR ohne Unfalltyp","zeitlich","monat","2",0.2417,2000
+"LR ohne Unfalltyp","zeitlich","monat","3",0.24154,2000
+"LR ohne Unfalltyp","zeitlich","monat","4",0.24138,2000
+"LR ohne Unfalltyp","zeitlich","monat","5",0.24123,2000
+"LR ohne Unfalltyp","zeitlich","monat","6",0.24107,2000
+"LR ohne Unfalltyp","zeitlich","monat","7",0.24091,2000
+"LR ohne Unfalltyp","zeitlich","monat","8",0.24075,2000
+"LR ohne Unfalltyp","zeitlich","monat","9",0.24059,2000
+"LR ohne Unfalltyp","zeitlich","monat","10",0.24044,2000
+"LR ohne Unfalltyp","zeitlich","monat","11",0.24028,2000
+"LR ohne Unfalltyp","zeitlich","monat","12",0.24012,2000
+"LR ohne Unfalltyp","zeitlich","tempo_klasse","Tempo 30 oder tiefer",0.20468,2000
+"LR ohne Unfalltyp","zeitlich","tempo_klasse","Tempo 50",0.26326,2000
+"LR ohne Unfalltyp","zeitlich","tempo_klasse","Tempo 60+",0.27141,2000
+"LR ohne Unfalltyp","zeitlich","tempo_klasse","unbekannt",0.23298,2000
+"LR ohne Unfalltyp","zeitlich","mit_fussgaenger","0",0.21453,2000
+"LR ohne Unfalltyp","zeitlich","mit_fussgaenger","1",0.93993,2000
+"LR ohne Unfalltyp","zeitlich","mit_velo","0",0.14755,2000
+"LR ohne Unfalltyp","zeitlich","mit_velo","1",0.79299,2000
+"LR ohne Unfalltyp","zeitlich","mit_motorrad","0",0.21421,2000
+"LR ohne Unfalltyp","zeitlich","mit_motorrad","1",0.60226,2000
+"LR voll","zeitlich","stunde","0",0.23507,2000
+"LR voll","zeitlich","stunde","1",0.23535,2000
+"LR voll","zeitlich","stunde","2",0.23563,2000
+"LR voll","zeitlich","stunde","3",0.23591,2000
+"LR voll","zeitlich","stunde","4",0.23619,2000
+"LR voll","zeitlich","stunde","5",0.23647,2000
+"LR voll","zeitlich","stunde","6",0.23675,2000
+"LR voll","zeitlich","stunde","7",0.23703,2000
+"LR voll","zeitlich","stunde","8",0.23732,2000
+"LR voll","zeitlich","stunde","9",0.2376,2000
+"LR voll","zeitlich","stunde","10",0.23788,2000
+"LR voll","zeitlich","stunde","11",0.23816,2000
+"LR voll","zeitlich","stunde","12",0.23845,2000
+"LR voll","zeitlich","stunde","13",0.23873,2000
+"LR voll","zeitlich","stunde","14",0.23901,2000
+"LR voll","zeitlich","stunde","15",0.2393,2000
+"LR voll","zeitlich","stunde","16",0.23958,2000
+"LR voll","zeitlich","stunde","17",0.23986,2000
+"LR voll","zeitlich","stunde","18",0.24015,2000
+"LR voll","zeitlich","stunde","19",0.24043,2000
+"LR voll","zeitlich","stunde","20",0.24072,2000
+"LR voll","zeitlich","stunde","21",0.241,2000
+"LR voll","zeitlich","stunde","22",0.24129,2000
+"LR voll","zeitlich","stunde","23",0.24157,2000
+"LR voll","zeitlich","monat","1",0.23872,2000
+"LR voll","zeitlich","monat","2",0.23874,2000
+"LR voll","zeitlich","monat","3",0.23876,2000
+"LR voll","zeitlich","monat","4",0.23879,2000
+"LR voll","zeitlich","monat","5",0.23881,2000
+"LR voll","zeitlich","monat","6",0.23884,2000
+"LR voll","zeitlich","monat","7",0.23886,2000
+"LR voll","zeitlich","monat","8",0.23889,2000
+"LR voll","zeitlich","monat","9",0.23891,2000
+"LR voll","zeitlich","monat","10",0.23894,2000
+"LR voll","zeitlich","monat","11",0.23896,2000
+"LR voll","zeitlich","monat","12",0.23899,2000
+"LR voll","zeitlich","tempo_klasse","Tempo 30 oder tiefer",0.21259,2000
+"LR voll","zeitlich","tempo_klasse","Tempo 50",0.2516,2000
+"LR voll","zeitlich","tempo_klasse","Tempo 60+",0.26223,2000
+"LR voll","zeitlich","tempo_klasse","unbekannt",0.24075,2000
+"LR voll","zeitlich","mit_fussgaenger","0",0.23058,2000
+"LR voll","zeitlich","mit_fussgaenger","1",0.51,2000
+"LR voll","zeitlich","mit_velo","0",0.14785,2000
+"LR voll","zeitlich","mit_velo","1",0.70173,2000
+"LR voll","zeitlich","mit_motorrad","0",0.21385,2000
+"LR voll","zeitlich","mit_motorrad","1",0.52037,2000
+"Elastic Net","zeitlich","stunde","0",0.24422,2000
+"Elastic Net","zeitlich","stunde","1",0.24422,2000
+"Elastic Net","zeitlich","stunde","2",0.24422,2000
+"Elastic Net","zeitlich","stunde","3",0.24422,2000
+"Elastic Net","zeitlich","stunde","4",0.24422,2000
+"Elastic Net","zeitlich","stunde","5",0.24422,2000
+"Elastic Net","zeitlich","stunde","6",0.24422,2000
+"Elastic Net","zeitlich","stunde","7",0.24422,2000
+"Elastic Net","zeitlich","stunde","8",0.24422,2000
+"Elastic Net","zeitlich","stunde","9",0.24422,2000
+"Elastic Net","zeitlich","stunde","10",0.24422,2000
+"Elastic Net","zeitlich","stunde","11",0.24422,2000
+"Elastic Net","zeitlich","stunde","12",0.24422,2000
+"Elastic Net","zeitlich","stunde","13",0.24422,2000
+"Elastic Net","zeitlich","stunde","14",0.24422,2000
+"Elastic Net","zeitlich","stunde","15",0.24422,2000
+"Elastic Net","zeitlich","stunde","16",0.24422,2000
+"Elastic Net","zeitlich","stunde","17",0.24422,2000
+"Elastic Net","zeitlich","stunde","18",0.24422,2000
+"Elastic Net","zeitlich","stunde","19",0.24422,2000
+"Elastic Net","zeitlich","stunde","20",0.24422,2000
+"Elastic Net","zeitlich","stunde","21",0.24422,2000
+"Elastic Net","zeitlich","stunde","22",0.24422,2000
+"Elastic Net","zeitlich","stunde","23",0.24422,2000
+"Elastic Net","zeitlich","monat","1",0.24422,2000
+"Elastic Net","zeitlich","monat","2",0.24422,2000
+"Elastic Net","zeitlich","monat","3",0.24422,2000
+"Elastic Net","zeitlich","monat","4",0.24422,2000
+"Elastic Net","zeitlich","monat","5",0.24422,2000
+"Elastic Net","zeitlich","monat","6",0.24422,2000
+"Elastic Net","zeitlich","monat","7",0.24422,2000
+"Elastic Net","zeitlich","monat","8",0.24422,2000
+"Elastic Net","zeitlich","monat","9",0.24422,2000
+"Elastic Net","zeitlich","monat","10",0.24422,2000
+"Elastic Net","zeitlich","monat","11",0.24422,2000
+"Elastic Net","zeitlich","monat","12",0.24422,2000
+"Elastic Net","zeitlich","tempo_klasse","Tempo 30 oder tiefer",0.22983,2000
+"Elastic Net","zeitlich","tempo_klasse","Tempo 50",0.25463,2000
+"Elastic Net","zeitlich","tempo_klasse","Tempo 60+",0.23363,2000
+"Elastic Net","zeitlich","tempo_klasse","unbekannt",0.22983,2000
+"Elastic Net","zeitlich","mit_fussgaenger","0",0.23527,2000
+"Elastic Net","zeitlich","mit_fussgaenger","1",0.49367,2000
+"Elastic Net","zeitlich","mit_velo","0",0.15705,2000
+"Elastic Net","zeitlich","mit_velo","1",0.70719,2000
+"Elastic Net","zeitlich","mit_motorrad","0",0.22071,2000
+"Elastic Net","zeitlich","mit_motorrad","1",0.53242,2000
+"GAM","zeitlich","stunde","0",0.23798,2000
+"GAM","zeitlich","stunde","1",0.23771,2000
+"GAM","zeitlich","stunde","2",0.23747,2000
+"GAM","zeitlich","stunde","3",0.23722,2000
+"GAM","zeitlich","stunde","4",0.23695,2000
+"GAM","zeitlich","stunde","5",0.23666,2000
+"GAM","zeitlich","stunde","6",0.23639,2000
+"GAM","zeitlich","stunde","7",0.23621,2000
+"GAM","zeitlich","stunde","8",0.23622,2000
+"GAM","zeitlich","stunde","9",0.23645,2000
+"GAM","zeitlich","stunde","10",0.23695,2000
+"GAM","zeitlich","stunde","11",0.23772,2000
+"GAM","zeitlich","stunde","12",0.23862,2000
+"GAM","zeitlich","stunde","13",0.23943,2000
+"GAM","zeitlich","stunde","14",0.24,2000
+"GAM","zeitlich","stunde","15",0.24034,2000
+"GAM","zeitlich","stunde","16",0.24045,2000
+"GAM","zeitlich","stunde","17",0.24038,2000
+"GAM","zeitlich","stunde","18",0.24016,2000
+"GAM","zeitlich","stunde","19",0.23984,2000
+"GAM","zeitlich","stunde","20",0.23945,2000
+"GAM","zeitlich","stunde","21",0.23905,2000
+"GAM","zeitlich","stunde","22",0.23865,2000
+"GAM","zeitlich","stunde","23",0.23829,2000
+"GAM","zeitlich","monat","1",0.2346,2000
+"GAM","zeitlich","monat","2",0.2353,2000
+"GAM","zeitlich","monat","3",0.23708,2000
+"GAM","zeitlich","monat","4",0.23935,2000
+"GAM","zeitlich","monat","5",0.24144,2000
+"GAM","zeitlich","monat","6",0.24275,2000
+"GAM","zeitlich","monat","7",0.24286,2000
+"GAM","zeitlich","monat","8",0.24157,2000
+"GAM","zeitlich","monat","9",0.23932,2000
+"GAM","zeitlich","monat","10",0.23701,2000
+"GAM","zeitlich","monat","11",0.23531,2000
+"GAM","zeitlich","monat","12",0.23462,2000
+"GAM","zeitlich","tempo_klasse","Tempo 30 oder tiefer",0.21247,2000
+"GAM","zeitlich","tempo_klasse","Tempo 50",0.25152,2000
+"GAM","zeitlich","tempo_klasse","Tempo 60+",0.26222,2000
+"GAM","zeitlich","tempo_klasse","unbekannt",0.24034,2000
+"GAM","zeitlich","mit_fussgaenger","0",0.23041,2000
+"GAM","zeitlich","mit_fussgaenger","1",0.51072,2000
+"GAM","zeitlich","mit_velo","0",0.14791,2000
+"GAM","zeitlich","mit_velo","1",0.69982,2000
+"GAM","zeitlich","mit_motorrad","0",0.21384,2000
+"GAM","zeitlich","mit_motorrad","1",0.51829,2000
+"Random Forest","zeitlich","stunde","0",0.25062,2000
+"Random Forest","zeitlich","stunde","1",0.25157,2000
+"Random Forest","zeitlich","stunde","2",0.25196,2000
+"Random Forest","zeitlich","stunde","3",0.25102,2000
+"Random Forest","zeitlich","stunde","4",0.25108,2000
+"Random Forest","zeitlich","stunde","5",0.25279,2000
+"Random Forest","zeitlich","stunde","6",0.24849,2000
+"Random Forest","zeitlich","stunde","7",0.24353,2000
+"Random Forest","zeitlich","stunde","8",0.23824,2000
+"Random Forest","zeitlich","stunde","9",0.23649,2000
+"Random Forest","zeitlich","stunde","10",0.23729,2000
+"Random Forest","zeitlich","stunde","11",0.23761,2000
+"Random Forest","zeitlich","stunde","12",0.23978,2000
+"Random Forest","zeitlich","stunde","13",0.23924,2000
+"Random Forest","zeitlich","stunde","14",0.23984,2000
+"Random Forest","zeitlich","stunde","15",0.23879,2000
+"Random Forest","zeitlich","stunde","16",0.23985,2000
+"Random Forest","zeitlich","stunde","17",0.24203,2000
+"Random Forest","zeitlich","stunde","18",0.24186,2000
+"Random Forest","zeitlich","stunde","19",0.24314,2000
+"Random Forest","zeitlich","stunde","20",0.24521,2000
+"Random Forest","zeitlich","stunde","21",0.24901,2000
+"Random Forest","zeitlich","stunde","22",0.25121,2000
+"Random Forest","zeitlich","stunde","23",0.25252,2000
+"Random Forest","zeitlich","monat","1",0.23825,2000
+"Random Forest","zeitlich","monat","2",0.2335,2000
+"Random Forest","zeitlich","monat","3",0.23716,2000
+"Random Forest","zeitlich","monat","4",0.24249,2000
+"Random Forest","zeitlich","monat","5",0.24168,2000
+"Random Forest","zeitlich","monat","6",0.24405,2000
+"Random Forest","zeitlich","monat","7",0.244,2000
+"Random Forest","zeitlich","monat","8",0.24419,2000
+"Random Forest","zeitlich","monat","9",0.24371,2000
+"Random Forest","zeitlich","monat","10",0.23814,2000
+"Random Forest","zeitlich","monat","11",0.237,2000
+"Random Forest","zeitlich","monat","12",0.23799,2000
+"Random Forest","zeitlich","tempo_klasse","Tempo 30 oder tiefer",0.23477,2000
+"Random Forest","zeitlich","tempo_klasse","Tempo 50",0.25197,2000
+"Random Forest","zeitlich","tempo_klasse","Tempo 60+",0.26841,2000
+"Random Forest","zeitlich","tempo_klasse","unbekannt",0.24307,2000
+"Random Forest","zeitlich","mit_fussgaenger","0",0.23422,2000
+"Random Forest","zeitlich","mit_fussgaenger","1",0.7455,2000
+"Random Forest","zeitlich","mit_velo","0",0.14974,2000
+"Random Forest","zeitlich","mit_velo","1",0.77428,2000
+"Random Forest","zeitlich","mit_motorrad","0",0.21738,2000
+"Random Forest","zeitlich","mit_motorrad","1",0.59728,2000
+"XGBoost","zeitlich","stunde","0",0.23308,2000
+"XGBoost","zeitlich","stunde","1",0.25607,2000
+"XGBoost","zeitlich","stunde","2",0.2531,2000
+"XGBoost","zeitlich","stunde","3",0.24583,2000
+"XGBoost","zeitlich","stunde","4",0.24897,2000
+"XGBoost","zeitlich","stunde","5",0.25426,2000
+"XGBoost","zeitlich","stunde","6",0.25101,2000
+"XGBoost","zeitlich","stunde","7",0.2414,2000
+"XGBoost","zeitlich","stunde","8",0.23258,2000
+"XGBoost","zeitlich","stunde","9",0.22768,2000
+"XGBoost","zeitlich","stunde","10",0.23334,2000
+"XGBoost","zeitlich","stunde","11",0.23306,2000
+"XGBoost","zeitlich","stunde","12",0.24028,2000
+"XGBoost","zeitlich","stunde","13",0.24187,2000
+"XGBoost","zeitlich","stunde","14",0.24185,2000
+"XGBoost","zeitlich","stunde","15",0.24018,2000
+"XGBoost","zeitlich","stunde","16",0.23616,2000
+"XGBoost","zeitlich","stunde","17",0.24228,2000
+"XGBoost","zeitlich","stunde","18",0.23934,2000
+"XGBoost","zeitlich","stunde","19",0.2373,2000
+"XGBoost","zeitlich","stunde","20",0.24066,2000
+"XGBoost","zeitlich","stunde","21",0.23855,2000
+"XGBoost","zeitlich","stunde","22",0.24418,2000
+"XGBoost","zeitlich","stunde","23",0.24339,2000
+"XGBoost","zeitlich","monat","1",0.2364,2000
+"XGBoost","zeitlich","monat","2",0.22949,2000
+"XGBoost","zeitlich","monat","3",0.23176,2000
+"XGBoost","zeitlich","monat","4",0.24549,2000
+"XGBoost","zeitlich","monat","5",0.24042,2000
+"XGBoost","zeitlich","monat","6",0.2452,2000
+"XGBoost","zeitlich","monat","7",0.24612,2000
+"XGBoost","zeitlich","monat","8",0.24365,2000
+"XGBoost","zeitlich","monat","9",0.24435,2000
+"XGBoost","zeitlich","monat","10",0.23589,2000
+"XGBoost","zeitlich","monat","11",0.23323,2000
+"XGBoost","zeitlich","monat","12",0.23508,2000
+"XGBoost","zeitlich","tempo_klasse","Tempo 30 oder tiefer",0.22984,2000
+"XGBoost","zeitlich","tempo_klasse","Tempo 50",0.25211,2000
+"XGBoost","zeitlich","tempo_klasse","Tempo 60+",0.26359,2000
+"XGBoost","zeitlich","tempo_klasse","unbekannt",0.23924,2000
+"XGBoost","zeitlich","mit_fussgaenger","0",0.22976,2000
+"XGBoost","zeitlich","mit_fussgaenger","1",0.49584,2000
+"XGBoost","zeitlich","mit_velo","0",0.14757,2000
+"XGBoost","zeitlich","mit_velo","1",0.76984,2000
+"XGBoost","zeitlich","mit_motorrad","0",0.21536,2000
+"XGBoost","zeitlich","mit_motorrad","1",0.53329,2000

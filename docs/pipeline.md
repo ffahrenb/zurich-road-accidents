@@ -48,6 +48,34 @@ Privacy-Gate, Site, Deployment auf GitHub Pages (nur `main`, Zeitplan, manuell) 
 manuellem Start auf `main`, das Zurückschreiben von `export/` (Abschnitt Automatisierung). Alle
 Actions sind auf Commit-SHA festgelegt.
 
+## Modelle
+
+Beide Modellspuren laufen erst nach dem DQ-Gate (`dq_passed`).
+
+**Schwere (Track P, nur öffentliche Daten).** Acht Modelle von der Basislinie bis XGBoost auf
+derselben Leiter (Protokoll: ADR 0007; Code `R/models_*.R`, Einstellungen `config/modell.yml`).
+Targets: `severity_data` (Mart, nach `unfall_id` sortiert) → `severity_plan` (Jahresregel aus dem
+automatischen Bereich) → `sev_zeit` (zeitlicher Test mit Tuning auf den Trainingsjahren,
+Interpretation) und `sev_zufall` (Zufallssplit als Kontrolle) → `sev_boot_zeit`, `sev_boot_zufall`
+(gepaarter Bootstrap) → `export_ladder_files`. Laufzeit lokal rund 10 Minuten (8 Threads, Budget
+15 Minuten, CI 30); die Abstriche am Budget stehen in `export/modell/schwere_lauf.json`.
+
+| Datei in `export/modell/` | Inhalt |
+|---------------------------|--------|
+| `schwere_vergleich.csv` | je Modell, Split, Teilgruppe und Kennzahl (`brier_skill`, `roc_auc`, `avg_precision`, `brier`, `log_loss`): Wert und 95-%-Intervall |
+| `schwere_differenzen.csv` | Differenzen zu «LR ohne Unfalltyp» und «LR voll» mit gepaartem Intervall |
+| `schwere_tuning.csv` | Tuning-Kandidaten mit Validierungs-Brier-Score; gewählte Zeile markiert |
+| `schwere_kalibrierung.csv`, `schwere_wichtigkeit.csv`, `schwere_effekte.csv` | Kalibrierung, Permutationswichtigkeit mit Intervall, Partial Dependence, je Modell |
+| `schwere_odds_ratios.csv` | Chancenverhältnisse der logistischen Regression ohne Unfalltyp |
+| `schwere_lauf.json` | Jahre, Anzahl Zeilen, Laufzeit je Modell, Kandidaten, Abstriche |
+
+Die PR-Kennzahl heisst `avg_precision` (Average Precision, wie `yardstick::average_precision`); für
+konstante Scores ist sie der Anteil der Positiven. Das Schema steht in `R/export_ladder.R` und wird in
+`tests/testthat/test-models-ladder.R` unabhängig davon geprüft.
+
+**Wetter (Track X, braucht die private Datei).** `fit_weather()` (negative Binomial, IRR);
+`export/trackx` wird in CI nie geschrieben (ADR 0004).
+
 ## Automatisierung (monatlicher Lauf)
 
 Ziel: Der Lauf braucht keine Handarbeit. Neue Datenjahre werden aufgenommen, die Ergebnisse

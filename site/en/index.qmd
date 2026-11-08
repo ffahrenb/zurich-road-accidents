@@ -11,14 +11,14 @@ source("../_helpers.R")
 jahr <- rd("data/jahr.csv")
 dq <- rd("dq/dq_ergebnisse.csv")
 eff <- rd("trackx/wetter_effekt.csv")
-met <- rd("modell/schwere_metriken.csv")
+vg <- rd("modell/schwere_vergleich.csv")
 tot <- sum(jahr$unfaelle); inj <- sum(jahr$unfaelle[jahr$schwere_kurz != "Sachschaden"])
 fatal <- sum(jahr$unfaelle[jahr$schwere_kurz == "Getötete"])
 tj <- jahr |> group_by(jahr) |> summarise(n = sum(unfaelle), i = sum(unfaelle[schwere_kurz != "Sachschaden"]), s = sum(unfaelle[schwere_kurz == "Sachschaden"]), .groups = "drop")
 ch <- function(col, y) round(100 * (tj[[col]][tj$jahr == y] / tj[[col]][tj$jahr == y - 1] - 1))
 r <- function(o, t) eff[eff$zielgroesse == o & eff$term == t, ]
 ra <- r("Alle Unfälle", "regenRegen"); ri <- r("Unfälle mit Personenschaden", "regenRegen"); rv <- r("Unfälle mit Velo", "regenRegen")
-mv <- function(m, k) met$test[met$modell == m & met$metrik == k]
+mv <- function(m, k) vg$wert[vg$modell == m & vg$metrik == k & vg$split == "zeitlich" & vg$auswertung == "alle"]
 n_chk <- nrow(dq); n_stop <- sum(dq$schwere == "STOP"); n_warn <- sum(dq$status == "WARN")
 en <- function(x) gsub("’", ",", x)
 ```
@@ -41,7 +41,7 @@ This site turns the open road-accident data of the City of Zurich and the Swiss 
 - **Detect, repair, verify.** Errors are never silently corrected: a check finds them (e.g. 9 invalid geometries, 40 impossible weather readings), a documented repair in the staging layer fixes them (`ST_MakeValid`; setting impossible values to NULL), and a second STOP check on the cleaned data proves the repair worked.
 - **When.** On weekdays accidents peak in the morning and late afternoon commute; after midnight there are fewer accidents but a larger share involves injuries. [Wann](../wann.qmd)
 - **Weather.** In rain there are about **+`r round(100 * (ra$irr - 1))` % more accidents per hour** (95 % CI +`r round(100 * (ra$ci_low - 1))` % to +`r round(100 * (ra$ci_high - 1))` %), +`r round(100 * (ri$irr - 1))` % for accidents with injuries, at the same time of day, season and temperature (negative-binomial model, incident rate ratios). For bicycle accidents there is no detectable rain effect (IRR `r fdec(rv$irr, 2)`, CI includes 1). Warmth goes with many more bicycle accidents. This is per hour, not per trip: exposure (traffic volume) is unknown. [Wetter](../wetter.qmd)
-- **Severity.** A model predicting whether an accident involved injury (test-set ROC-AUC `r fdec(mv("Random Forest", "roc_auc"), 2)` for the random forest, `r fdec(mv("Logistische Regression", "roc_auc"), 2)` for logistic regression, versus 0.50 for guessing the base rate) mostly learns that accidents involving **bicycles, motorcycles or pedestrians** much more often cause injury. It shows association, not causation, and is not a prediction tool. [Schwere](../schwere.qmd)
+- **Severity.** Eight models of increasing complexity, from guessing the base rate to boosted trees, tested on the most recent three years (temporal split, tuned on earlier years only). A simple rule ("bicycle, motorcycle or pedestrian involved?") already reaches a Brier skill of `r fdec(100 * mv("Regel (verletzliche Gruppen)", "brier_skill"), 0)` % (0 % = guessing the base rate); tuned tree models reach `r fdec(100 * mv("Random Forest", "brier_skill"), 0)` % (random forest) and `r fdec(100 * mv("XGBoost", "brier_skill"), 0)` % (XGBoost), a gap larger than the test-set noise, while elastic net and GAM add nothing over plain logistic regression (ROC-AUC `r fdec(mv("Random Forest", "roc_auc"), 2)` for the random forest, `r fdec(mv("LR voll", "roc_auc"), 2)` for logistic regression). It shows association, not causation, and is not a prediction tool. [Schwere](../schwere.qmd)
 - **Where.** Per resident, small inner-city quarters (Hochschulen, City, Lindenhof) have the highest rates because few people live there and many pass through. Rates start in 2015 because of the structural break. [Wo](../wo.qmd), [Karte](../karte.qmd)
 :::
 

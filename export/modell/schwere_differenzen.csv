@@ -1,0 +1,211 @@
+"modell","referenz","split","auswertung","metrik","differenz","ki_low","ki_high"
+"Basislinie","LR ohne Unfalltyp","zeitlich","alle","roc_auc",-0.3672,-0.3745,-0.3603
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","alle","roc_auc",-0.0498,-0.0543,-0.0448
+"LR voll","LR ohne Unfalltyp","zeitlich","alle","roc_auc",0.0416,0.0373,0.0459
+"Elastic Net","LR ohne Unfalltyp","zeitlich","alle","roc_auc",0.0378,0.0338,0.0421
+"GAM","LR ohne Unfalltyp","zeitlich","alle","roc_auc",0.0419,0.0376,0.0462
+"Random Forest","LR ohne Unfalltyp","zeitlich","alle","roc_auc",0.0524,0.0476,0.0574
+"XGBoost","LR ohne Unfalltyp","zeitlich","alle","roc_auc",0.051,0.0461,0.0556
+"Basislinie","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",-0.3327,-0.3414,-0.3243
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",-0.0307,-0.0351,-0.0255
+"LR voll","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",0.0412,0.0365,0.0464
+"Elastic Net","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",0.0365,0.0318,0.0415
+"GAM","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",0.0417,0.0371,0.0467
+"Random Forest","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",0.0564,0.0507,0.062
+"XGBoost","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","roc_auc",0.0553,0.05,0.0603
+"Basislinie","LR ohne Unfalltyp","zeitlich","alle","avg_precision",-0.4991,-0.5115,-0.4867
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","alle","avg_precision",-0.1336,-0.141,-0.1257
+"LR voll","LR ohne Unfalltyp","zeitlich","alle","avg_precision",0.0314,0.026,0.0367
+"Elastic Net","LR ohne Unfalltyp","zeitlich","alle","avg_precision",0.0235,0.0186,0.0289
+"GAM","LR ohne Unfalltyp","zeitlich","alle","avg_precision",0.0321,0.0265,0.0373
+"Random Forest","LR ohne Unfalltyp","zeitlich","alle","avg_precision",0.068,0.0591,0.0774
+"XGBoost","LR ohne Unfalltyp","zeitlich","alle","avg_precision",0.065,0.0561,0.0731
+"Basislinie","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",-0.4348,-0.4473,-0.4219
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",-0.1188,-0.1264,-0.1107
+"LR voll","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",0.0271,0.022,0.0321
+"Elastic Net","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",0.0196,0.0148,0.0247
+"GAM","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",0.0277,0.0225,0.0329
+"Random Forest","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",0.0625,0.0536,0.072
+"XGBoost","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","avg_precision",0.0605,0.0516,0.0687
+"Basislinie","LR ohne Unfalltyp","zeitlich","alle","brier",0.0835,0.08,0.0872
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","alle","brier",0.0052,0.0041,0.0062
+"LR voll","LR ohne Unfalltyp","zeitlich","alle","brier",-0.0069,-0.0084,-0.0055
+"Elastic Net","LR ohne Unfalltyp","zeitlich","alle","brier",-0.0068,-0.0082,-0.0057
+"GAM","LR ohne Unfalltyp","zeitlich","alle","brier",-0.007,-0.0085,-0.0057
+"Random Forest","LR ohne Unfalltyp","zeitlich","alle","brier",-0.0149,-0.0166,-0.0133
+"XGBoost","LR ohne Unfalltyp","zeitlich","alle","brier",-0.0143,-0.0159,-0.0126
+"Basislinie","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",0.09,0.0852,0.0946
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",0.0047,0.0032,0.006
+"LR voll","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",-0.0089,-0.0108,-0.0073
+"Elastic Net","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",-0.0088,-0.0106,-0.0075
+"GAM","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",-0.009,-0.011,-0.0074
+"Random Forest","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",-0.0182,-0.0204,-0.0161
+"XGBoost","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier",-0.0176,-0.0197,-0.0156
+"Basislinie","LR ohne Unfalltyp","zeitlich","alle","log_loss",0.209,0.1998,0.2178
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","alle","log_loss",0.0175,0.014,0.0206
+"LR voll","LR ohne Unfalltyp","zeitlich","alle","log_loss",-0.0337,-0.0378,-0.0296
+"Elastic Net","LR ohne Unfalltyp","zeitlich","alle","log_loss",-0.0306,-0.0347,-0.0268
+"GAM","LR ohne Unfalltyp","zeitlich","alle","log_loss",-0.0341,-0.0383,-0.03
+"Random Forest","LR ohne Unfalltyp","zeitlich","alle","log_loss",-0.0583,-0.0639,-0.0532
+"XGBoost","LR ohne Unfalltyp","zeitlich","alle","log_loss",-0.0566,-0.0618,-0.0517
+"Basislinie","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",0.2031,0.1905,0.2148
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",0.0093,0.0048,0.0134
+"LR voll","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",-0.0331,-0.0385,-0.0281
+"Elastic Net","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",-0.0321,-0.0373,-0.0275
+"GAM","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",-0.0337,-0.039,-0.0286
+"Random Forest","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",-0.0623,-0.0695,-0.0557
+"XGBoost","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","log_loss",-0.0608,-0.0673,-0.0545
+"Basislinie","LR ohne Unfalltyp","zeitlich","alle","brier_skill",-0.4463,-0.4628,-0.4287
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","alle","brier_skill",-0.0276,-0.0329,-0.0219
+"LR voll","LR ohne Unfalltyp","zeitlich","alle","brier_skill",0.0368,0.0298,0.0446
+"Elastic Net","LR ohne Unfalltyp","zeitlich","alle","brier_skill",0.0364,0.0305,0.0439
+"GAM","LR ohne Unfalltyp","zeitlich","alle","brier_skill",0.0374,0.0304,0.0453
+"Random Forest","LR ohne Unfalltyp","zeitlich","alle","brier_skill",0.0794,0.0714,0.0881
+"XGBoost","LR ohne Unfalltyp","zeitlich","alle","brier_skill",0.0762,0.0678,0.0847
+"Basislinie","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",-0.4059,-0.4243,-0.3864
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",-0.0212,-0.0273,-0.0145
+"LR voll","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",0.04,0.0329,0.0485
+"Elastic Net","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",0.0397,0.0337,0.0476
+"GAM","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",0.0407,0.0336,0.0491
+"Random Forest","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",0.0819,0.0732,0.0915
+"XGBoost","LR ohne Unfalltyp","zeitlich","ohne_parkier_tier","brier_skill",0.0794,0.0702,0.0888
+"Elastic Net","LR voll","zeitlich","alle","roc_auc",-0.0038,-0.0051,-0.0025
+"GAM","LR voll","zeitlich","alle","roc_auc",3e-04,1e-04,5e-04
+"Random Forest","LR voll","zeitlich","alle","roc_auc",0.0108,0.0091,0.0127
+"XGBoost","LR voll","zeitlich","alle","roc_auc",0.0094,0.0078,0.0107
+"Elastic Net","LR voll","zeitlich","ohne_parkier_tier","roc_auc",-0.0048,-0.0065,-0.003
+"GAM","LR voll","zeitlich","ohne_parkier_tier","roc_auc",5e-04,2e-04,7e-04
+"Random Forest","LR voll","zeitlich","ohne_parkier_tier","roc_auc",0.0152,0.0126,0.0176
+"XGBoost","LR voll","zeitlich","ohne_parkier_tier","roc_auc",0.014,0.012,0.016
+"Elastic Net","LR voll","zeitlich","alle","avg_precision",-0.0079,-0.0102,-0.0055
+"GAM","LR voll","zeitlich","alle","avg_precision",6e-04,2e-04,0.0011
+"Random Forest","LR voll","zeitlich","alle","avg_precision",0.0366,0.0289,0.0447
+"XGBoost","LR voll","zeitlich","alle","avg_precision",0.0336,0.0262,0.0411
+"Elastic Net","LR voll","zeitlich","ohne_parkier_tier","avg_precision",-0.0075,-0.0097,-0.0052
+"GAM","LR voll","zeitlich","ohne_parkier_tier","avg_precision",7e-04,2e-04,0.0011
+"Random Forest","LR voll","zeitlich","ohne_parkier_tier","avg_precision",0.0355,0.0277,0.044
+"XGBoost","LR voll","zeitlich","ohne_parkier_tier","avg_precision",0.0334,0.0258,0.0407
+"Elastic Net","LR voll","zeitlich","alle","brier",1e-04,-4e-04,6e-04
+"GAM","LR voll","zeitlich","alle","brier",-1e-04,-2e-04,-1e-04
+"Random Forest","LR voll","zeitlich","alle","brier",-0.008,-0.0092,-0.0068
+"XGBoost","LR voll","zeitlich","alle","brier",-0.0074,-0.0086,-0.0061
+"Elastic Net","LR voll","zeitlich","ohne_parkier_tier","brier",1e-04,-6e-04,7e-04
+"GAM","LR voll","zeitlich","ohne_parkier_tier","brier",-2e-04,-2e-04,-1e-04
+"Random Forest","LR voll","zeitlich","ohne_parkier_tier","brier",-0.0093,-0.0107,-0.0079
+"XGBoost","LR voll","zeitlich","ohne_parkier_tier","brier",-0.0087,-0.0102,-0.007
+"Elastic Net","LR voll","zeitlich","alle","log_loss",0.0031,0.0012,0.0048
+"GAM","LR voll","zeitlich","alle","log_loss",-4e-04,-6e-04,-3e-04
+"Random Forest","LR voll","zeitlich","alle","log_loss",-0.0246,-0.0285,-0.0212
+"XGBoost","LR voll","zeitlich","alle","log_loss",-0.0229,-0.0265,-0.0194
+"Elastic Net","LR voll","zeitlich","ohne_parkier_tier","log_loss",0.001,-0.0013,0.0033
+"GAM","LR voll","zeitlich","ohne_parkier_tier","log_loss",-6e-04,-8e-04,-3e-04
+"Random Forest","LR voll","zeitlich","ohne_parkier_tier","log_loss",-0.0292,-0.0338,-0.025
+"XGBoost","LR voll","zeitlich","ohne_parkier_tier","log_loss",-0.0277,-0.0322,-0.0234
+"Elastic Net","LR voll","zeitlich","alle","brier_skill",-4e-04,-0.0029,0.0023
+"GAM","LR voll","zeitlich","alle","brier_skill",7e-04,4e-04,0.001
+"Random Forest","LR voll","zeitlich","alle","brier_skill",0.0426,0.0363,0.0493
+"XGBoost","LR voll","zeitlich","alle","brier_skill",0.0394,0.0327,0.0456
+"Elastic Net","LR voll","zeitlich","ohne_parkier_tier","brier_skill",-3e-04,-0.003,0.0025
+"GAM","LR voll","zeitlich","ohne_parkier_tier","brier_skill",7e-04,4e-04,0.0011
+"Random Forest","LR voll","zeitlich","ohne_parkier_tier","brier_skill",0.0419,0.0356,0.0485
+"XGBoost","LR voll","zeitlich","ohne_parkier_tier","brier_skill",0.0394,0.0315,0.0461
+"Basislinie","LR ohne Unfalltyp","zufaellig","alle","roc_auc",-0.3705,-0.3785,-0.3624
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","alle","roc_auc",-0.0597,-0.0652,-0.0548
+"LR voll","LR ohne Unfalltyp","zufaellig","alle","roc_auc",0.0423,0.0382,0.0475
+"Random Forest","LR ohne Unfalltyp","zufaellig","alle","roc_auc",0.05,0.0453,0.0561
+"Basislinie","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","roc_auc",-0.3385,-0.348,-0.3292
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","roc_auc",-0.0421,-0.0475,-0.0371
+"LR voll","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","roc_auc",0.0399,0.0356,0.0455
+"Random Forest","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","roc_auc",0.0505,0.045,0.057
+"Basislinie","LR ohne Unfalltyp","zufaellig","vor_2015","roc_auc",-0.357,-0.3723,-0.3405
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","vor_2015","roc_auc",-0.0725,-0.0861,-0.0611
+"LR voll","LR ohne Unfalltyp","zufaellig","vor_2015","roc_auc",0.048,0.0381,0.058
+"Random Forest","LR ohne Unfalltyp","zufaellig","vor_2015","roc_auc",0.0604,0.0487,0.0724
+"Basislinie","LR ohne Unfalltyp","zufaellig","ab_2015","roc_auc",-0.3715,-0.3798,-0.3623
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ab_2015","roc_auc",-0.0511,-0.0567,-0.0453
+"LR voll","LR ohne Unfalltyp","zufaellig","ab_2015","roc_auc",0.0416,0.0367,0.0475
+"Random Forest","LR ohne Unfalltyp","zufaellig","ab_2015","roc_auc",0.048,0.0421,0.0547
+"Basislinie","LR ohne Unfalltyp","zufaellig","alle","avg_precision",-0.5071,-0.5202,-0.4924
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","alle","avg_precision",-0.1397,-0.1479,-0.1303
+"LR voll","LR ohne Unfalltyp","zufaellig","alle","avg_precision",0.0391,0.0342,0.0454
+"Random Forest","LR ohne Unfalltyp","zufaellig","alle","avg_precision",0.0654,0.0562,0.0744
+"Basislinie","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","avg_precision",-0.4407,-0.4541,-0.4265
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","avg_precision",-0.1247,-0.1329,-0.1161
+"LR voll","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","avg_precision",0.0339,0.0292,0.04
+"Random Forest","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","avg_precision",0.0582,0.0493,0.0672
+"Basislinie","LR ohne Unfalltyp","zufaellig","vor_2015","avg_precision",-0.4607,-0.4887,-0.4325
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","vor_2015","avg_precision",-0.131,-0.1483,-0.113
+"LR voll","LR ohne Unfalltyp","zufaellig","vor_2015","avg_precision",0.0464,0.0354,0.0595
+"Random Forest","LR ohne Unfalltyp","zufaellig","vor_2015","avg_precision",0.0781,0.0595,0.0969
+"Basislinie","LR ohne Unfalltyp","zufaellig","ab_2015","avg_precision",-0.5136,-0.529,-0.4983
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ab_2015","avg_precision",-0.1339,-0.1443,-0.124
+"LR voll","LR ohne Unfalltyp","zufaellig","ab_2015","avg_precision",0.0374,0.0315,0.0445
+"Random Forest","LR ohne Unfalltyp","zufaellig","ab_2015","avg_precision",0.0619,0.0509,0.0724
+"Basislinie","LR ohne Unfalltyp","zufaellig","alle","brier",0.0857,0.0815,0.0897
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","alle","brier",0.0054,0.0044,0.0067
+"LR voll","LR ohne Unfalltyp","zufaellig","alle","brier",-0.0084,-0.0099,-0.0072
+"Random Forest","LR ohne Unfalltyp","zufaellig","alle","brier",-0.015,-0.0168,-0.0134
+"Basislinie","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier",0.0934,0.0878,0.0985
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier",0.0058,0.0045,0.0073
+"LR voll","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier",-0.0109,-0.0128,-0.0093
+"Random Forest","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier",-0.0179,-0.0203,-0.0158
+"Basislinie","LR ohne Unfalltyp","zufaellig","vor_2015","brier",0.0938,0.0845,0.1028
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","vor_2015","brier",0.0085,0.0052,0.0112
+"LR voll","LR ohne Unfalltyp","zufaellig","vor_2015","brier",-0.0143,-0.0178,-0.0106
+"Random Forest","LR ohne Unfalltyp","zufaellig","vor_2015","brier",-0.0224,-0.0272,-0.018
+"Basislinie","LR ohne Unfalltyp","zufaellig","ab_2015","brier",0.0836,0.0792,0.0878
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ab_2015","brier",0.0047,0.0036,0.0061
+"LR voll","LR ohne Unfalltyp","zufaellig","ab_2015","brier",-0.0069,-0.0085,-0.0056
+"Random Forest","LR ohne Unfalltyp","zufaellig","ab_2015","brier",-0.0131,-0.015,-0.0113
+"Basislinie","LR ohne Unfalltyp","zufaellig","alle","log_loss",0.2143,0.2029,0.2243
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","alle","log_loss",0.0207,0.017,0.0248
+"LR voll","LR ohne Unfalltyp","zufaellig","alle","log_loss",-0.0381,-0.0426,-0.0343
+"Random Forest","LR ohne Unfalltyp","zufaellig","alle","log_loss",-0.0584,-0.0642,-0.0533
+"Basislinie","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","log_loss",0.2133,0.1982,0.2265
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","log_loss",0.018,0.0132,0.0229
+"LR voll","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","log_loss",-0.0371,-0.0427,-0.0325
+"Random Forest","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","log_loss",-0.0593,-0.0665,-0.0524
+"Basislinie","LR ohne Unfalltyp","zufaellig","vor_2015","log_loss",0.2204,0.1974,0.2434
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","vor_2015","log_loss",0.033,0.0197,0.0439
+"LR voll","LR ohne Unfalltyp","zufaellig","vor_2015","log_loss",-0.0551,-0.0658,-0.0458
+"Random Forest","LR ohne Unfalltyp","zufaellig","vor_2015","log_loss",-0.0821,-0.0961,-0.0687
+"Basislinie","LR ohne Unfalltyp","zufaellig","ab_2015","log_loss",0.2127,0.2015,0.2235
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ab_2015","log_loss",0.0176,0.0138,0.0216
+"LR voll","LR ohne Unfalltyp","zufaellig","ab_2015","log_loss",-0.0337,-0.0386,-0.0297
+"Random Forest","LR ohne Unfalltyp","zufaellig","ab_2015","log_loss",-0.0524,-0.0584,-0.0455
+"Basislinie","LR ohne Unfalltyp","zufaellig","alle","brier_skill",-0.4511,-0.4699,-0.4315
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","alle","brier_skill",-0.0286,-0.0355,-0.023
+"LR voll","LR ohne Unfalltyp","zufaellig","alle","brier_skill",0.0442,0.0376,0.0521
+"Random Forest","LR ohne Unfalltyp","zufaellig","alle","brier_skill",0.079,0.0708,0.0884
+"Basislinie","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier_skill",-0.4124,-0.4332,-0.3899
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier_skill",-0.0257,-0.0326,-0.0196
+"LR voll","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier_skill",0.0482,0.0409,0.0565
+"Random Forest","LR ohne Unfalltyp","zufaellig","ohne_parkier_tier","brier_skill",0.0791,0.0703,0.0895
+"Basislinie","LR ohne Unfalltyp","zufaellig","vor_2015","brier_skill",-0.4265,-0.4618,-0.3904
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","vor_2015","brier_skill",-0.0385,-0.0503,-0.0244
+"LR voll","LR ohne Unfalltyp","zufaellig","vor_2015","brier_skill",0.0648,0.0493,0.0807
+"Random Forest","LR ohne Unfalltyp","zufaellig","vor_2015","brier_skill",0.1019,0.0835,0.1212
+"Basislinie","LR ohne Unfalltyp","zufaellig","ab_2015","brier_skill",-0.4586,-0.4779,-0.437
+"Regel (verletzliche Gruppen)","LR ohne Unfalltyp","zufaellig","ab_2015","brier_skill",-0.0255,-0.0333,-0.0194
+"LR voll","LR ohne Unfalltyp","zufaellig","ab_2015","brier_skill",0.0378,0.0307,0.0466
+"Random Forest","LR ohne Unfalltyp","zufaellig","ab_2015","brier_skill",0.0719,0.062,0.0823
+"Random Forest","LR voll","zufaellig","alle","roc_auc",0.0076,0.0056,0.0096
+"Random Forest","LR voll","zufaellig","ohne_parkier_tier","roc_auc",0.0106,0.0077,0.0134
+"Random Forest","LR voll","zufaellig","vor_2015","roc_auc",0.0124,0.0076,0.0182
+"Random Forest","LR voll","zufaellig","ab_2015","roc_auc",0.0064,0.004,0.0087
+"Random Forest","LR voll","zufaellig","alle","avg_precision",0.0263,0.0186,0.0329
+"Random Forest","LR voll","zufaellig","ohne_parkier_tier","avg_precision",0.0244,0.0168,0.0312
+"Random Forest","LR voll","zufaellig","vor_2015","avg_precision",0.0318,0.018,0.0459
+"Random Forest","LR voll","zufaellig","ab_2015","avg_precision",0.0245,0.0154,0.0328
+"Random Forest","LR voll","zufaellig","alle","brier",-0.0066,-0.0079,-0.0053
+"Random Forest","LR voll","zufaellig","ohne_parkier_tier","brier",-0.007,-0.0086,-0.0055
+"Random Forest","LR voll","zufaellig","vor_2015","brier",-0.0081,-0.0113,-0.0053
+"Random Forest","LR voll","zufaellig","ab_2015","brier",-0.0062,-0.0076,-0.0048
+"Random Forest","LR voll","zufaellig","alle","log_loss",-0.0203,-0.024,-0.0162
+"Random Forest","LR voll","zufaellig","ohne_parkier_tier","log_loss",-0.0222,-0.0268,-0.0173
+"Random Forest","LR voll","zufaellig","vor_2015","log_loss",-0.027,-0.0367,-0.0174
+"Random Forest","LR voll","zufaellig","ab_2015","log_loss",-0.0186,-0.0225,-0.0139
+"Random Forest","LR voll","zufaellig","alle","brier_skill",0.0348,0.0282,0.0416
+"Random Forest","LR voll","zufaellig","ohne_parkier_tier","brier_skill",0.0309,0.0243,0.038
+"Random Forest","LR voll","zufaellig","vor_2015","brier_skill",0.037,0.0239,0.0513
+"Random Forest","LR voll","zufaellig","ab_2015","brier_skill",0.0341,0.0262,0.0416

@@ -1,0 +1,14 @@
+# Severity model ladder (R/models_*.R). Defaults of the plan; a changed value is a descope step and is
+# written to export/modell/schwere_lauf.json automatically.
+# Descope order when the projected run time exceeds the budget:
+#   1 zufall: reduced   2 n_boot: 500   3 n_cand_rf / n_cand_xgb: 10   4 gam: false
+n_boot: 500           # paired bootstrap draws, identical for all models
+n_cand_rf: 10         # Latin-hypercube candidates, tune_race_anova
+n_cand_xgb: 10
+rf_trees: 500
+xgb_trees: 1000       # upper bound, early stopping decides
+xgb_stop: 25
+gam: true
+zufall: reduced         # alle | reduced (random split only for LR full + best tuned model)
+budget_min_lokal: 15  # all model targets, 8 threads
+budget_min_ci: 30     # ubuntu-24.04 runner, 4 vCPU

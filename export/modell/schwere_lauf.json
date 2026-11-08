@@ -1,0 +1,170 @@
+{
+  "jahre": {
+    "year_from": 2011,
+    "year_to": 2024,
+    "test": [2022, 2023, 2024],
+    "validation": [2018, 2019, 2020, 2021],
+    "train_final": [2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021]
+  },
+  "split": {
+    "zeitlich": {
+      "n_train": 50365,
+      "n_test": 15686
+    },
+    "zufaellig": {
+      "n_train": 52840,
+      "n_test": 13211
+    }
+  },
+  "referenz": "LR ohne Unfalltyp",
+  "zusatzreferenz": "LR voll",
+  "basislinie": "Basislinie",
+  "bootstrap_n": 500,
+  "kandidaten": {
+    "random_forest": 10,
+    "xgboost": 10,
+    "elastic_net_grid": 30
+  },
+  "baeume": {
+    "random_forest": 500,
+    "xgboost_max": 1000,
+    "xgboost_runden_gewaehlt": 165
+  },
+  "threads": 8,
+  "modelle_zufallssplit": ["Basislinie", "Regel (verletzliche Gruppen)", "LR ohne Unfalltyp", "LR voll", "Random Forest"],
+  "bestes_getuntes_modell": "Random Forest",
+  "descope": [
+    "1: Zufallssplit nur fuer LR voll + bestes getuntes Modell",
+    "2: Bootstrap auf 500 Ziehungen reduziert",
+    "3: Racing-Kandidaten reduziert"
+  ],
+  "laufzeit_sekunden": {
+    "gesamt": 610.4,
+    "bootstrap": {
+      "zeitlich": 4.2,
+      "zufaellig": 4.1
+    },
+    "je_modell": {
+      "Basislinie": {
+        "zeitlich_fit": 0,
+        "zeitlich_predict": 0,
+        "zeitlich_interpretation": 0.1,
+        "zufaellig_fit": 0,
+        "zufaellig_predict": 0
+      },
+      "Elastic Net": {
+        "zeitlich_tuning": 21,
+        "zeitlich_fit": 1.3,
+        "zeitlich_predict": 0.1,
+        "zeitlich_interpretation": 3.1
+      },
+      "GAM": {
+        "zeitlich_fit": 0.3,
+        "zeitlich_predict": 0,
+        "zeitlich_interpretation": 1.8
+      },
+      "LR ohne Unfalltyp": {
+        "zeitlich_fit": 2.1,
+        "zeitlich_predict": 0.1,
+        "zeitlich_interpretation": 1.9,
+        "zufaellig_fit": 2.5,
+        "zufaellig_predict": 0.1
+      },
+      "LR voll": {
+        "zeitlich_fit": 0.9,
+        "zeitlich_predict": 0.1,
+        "zeitlich_interpretation": 2.4,
+        "zufaellig_fit": 1.2,
+        "zufaellig_predict": 0.1
+      },
+      "Random Forest": {
+        "zeitlich_tuning": 118,
+        "zeitlich_fit": 3.9,
+        "zeitlich_predict": 0.9,
+        "zeitlich_interpretation": 30.6,
+        "zufaellig_tuning": 154,
+        "zufaellig_fit": 3.6,
+        "zufaellig_predict": 0.9
+      },
+      "Regel (verletzliche Gruppen)": {
+        "zeitlich_fit": 0,
+        "zeitlich_predict": 0,
+        "zeitlich_interpretation": 0,
+        "zufaellig_fit": 0,
+        "zufaellig_predict": 0
+      },
+      "XGBoost": {
+        "zeitlich_tuning": 246.8,
+        "zeitlich_fit": 1.9,
+        "zeitlich_predict": 0.1,
+        "zeitlich_interpretation": 2.3
+      }
+    }
+  },
+  "budget_minuten": {
+    "lokal": 15,
+    "ci": 30
+  },
+  "smoke": {
+    "datum": "2026-11-08",
+    "anteil": 0.2,
+    "tuning": {
+      "sekunden": 111.1,
+      "spitze_prozess_mb": 745,
+      "spitze_container_mb": 673,
+      "threads": 8,
+      "n": {
+        "train": 10073,
+        "test": 3137
+      },
+      "sekunden_je_modell": {
+        "Basislinie": 0,
+        "Regel (verletzliche Gruppen)": 0,
+        "LR ohne Unfalltyp": 2.5,
+        "LR voll": 2,
+        "Elastic Net": 9,
+        "GAM": 1.4,
+        "Random Forest": 57.7,
+        "XGBoost": 37.8
+      }
+    },
+    "bootstrap": {
+      "sekunden": 4,
+      "spitze_prozess_mb": 133,
+      "spitze_container_mb": 924,
+      "threads": 8,
+      "n": {
+        "test": 16000
+      },
+      "laufzeit": {}
+    },
+    "hochrechnung": {
+      "tuning_sekunden": 555,
+      "bootstrap_sekunden": 20,
+      "gesamt_sekunden": 575,
+      "gesamt_minuten": 9.6,
+      "spitze_container_mb_100pct": 4620,
+      "methode": "linear in 1/anteil (Trainingszeilen bzw. Bootstrap-Ziehungen)"
+    },
+    "hinweis": "spitze_prozess_mb = groesster Einzelprozess (/usr/bin/time -v), je Phase getrennt; spitze_container_mb = cgroup memory.peak, kumulativ seit Containerstart (Phasen laufen nacheinander im selben Container, enthaelt Page-Cache)"
+  },
+  "hyperparameter": {
+    "Elastic Net": {
+      "penalty": 0.007743,
+      "mixture": 1
+    },
+    "Random Forest": {
+      "mtry": 5,
+      "min_n": 144
+    },
+    "XGBoost": {
+      "mtry": 0.3081,
+      "min_n": 25,
+      "tree_depth": 6,
+      "learn_rate": 0.08443,
+      "loss_reduction": 0.2787,
+      "sample_size": 0.947
+    }
+  },
+  "r_version": "4.5.1"
+}

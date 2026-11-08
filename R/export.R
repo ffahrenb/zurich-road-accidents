@@ -30,6 +30,7 @@ export_public <- function(db_path, export_cfg, out_dir = "export/data") {
       FROM stg_quartiere q
       LEFT JOIN mart_quartier m ON q.quartier_nr = m.quartier_nr AND m.jahr >= 2015
       GROUP BY ALL
+      ORDER BY q.quartier_nr
     ) TO '%s' WITH (FORMAT gdal, DRIVER 'GeoJSON', LAYER_CREATION_OPTIONS 'COORDINATE_PRECISION=5')", qrt))
   c(files, pts, qrt)
 }
@@ -58,15 +59,6 @@ write_csv <- function(x, path) {
   dir.create(dirname(path), recursive = TRUE, showWarnings = FALSE)
   utils::write.csv(x, path, row.names = FALSE, na = "", fileEncoding = "UTF-8")
   path
-}
-
-export_models <- function(sev, out_dir = "export/modell") {
-  c(
-    write_csv(sev$metrics, file.path(out_dir, "schwere_metriken.csv")),
-    write_csv(sev$calibration, file.path(out_dir, "schwere_kalibrierung.csv")),
-    write_csv(sev$odds_ratios, file.path(out_dir, "schwere_odds_ratios.csv")),
-    write_csv(sev$importance, file.path(out_dir, "schwere_wichtigkeit.csv"))
-  )
 }
 
 # Track X: statistical disclosure control before anything is written.
