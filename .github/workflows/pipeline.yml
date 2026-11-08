@@ -1,0 +1,120 @@
+name: pipeline
+
+# Public track only: CI never sees the private exact-date file. Track X outputs
+# (export/trackx) are committed and must survive tar_make() unchanged.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 4 1 * *"   # monthly: pick up new open-data snapshots
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pipeline-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    container:
+      image: docker.io/rocker/geospatial:4.5.1@sha256:3c1eba8663ca573b540486769c665b5c5217035de7477d05e485d738edcfd582
+    permissions:
+      contents: read
+      pages: read
+    env:
+      # same dated CRAN snapshot as docker/Containerfile
+      CRAN_SNAPSHOT: https://p3m.dev/cran/__linux__/noble/2025-10-30
+      DUCKDB_EXTENSION_DIR: /opt/duckdb_extensions
+      R_LIBS_USER: ${{ github.workspace }}/.rlib
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - name: Cache R library
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9  # v6.1.0
+        with:
+          path: ${{ github.workspace }}/.rlib
+          key: rlib-4.5.1-${{ hashFiles('docker/packages.txt') }}
+
+      - name: Install R packages (docker/packages.txt, dated snapshot)
+        run: |
+          mkdir -p "$R_LIBS_USER"
+          Rscript -e '
+            options(repos = c(CRAN = Sys.getenv("CRAN_SNAPSHOT")))
+            pk <- readLines("docker/packages.txt"); pk <- pk[nzchar(pk) & !startsWith(pk, "#")]
+            todo <- setdiff(pk, rownames(installed.packages()))
+            if (length(todo)) install.packages(todo, lib = Sys.getenv("R_LIBS_USER"), Ncpus = 4)
+            missing <- setdiff(pk, rownames(installed.packages()))
+            if (length(missing)) stop("not installed: ", paste(missing, collapse = ", "))'
+
+      - name: Install DuckDB extensions (spatial, icu)
+        run: |
+          mkdir -p "$DUCKDB_EXTENSION_DIR"
+          Rscript -e '
+            con <- DBI::dbConnect(duckdb::duckdb())
+            DBI::dbExecute(con, sprintf("SET extension_directory = \"%s\"", Sys.getenv("DUCKDB_EXTENSION_DIR")))
+            for (e in c("spatial", "icu")) {
+              DBI::dbExecute(con, paste("INSTALL", e)); DBI::dbExecute(con, paste("LOAD", e))
+            }
+            DBI::dbDisconnect(con, shutdown = TRUE)'
+
+      - name: Install sqlfluff 3.4.2 (venv)
+        run: |
+          apt-get update -qq && apt-get install -y --no-install-recommends python3-venv
+          python3 -m venv /opt/sqlfluff
+          /opt/sqlfluff/bin/pip install --no-cache-dir sqlfluff==3.4.2
+          echo /opt/sqlfluff/bin >> "$GITHUB_PATH"
+
+      - name: Lint (lintr + sqlfluff)
+        run: |
+          Rscript tests/lint.R
+          sqlfluff lint sql/
+
+      - name: Tests (testthat incl. privacy gate)
+        run: Rscript tests/testthat.R
+
+      - name: Pipeline (tar_make, public track only)
+        run: Rscript -e 'targets::tar_make()'
+
+      - name: Privacy gate on fresh outputs
+        run: Rscript -e 'testthat::test_file("tests/testthat/test-privacy.R", stop_on_failure = TRUE)'
+
+      - name: Track X files untouched by the public run
+        run: |
+          # committed Track X outputs must not be modified or deleted by tar_make()
+          if [ -d export/trackx ]; then git -c safe.directory='*' diff --exit-code -- export/trackx; fi
+
+      - name: Render site
+        run: quarto render site/
+
+      - name: Configure Pages
+        if: github.event_name != 'pull_request'
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
+
+      - name: Upload Pages artifact
+        if: github.event_name != 'pull_request'
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        with:
+          path: site/_site
+
+  deploy:
+    if: github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346  # v5.0.1

@@ -1,0 +1,17 @@
+linters: linters_with_defaults(
+    line_length_linter(120),
+    # snake_case, German names and digits allowed (e.g. mart_unfaelle, wetter_klassen)
+    object_name_linter(styles = "snake_case"),
+    # off: functions are shared across R/*.R via targets::tar_source(), so the
+    # per-file check reports every cross-file call as an undefined global
+    object_usage_linter = NULL,
+    # off: hanging-indent rules fight the aligned multi-line calls used throughout
+    indentation_linter = NULL
+  )
+encoding: "UTF-8"
+exclusions: list(
+    "_targets",
+    "renv",
+    "site/_site",
+    "site/_freeze"
+  )
