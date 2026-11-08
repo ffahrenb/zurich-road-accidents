@@ -39,52 +39,52 @@
     "3: Racing-Kandidaten reduziert"
   ],
   "laufzeit_sekunden": {
-    "gesamt": 554.1,
+    "gesamt": 610.4,
     "bootstrap": {
-      "zeitlich": 2.8,
-      "zufaellig": 3
+      "zeitlich": 4.2,
+      "zufaellig": 4.1
     },
     "je_modell": {
       "Basislinie": {
         "zeitlich_fit": 0,
         "zeitlich_predict": 0,
-        "zeitlich_interpretation": 0,
+        "zeitlich_interpretation": 0.1,
         "zufaellig_fit": 0,
         "zufaellig_predict": 0
       },
       "Elastic Net": {
-        "zeitlich_tuning": 18.5,
-        "zeitlich_fit": 0.9,
+        "zeitlich_tuning": 21,
+        "zeitlich_fit": 1.3,
         "zeitlich_predict": 0.1,
-        "zeitlich_interpretation": 2.3
+        "zeitlich_interpretation": 3.1
       },
       "GAM": {
-        "zeitlich_fit": 0.2,
+        "zeitlich_fit": 0.3,
         "zeitlich_predict": 0,
-        "zeitlich_interpretation": 1.9
+        "zeitlich_interpretation": 1.8
       },
       "LR ohne Unfalltyp": {
-        "zeitlich_fit": 0.6,
-        "zeitlich_predict": 0,
-        "zeitlich_interpretation": 1.8,
-        "zufaellig_fit": 0.4,
-        "zufaellig_predict": 0.2
+        "zeitlich_fit": 2.1,
+        "zeitlich_predict": 0.1,
+        "zeitlich_interpretation": 1.9,
+        "zufaellig_fit": 2.5,
+        "zufaellig_predict": 0.1
       },
       "LR voll": {
-        "zeitlich_fit": 0.5,
+        "zeitlich_fit": 0.9,
         "zeitlich_predict": 0.1,
-        "zeitlich_interpretation": 2.2,
-        "zufaellig_fit": 0.5,
+        "zeitlich_interpretation": 2.4,
+        "zufaellig_fit": 1.2,
         "zufaellig_predict": 0.1
       },
       "Random Forest": {
-        "zeitlich_tuning": 119.5,
-        "zeitlich_fit": 3.1,
+        "zeitlich_tuning": 118,
+        "zeitlich_fit": 3.9,
         "zeitlich_predict": 0.9,
-        "zeitlich_interpretation": 27.1,
-        "zufaellig_tuning": 133.8,
-        "zufaellig_fit": 3.2,
-        "zufaellig_predict": 0.8
+        "zeitlich_interpretation": 30.6,
+        "zufaellig_tuning": 154,
+        "zufaellig_fit": 3.6,
+        "zufaellig_predict": 0.9
       },
       "Regel (verletzliche Gruppen)": {
         "zeitlich_fit": 0,
@@ -94,10 +94,10 @@
         "zufaellig_predict": 0
       },
       "XGBoost": {
-        "zeitlich_tuning": 225.6,
-        "zeitlich_fit": 1.5,
+        "zeitlich_tuning": 246.8,
+        "zeitlich_fit": 1.9,
         "zeitlich_predict": 0.1,
-        "zeitlich_interpretation": 2
+        "zeitlich_interpretation": 2.3
       }
     }
   },

@@ -1,42 +1,32 @@
-"term","odds_ratio","ci_low","ci_high","p_value"
-"stunde",1.002,0.997,1.008,0.379
-"monat",1,0.991,1.008,0.94
-"jahr",0.953,0.946,0.96,7.47e-38
-"mit_fussgaenger",8.29,6.061,11.339,5.32e-40
-"mit_velo",36.214,33.453,39.203,0
-"mit_motorrad",10.099,9.291,10.978,0
-"nahe_schule",0.977,0.911,1.048,0.515
-"nacht",1.223,1.118,1.338,1.15e-05
-"wochentag_X2",0.998,0.901,1.105,0.97
-"wochentag_X3",0.99,0.895,1.095,0.847
-"wochentag_X4",0.932,0.841,1.032,0.177
-"wochentag_X5",0.918,0.83,1.016,0.0971
-"wochentag_X6",1.06,0.953,1.178,0.286
-"wochentag_X7",1.019,0.907,1.145,0.749
-"typ_Andere",9.404,7.5,11.791,5.9e-84
-"typ_Auffahrunfall",0.718,0.645,0.8,1.44e-09
-"typ_Einbiegeunfall",0.622,0.541,0.715,2.33e-11
-"typ_Frontalkollision",0.445,0.353,0.562,8.25e-12
-"typ_Fussgängerunfall",11.319,8.095,15.827,1.14e-45
-"typ_Parkierunfall",0.084,0.072,0.098,1.88e-216
-"typ_Schleuder..oder.Selbstunfall",0.585,0.526,0.65,2.91e-23
-"typ_Tierunfall",0.145,0.087,0.243,2.17e-13
-"typ_Überholunfall.oder.Fahrstreifenwechsel",0.164,0.144,0.187,1.52e-163
-"typ_Überqueren.der.Fahrbahn",0.938,0.811,1.084,0.386
-"strassenart_Hauptstrasse",2,1.638,2.442,1.01e-11
-"strassenart_Nebenstrasse",1.501,1.238,1.82,3.69e-05
-"tempo_klasse_Tempo.50",1.566,1.463,1.676,2.57e-38
-"tempo_klasse_Tempo.60.",1.716,1.452,2.028,2.34e-10
-"tempo_klasse_unbekannt",1.437,1.229,1.681,5.84e-06
-"kreis_nr_X1",2.094,0.189,23.266,0.547
-"kreis_nr_X2",2.744,0.247,30.508,0.411
-"kreis_nr_X3",2.626,0.236,29.198,0.432
-"kreis_nr_X4",2.353,0.212,26.152,0.486
-"kreis_nr_X5",2.651,0.238,29.483,0.428
-"kreis_nr_X6",3.1,0.279,34.47,0.357
-"kreis_nr_X7",2.652,0.238,29.498,0.428
-"kreis_nr_X8",2.733,0.245,30.438,0.414
-"kreis_nr_X9",3.106,0.279,34.537,0.356
-"kreis_nr_X10",3.064,0.275,34.086,0.362
-"kreis_nr_X11",3.017,0.272,33.528,0.369
-"kreis_nr_X12",3.004,0.27,33.478,0.371
+"modell","term","odds_ratio","ci_low","ci_high","p_value"
+"LR ohne Unfalltyp","stunde",0.9984,0.9932,1.0037,0.55
+"LR ohne Unfalltyp","monat",0.9984,0.9901,1.0067,0.704
+"LR ohne Unfalltyp","ab_2015",0.5339,0.5032,0.5665,0
+"LR ohne Unfalltyp","mit_fussgaenger",157.8514,130.2437,191.3112,0
+"LR ohne Unfalltyp","mit_velo",40.8448,37.7874,44.1495,0
+"LR ohne Unfalltyp","mit_motorrad",12.3389,11.3585,13.404,0
+"LR ohne Unfalltyp","nahe_schule",0.9766,0.9117,1.0461,0.5
+"LR ohne Unfalltyp","nacht",1.1378,1.0418,1.2427,0.0041
+"LR ohne Unfalltyp","wochentag_X2",1.0494,0.9494,1.1599,0.346
+"LR ohne Unfalltyp","wochentag_X3",1.0279,0.9312,1.1347,0.585
+"LR ohne Unfalltyp","wochentag_X4",0.9694,0.8769,1.0717,0.544
+"LR ohne Unfalltyp","wochentag_X5",0.8868,0.803,0.9794,0.0177
+"LR ohne Unfalltyp","wochentag_X6",1.1008,0.9924,1.2209,0.0693
+"LR ohne Unfalltyp","wochentag_X7",1.0135,0.9041,1.1361,0.818
+"LR ohne Unfalltyp","strassenart_Hauptstrasse",3.3181,2.7665,3.9797,0
+"LR ohne Unfalltyp","strassenart_Nebenstrasse",2.105,1.7659,2.5092,0
+"LR ohne Unfalltyp","tempo_klasse_Tempo.50",1.8351,1.7196,1.9582,0
+"LR ohne Unfalltyp","tempo_klasse_Tempo.60.",1.9778,1.6744,2.3362,0
+"LR ohne Unfalltyp","tempo_klasse_unbekannt",1.3622,1.1735,1.5813,0
+"LR ohne Unfalltyp","kreis_nr_X1",2.0498,0.0192,218.458,0.763
+"LR ohne Unfalltyp","kreis_nr_X2",3.1134,0.0292,331.9852,0.634
+"LR ohne Unfalltyp","kreis_nr_X3",2.924,0.0274,311.7407,0.652
+"LR ohne Unfalltyp","kreis_nr_X4",2.8106,0.0264,299.6403,0.664
+"LR ohne Unfalltyp","kreis_nr_X5",2.931,0.0275,312.5579,0.652
+"LR ohne Unfalltyp","kreis_nr_X6",3.5815,0.0336,381.8911,0.592
+"LR ohne Unfalltyp","kreis_nr_X7",3.0161,0.0283,321.6809,0.643
+"LR ohne Unfalltyp","kreis_nr_X8",2.9112,0.0273,310.6743,0.654
+"LR ohne Unfalltyp","kreis_nr_X9",3.5935,0.0337,383.1257,0.591
+"LR ohne Unfalltyp","kreis_nr_X10",3.8369,0.036,409.2523,0.572
+"LR ohne Unfalltyp","kreis_nr_X11",3.4686,0.0325,369.7349,0.602
+"LR ohne Unfalltyp","kreis_nr_X12",3.4047,0.0319,363.3963,0.607

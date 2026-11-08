@@ -35,9 +35,13 @@ Hinweise für Maschinen und Menschen: Die Zahl der erfassten Unfälle springt 20
 - https://ffahrenb.github.io/zurich-road-accidents/export/dq/snapshot_history.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/meta/katalog.jsonld
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_differenzen.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_effekte.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_kalibrierung.csv
-- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_metriken.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_lauf.json
 - https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_odds_ratios.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_tuning.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_vergleich.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_wichtigkeit.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/trackx/wetter_effekt.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/trackx/wetter_klassen.csv

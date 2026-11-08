@@ -15,22 +15,22 @@
 "GAM",6,"zeitlich","ohne_parkier_tier","roc_auc",0.8744,0.8676,0.8818,11930
 "Random Forest",7,"zeitlich","ohne_parkier_tier","roc_auc",0.8892,0.8824,0.896,11930
 "XGBoost",8,"zeitlich","ohne_parkier_tier","roc_auc",0.888,0.8814,0.8949,11930
-"Basislinie",1,"zeitlich","alle","pr_auc",0.6246,0.6214,0.6284,15686
-"Regel (verletzliche Gruppen)",2,"zeitlich","alle","pr_auc",0.7409,0.7202,0.7605,15686
-"LR ohne Unfalltyp",3,"zeitlich","alle","pr_auc",0.7483,0.7342,0.7618,15686
-"LR voll",4,"zeitlich","alle","pr_auc",0.7797,0.7661,0.7934,15686
-"Elastic Net",5,"zeitlich","alle","pr_auc",0.7757,0.7615,0.7896,15686
-"GAM",6,"zeitlich","alle","pr_auc",0.7804,0.7667,0.794,15686
-"Random Forest",7,"zeitlich","alle","pr_auc",0.8164,0.8031,0.8292,15686
-"XGBoost",8,"zeitlich","alle","pr_auc",0.8134,0.8001,0.8262,15686
-"Basislinie",1,"zeitlich","ohne_parkier_tier","pr_auc",0.6602,0.6561,0.665,11930
-"Regel (verletzliche Gruppen)",2,"zeitlich","ohne_parkier_tier","pr_auc",0.7519,0.7315,0.7714,11930
-"LR ohne Unfalltyp",3,"zeitlich","ohne_parkier_tier","pr_auc",0.7552,0.7411,0.7683,11930
-"LR voll",4,"zeitlich","ohne_parkier_tier","pr_auc",0.7823,0.7682,0.7958,11930
-"Elastic Net",5,"zeitlich","ohne_parkier_tier","pr_auc",0.7787,0.7644,0.7923,11930
-"GAM",6,"zeitlich","ohne_parkier_tier","pr_auc",0.7829,0.7687,0.7964,11930
-"Random Forest",7,"zeitlich","ohne_parkier_tier","pr_auc",0.8178,0.8045,0.8309,11930
-"XGBoost",8,"zeitlich","ohne_parkier_tier","pr_auc",0.8157,0.8023,0.8289,11930
+"Basislinie",1,"zeitlich","alle","avg_precision",0.2493,0.2429,0.2567,15686
+"Regel (verletzliche Gruppen)",2,"zeitlich","alle","avg_precision",0.6148,0.6013,0.6296,15686
+"LR ohne Unfalltyp",3,"zeitlich","alle","avg_precision",0.7484,0.7344,0.7619,15686
+"LR voll",4,"zeitlich","alle","avg_precision",0.7798,0.7663,0.7937,15686
+"Elastic Net",5,"zeitlich","alle","avg_precision",0.7719,0.7579,0.7859,15686
+"GAM",6,"zeitlich","alle","avg_precision",0.7805,0.7669,0.7942,15686
+"Random Forest",7,"zeitlich","alle","avg_precision",0.8164,0.8032,0.8293,15686
+"XGBoost",8,"zeitlich","alle","avg_precision",0.8135,0.8002,0.8263,15686
+"Basislinie",1,"zeitlich","ohne_parkier_tier","avg_precision",0.3205,0.3121,0.3299,11930
+"Regel (verletzliche Gruppen)",2,"zeitlich","ohne_parkier_tier","avg_precision",0.6365,0.6226,0.651,11930
+"LR ohne Unfalltyp",3,"zeitlich","ohne_parkier_tier","avg_precision",0.7553,0.7413,0.7684,11930
+"LR voll",4,"zeitlich","ohne_parkier_tier","avg_precision",0.7824,0.7684,0.796,11930
+"Elastic Net",5,"zeitlich","ohne_parkier_tier","avg_precision",0.7749,0.7608,0.7885,11930
+"GAM",6,"zeitlich","ohne_parkier_tier","avg_precision",0.783,0.769,0.7966,11930
+"Random Forest",7,"zeitlich","ohne_parkier_tier","avg_precision",0.8178,0.8046,0.831,11930
+"XGBoost",8,"zeitlich","ohne_parkier_tier","avg_precision",0.8158,0.8024,0.8291,11930
 "Basislinie",1,"zeitlich","alle","brier",0.1872,0.1841,0.1908,15686
 "Regel (verletzliche Gruppen)",2,"zeitlich","alle","brier",0.1088,0.1052,0.1124,15686
 "LR ohne Unfalltyp",3,"zeitlich","alle","brier",0.1037,0.1,0.1071,15686
@@ -99,26 +99,26 @@
 "LR ohne Unfalltyp",3,"zufaellig","ab_2015","roc_auc",0.8715,0.8623,0.8798,10518
 "LR voll",4,"zufaellig","ab_2015","roc_auc",0.9131,0.9063,0.9189,10518
 "Random Forest",7,"zufaellig","ab_2015","roc_auc",0.9195,0.9132,0.9257,10518
-"Basislinie",1,"zufaellig","alle","pr_auc",0.6276,0.6238,0.6312,13211
-"Regel (verletzliche Gruppen)",2,"zufaellig","alle","pr_auc",0.7547,0.7337,0.7712,13211
-"LR ohne Unfalltyp",3,"zufaellig","alle","pr_auc",0.7622,0.7456,0.7765,13211
-"LR voll",4,"zufaellig","alle","pr_auc",0.8013,0.7868,0.8153,13211
-"Random Forest",7,"zufaellig","alle","pr_auc",0.8276,0.8156,0.8414,13211
-"Basislinie",1,"zufaellig","ohne_parkier_tier","pr_auc",0.6649,0.6602,0.6691,9974
-"Regel (verletzliche Gruppen)",2,"zufaellig","ohne_parkier_tier","pr_auc",0.7663,0.746,0.7827,9974
-"LR ohne Unfalltyp",3,"zufaellig","ohne_parkier_tier","pr_auc",0.7704,0.754,0.7844,9974
-"LR voll",4,"zufaellig","ohne_parkier_tier","pr_auc",0.8042,0.7894,0.8183,9974
-"Random Forest",7,"zufaellig","ohne_parkier_tier","pr_auc",0.8286,0.8161,0.8433,9974
-"Basislinie",1,"zufaellig","vor_2015","pr_auc",0.6582,0.6492,0.6666,2693
-"Regel (verletzliche Gruppen)",2,"zufaellig","vor_2015","pr_auc",0.7546,0.7053,0.7959,2693
-"LR ohne Unfalltyp",3,"zufaellig","vor_2015","pr_auc",0.7768,0.7487,0.8046,2693
-"LR voll",4,"zufaellig","vor_2015","pr_auc",0.8232,0.7958,0.8471,2693
-"Random Forest",7,"zufaellig","vor_2015","pr_auc",0.855,0.8314,0.8738,2693
-"Basislinie",1,"zufaellig","ab_2015","pr_auc",0.6197,0.6156,0.6236,10518
-"Regel (verletzliche Gruppen)",2,"zufaellig","ab_2015","pr_auc",0.7578,0.7354,0.7752,10518
-"LR ohne Unfalltyp",3,"zufaellig","ab_2015","pr_auc",0.753,0.7357,0.7701,10518
-"LR voll",4,"zufaellig","ab_2015","pr_auc",0.7904,0.7743,0.8067,10518
-"Random Forest",7,"zufaellig","ab_2015","pr_auc",0.815,0.8,0.8303,10518
+"Basislinie",1,"zufaellig","alle","avg_precision",0.2552,0.2476,0.2624,13211
+"Regel (verletzliche Gruppen)",2,"zufaellig","alle","avg_precision",0.6225,0.6056,0.6378,13211
+"LR ohne Unfalltyp",3,"zufaellig","alle","avg_precision",0.7622,0.7458,0.7766,13211
+"LR voll",4,"zufaellig","alle","avg_precision",0.8014,0.7871,0.8154,13211
+"Random Forest",7,"zufaellig","alle","avg_precision",0.8277,0.8157,0.8415,13211
+"Basislinie",1,"zufaellig","ohne_parkier_tier","avg_precision",0.3298,0.3205,0.3382,9974
+"Regel (verletzliche Gruppen)",2,"zufaellig","ohne_parkier_tier","avg_precision",0.6457,0.629,0.66,9974
+"LR ohne Unfalltyp",3,"zufaellig","ohne_parkier_tier","avg_precision",0.7704,0.7542,0.7845,9974
+"LR voll",4,"zufaellig","ohne_parkier_tier","avg_precision",0.8043,0.7897,0.8185,9974
+"Random Forest",7,"zufaellig","ohne_parkier_tier","avg_precision",0.8287,0.8162,0.8433,9974
+"Basislinie",1,"zufaellig","vor_2015","avg_precision",0.3164,0.2984,0.3333,2693
+"Regel (verletzliche Gruppen)",2,"zufaellig","vor_2015","avg_precision",0.6461,0.6166,0.6739,2693
+"LR ohne Unfalltyp",3,"zufaellig","vor_2015","avg_precision",0.777,0.7494,0.8049,2693
+"LR voll",4,"zufaellig","vor_2015","avg_precision",0.8234,0.7963,0.8474,2693
+"Random Forest",7,"zufaellig","vor_2015","avg_precision",0.8552,0.8319,0.874,2693
+"Basislinie",1,"zufaellig","ab_2015","avg_precision",0.2395,0.2313,0.2471,10518
+"Regel (verletzliche Gruppen)",2,"zufaellig","ab_2015","avg_precision",0.6192,0.5988,0.6361,10518
+"LR ohne Unfalltyp",3,"zufaellig","ab_2015","avg_precision",0.7531,0.7359,0.7702,10518
+"LR voll",4,"zufaellig","ab_2015","avg_precision",0.7905,0.7747,0.8069,10518
+"Random Forest",7,"zufaellig","ab_2015","avg_precision",0.815,0.8002,0.8304,10518
 "Basislinie",1,"zufaellig","alle","brier",0.1901,0.1863,0.1936,13211
 "Regel (verletzliche Gruppen)",2,"zufaellig","alle","brier",0.1098,0.106,0.1137,13211
 "LR ohne Unfalltyp",3,"zufaellig","alle","brier",0.1043,0.1008,0.1082,13211

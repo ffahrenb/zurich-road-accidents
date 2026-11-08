@@ -50,11 +50,7 @@ list(
     dq_passed
     fit_weather(warehouse)
   }),
-  tar_target(severity_model, {
-    dq_passed
-    fit_severity(warehouse)
-  }),
-  # Severity ladder (8 models): tune on training years only -> freeze -> evaluate on the test years.
+  # Severity (track P), ladder of 8 models: tune on training years only -> freeze -> evaluate on the test years.
   tar_files_input(model_cfg_file, "config/modell.yml"),
   tar_target(model_cfg, yaml::read_yaml(model_cfg_file)),
   tar_target(severity_data, {
@@ -73,10 +69,6 @@ list(
   tar_target(export_public_files, {
     dq_passed
     export_public(warehouse, export_cfg)
-  }, format = "file"),
-  tar_target(export_model_files, {
-    dq_passed
-    export_models(severity_model)
   }, format = "file"),
   tar_target(export_ladder_files, {
     dq_passed

@@ -6,15 +6,18 @@ ladder_schema <- list(
   schwere_tuning = c("modell", "split", "kandidat", "penalty", "mixture", "mtry", "min_n", "tree_depth",
                      "learn_rate", "loss_reduction", "sample_size", "brier_cv", "log_loss_cv", "n_resamples",
                      "gewaehlt"),
-  schwere_kalibrierung2 = c("modell", "split", "bin", "vorhergesagt", "beobachtet", "n"),
-  schwere_wichtigkeit2 = c("modell", "split", "merkmal", "wichtigkeit", "ki_low", "ki_high", "n_wiederholungen"),
+  schwere_kalibrierung = c("modell", "split", "bin", "vorhergesagt", "beobachtet", "n"),
+  schwere_wichtigkeit = c("modell", "split", "merkmal", "wichtigkeit", "ki_low", "ki_high", "n_wiederholungen"),
   schwere_effekte = c("modell", "split", "merkmal", "wert", "pdp", "n_zeilen"),
-  schwere_odds_ratios2 = c("modell", "term", "odds_ratio", "ci_low", "ci_high", "p_value")
+  schwere_odds_ratios = c("modell", "term", "odds_ratio", "ci_low", "ci_high", "p_value")
 )
 
 round_cols <- function(x, places = 4) {
+  raw_penalty <- x$penalty
   num <- vapply(x, is.double, logical(1))
   x[num] <- lapply(x[num], round, places)
+  # the elastic-net penalty grid spans 1e-10 .. 0.1: significant digits, not decimal places
+  if ("penalty" %in% names(x)) x$penalty <- signif(raw_penalty, 3)
   x
 }
 
@@ -68,12 +71,12 @@ export_ladder <- function(zeit, zufall, boot_zeit, boot_zufall, s, plan, smoke_f
     schwere_vergleich = rbind(boot_zeit$vergleich, boot_zufall$vergleich),
     schwere_differenzen = rbind(boot_zeit$differenzen, boot_zufall$differenzen),
     schwere_tuning = rbind(zeit$tuning, zufall$tuning),
-    schwere_kalibrierung2 = rbind(zeit$calibration, zufall$calibration),
-    schwere_wichtigkeit2 = cbind(split = zeit$kind, zeit$importance),
+    schwere_kalibrierung = rbind(zeit$calibration, zufall$calibration),
+    schwere_wichtigkeit = cbind(split = zeit$kind, zeit$importance),
     schwere_effekte = cbind(split = zeit$kind, zeit$effects),
-    schwere_odds_ratios2 = zeit$odds_ratios
+    schwere_odds_ratios = zeit$odds_ratios
   )
-  tables$schwere_odds_ratios2$p_value <- signif(tables$schwere_odds_ratios2$p_value, 3)
+  tables$schwere_odds_ratios$p_value <- signif(tables$schwere_odds_ratios$p_value, 3)
   files <- vapply(names(ladder_schema), function(nm) {
     write_csv(round_cols(tables[[nm]][, ladder_schema[[nm]]], if (nm == "schwere_effekte") 5 else 4),
               file.path(out_dir, paste0(nm, ".csv")))

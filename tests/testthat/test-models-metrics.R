@@ -2,7 +2,8 @@ truth_factor <- function(y) factor(ifelse(y == 1, "ja", "nein"), levels = c("ja"
 
 yardstick_metrics <- function(p, y, w = NULL) {
   d <- data.frame(truth = truth_factor(y), p = p)
-  c(roc_auc = yardstick::roc_auc(d, truth, p)$.estimate, pr_auc = yardstick::pr_auc(d, truth, p)$.estimate,
+  c(roc_auc = yardstick::roc_auc(d, truth, p)$.estimate,
+    avg_precision = yardstick::average_precision(d, truth, p)$.estimate,
     brier = yardstick::brier_class(d, truth, p)$.estimate, log_loss = yardstick::mn_log_loss(d, truth, p)$.estimate)
 }
 
@@ -22,9 +23,10 @@ test_that("fast metrics equal yardstick with heavy ties and extreme probabilitie
   got <- weighted_metrics(metric_prep(p, y), rep(1, length(y)))
   expect_equal(got, yardstick_metrics(clip_prob(p), y), tolerance = 1e-9)
   expect_true(all(is.finite(got)))
-  # constant score (baseline model): AUC 0.5, PR-AUC = prevalence-based, still finite
+  # constant score (baseline model): AUC 0.5, average precision = prevalence
   const <- weighted_metrics(metric_prep(rep(0.25, 4000), y), rep(1, 4000))
   expect_equal(const[["roc_auc"]], 0.5)
+  expect_equal(const[["avg_precision"]], mean(y), tolerance = 1e-9)
   expect_equal(const, yardstick_metrics(rep(0.25, 4000), y), tolerance = 1e-9)
 })
 

@@ -4,7 +4,7 @@
 # replicates stay cheap. Validated against yardstick (tests/testthat/test-models-metrics.R).
 
 sev_clip <- 1e-6
-metric_names <- c("roc_auc", "pr_auc", "brier", "log_loss", "brier_skill")
+metric_names <- c("roc_auc", "avg_precision", "brier", "log_loss", "brier_skill")
 
 # Probabilities live in [1e-6, 1 - 1e-6]: finite log-loss for every model, incl. rule and baseline.
 clip_prob <- function(p, eps = sev_clip) pmin(pmax(p, eps), 1 - eps)
@@ -20,7 +20,8 @@ metric_prep <- function(p, y) {
   )
 }
 
-# ROC-AUC (Mann-Whitney, ties count 0.5), PR-AUC (trapezoid incl. the (0, 1) start point, as yardstick),
+# ROC-AUC (Mann-Whitney, ties count 0.5), average precision (step sum, yardstick::average_precision; a constant
+# score gives the prevalence),
 # Brier and log-loss for case weights w (original row order). brier_skill is added by the caller.
 weighted_metrics <- function(prep, w) {
   ws <- w[prep$o]
@@ -38,9 +39,9 @@ weighted_metrics <- function(prep, w) {
   fp <- cumsum(rev(neg_g))[seen]
   recall <- c(0, tp / n_pos)
   precision <- c(1, tp / (tp + fp))
-  pr <- sum(diff(recall) * (precision[-1] + precision[-length(precision)]) / 2)
+  ap <- sum(diff(recall) * precision[-1])
   sw <- sum(w)
-  c(roc_auc = auc, pr_auc = pr, brier = sum(w * prep$sq) / sw, log_loss = sum(w * prep$ll) / sw)
+  c(roc_auc = auc, avg_precision = ap, brier = sum(w * prep$sq) / sw, log_loss = sum(w * prep$ll) / sw)
 }
 
 # Bootstrap draw b as case weights; the seed depends on b only, so any core count gives the same draws.

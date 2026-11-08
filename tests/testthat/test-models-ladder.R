@@ -126,10 +126,10 @@ test_that("export writes exactly the frozen schema", {
     schwere_tuning = c("modell", "split", "kandidat", "penalty", "mixture", "mtry", "min_n", "tree_depth",
                        "learn_rate", "loss_reduction", "sample_size", "brier_cv", "log_loss_cv", "n_resamples",
                        "gewaehlt"),
-    schwere_kalibrierung2 = c("modell", "split", "bin", "vorhergesagt", "beobachtet", "n"),
-    schwere_wichtigkeit2 = c("modell", "split", "merkmal", "wichtigkeit", "ki_low", "ki_high", "n_wiederholungen"),
+    schwere_kalibrierung = c("modell", "split", "bin", "vorhergesagt", "beobachtet", "n"),
+    schwere_wichtigkeit = c("modell", "split", "merkmal", "wichtigkeit", "ki_low", "ki_high", "n_wiederholungen"),
     schwere_effekte = c("modell", "split", "merkmal", "wert", "pdp", "n_zeilen"),
-    schwere_odds_ratios2 = c("modell", "term", "odds_ratio", "ci_low", "ci_high", "p_value")
+    schwere_odds_ratios = c("modell", "term", "odds_ratio", "ci_low", "ci_high", "p_value")
   )
   files <- export_ladder(x$zeit, x$zufall, x$bz, x$bf, x$s, x$plan, smoke_file = "none", out_dir = out)
   expect_setequal(basename(files), c(paste0(names(expected), ".csv"), "schwere_lauf.json"))
