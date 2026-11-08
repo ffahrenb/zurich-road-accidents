@@ -31,11 +31,15 @@ fit_weather <- function(db_path) {
   irr <- do.call(rbind, lapply(names(outcomes), function(y) {
     f <- stats::as.formula(paste(y, "~ regen + temperatur + tagesstunde + monat + jahr"))
     m <- MASS::glm.nb(f, data = d)
-    td <- broom::tidy(m, conf.int = TRUE, exponentiate = TRUE)
+    # Wald intervals: profile-likelihood CIs for ~80 coefficients take minutes.
+    td <- broom::tidy(m)
     td <- td[grepl("^(regen|temperatur)", td$term), ]
+    z <- stats::qnorm(0.975)
     data.frame(
       zielgroesse = outcomes[[y]], term = td$term,
-      irr = round(td$estimate, 3), ci_low = round(td$conf.low, 3), ci_high = round(td$conf.high, 3),
+      irr = round(exp(td$estimate), 3),
+      ci_low = round(exp(td$estimate - z * td$std.error), 3),
+      ci_high = round(exp(td$estimate + z * td$std.error), 3),
       p_value = signif(td$p.value, 3), n_stunden = stats::nobs(m)
     )
   }))
@@ -77,7 +81,7 @@ fit_severity <- function(db_path, seed = 2026) {
   specs <- list(
     "Logistische Regression" = parsnip::logistic_reg() |> parsnip::set_engine("glm"),
     "Random Forest" = parsnip::rand_forest(trees = 400, min_n = 20) |>
-      parsnip::set_engine("ranger", importance = "permutation", seed = seed) |>
+      parsnip::set_engine("ranger", seed = seed) |>
       parsnip::set_mode("classification")
   )
   metrics <- yardstick::metric_set(yardstick::roc_auc, yardstick::pr_auc, yardstick::brier_class)
@@ -85,6 +89,10 @@ fit_severity <- function(db_path, seed = 2026) {
     wf <- workflows::workflow(rec, specs[[nm]])
     cv <- tune::fit_resamples(wf, folds, metrics = metrics)
     cvm <- tune::collect_metrics(cv)
+    # Permutation importance is costly: compute it on the final fit only, not in every CV fold.
+    if (nm == "Random Forest") {
+      wf <- workflows::workflow(rec, parsnip::set_engine(specs[[nm]], "ranger", importance = "permutation", seed = seed))
+    }
     fit <- parsnip::fit(wf, train)
     pred <- stats::predict(fit, test, type = "prob")
     pred$truth <- test$personenschaden
@@ -112,8 +120,13 @@ fit_severity <- function(db_path, seed = 2026) {
 
   # Odds ratios from the logistic model (interpretable effects).
   lr <- workflows::extract_fit_engine(res[["Logistische Regression"]]$fit)
-  or <- broom::tidy(lr, conf.int = TRUE, exponentiate = TRUE)
-  or <- or[or$term != "(Intercept)", c("term", "estimate", "conf.low", "conf.high", "p.value")]
+  or <- broom::tidy(lr)  # Wald intervals (profile likelihood is slow on 50k rows)
+  z <- stats::qnorm(0.975)
+  # parsnip models the SECOND factor level ("nein"); flip the sign so ORs describe "Personenschaden = ja".
+  or$odds_ratio <- exp(-or$estimate)
+  or$ci_low <- exp(-or$estimate - z * or$std.error)
+  or$ci_high <- exp(-or$estimate + z * or$std.error)
+  or <- or[or$term != "(Intercept)", c("term", "odds_ratio", "ci_low", "ci_high", "p.value")]
   names(or) <- c("term", "odds_ratio", "ci_low", "ci_high", "p_value")
   or[, 2:4] <- round(or[, 2:4], 3); or$p_value <- signif(or$p_value, 3)
 

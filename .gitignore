@@ -4,9 +4,10 @@ ffahrenb-copy/
 private/
 PLAN.md
 *unfaelle*.csv
+!export/data/unfaelle.csv
 
 # --- data & pipeline state (rebuildable) ---
-data/
+/data/
 _targets/
 *.duckdb
 *.duckdb.wal
