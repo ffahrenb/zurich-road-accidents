@@ -1,0 +1,43 @@
+{
+  "datum": "2026-11-08",
+  "anteil": 0.2,
+  "tuning": {
+    "sekunden": 111.1,
+    "spitze_prozess_mb": 745,
+    "spitze_container_mb": 673,
+    "threads": 8,
+    "n": {
+      "train": 10073,
+      "test": 3137
+    },
+    "sekunden_je_modell": {
+      "Basislinie": 0.0,
+      "Regel (verletzliche Gruppen)": 0.0,
+      "LR ohne Unfalltyp": 2.5,
+      "LR voll": 2.0,
+      "Elastic Net": 9.0,
+      "GAM": 1.4,
+      "Random Forest": 57.7,
+      "XGBoost": 37.8
+    }
+  },
+  "bootstrap": {
+    "sekunden": 4,
+    "spitze_prozess_mb": 133,
+    "spitze_container_mb": 924,
+    "threads": 8,
+    "n": {
+      "test": 16000
+    },
+    "laufzeit": {}
+  },
+  "hochrechnung": {
+    "tuning_sekunden": 555,
+    "bootstrap_sekunden": 20,
+    "gesamt_sekunden": 575,
+    "gesamt_minuten": 9.6,
+    "spitze_container_mb_100pct": 4620,
+    "methode": "linear in 1/anteil (Trainingszeilen bzw. Bootstrap-Ziehungen)"
+  },
+  "hinweis": "spitze_prozess_mb = groesster Einzelprozess (/usr/bin/time -v), je Phase getrennt; spitze_container_mb = cgroup memory.peak, kumulativ seit Containerstart (Phasen laufen nacheinander im selben Container, enthaelt Page-Cache)"
+}
