@@ -11,6 +11,14 @@ workflows
 yardstick
 tune
 ranger
+glmnet
+xgboost
+finetune
+lme4
+probably
+mgcv
+dials
+tailor
 # visualisation
 ggiraph
 mapgl
