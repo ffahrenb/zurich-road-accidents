@@ -3,7 +3,8 @@
 # Usage (repo root): Rscript tests/lint.R
 files <- c(
   list.files(c("R", "tests"), "\\.R$", recursive = TRUE, full.names = TRUE),
-  "_targets.R", "site/_helpers.R", "site/_prerender.R", "tools/dq_scorecard.R"
+  "_targets.R", "site/_helpers.R", "site/_prerender.R", "tools/dq_scorecard.R",
+  "tools/model_smoke.R", "tools/model_smoke_merge.R"
 )
 files <- files[file.exists(files)]
 lints <- do.call(c, lapply(files, lintr::lint))

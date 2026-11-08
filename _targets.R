@@ -54,6 +54,20 @@ list(
     dq_passed
     fit_severity(warehouse)
   }),
+  # Severity ladder (8 models): tune on training years only -> freeze -> evaluate on the test years.
+  tar_files_input(model_cfg_file, "config/modell.yml"),
+  tar_target(model_cfg, yaml::read_yaml(model_cfg_file)),
+  tar_target(severity_data, {
+    dq_passed
+    load_severity_data(warehouse)
+  }),
+  tar_target(severity_plan, model_year_plan(cfg_run$years$to, cfg_run$years$from)),
+  tar_target(sev_zeit, run_ladder(severity_data, severity_plan, "zeitlich", model_settings(model_cfg),
+                                  interpret = TRUE)),
+  tar_target(sev_zufall, run_ladder(severity_data, severity_plan, "zufaellig", model_settings(model_cfg),
+                                    only = sev_zeit$best_tuned)),
+  tar_target(sev_boot_zeit, run_bootstrap(sev_zeit, model_settings(model_cfg))),
+  tar_target(sev_boot_zufall, run_bootstrap(sev_zufall, model_settings(model_cfg))),
 
   # --- 5 export: the only path to the public (all behind dq_passed) ---------
   tar_target(export_public_files, {
@@ -63,6 +77,10 @@ list(
   tar_target(export_model_files, {
     dq_passed
     export_models(severity_model)
+  }, format = "file"),
+  tar_target(export_ladder_files, {
+    dq_passed
+    export_ladder(sev_zeit, sev_zufall, sev_boot_zeit, sev_boot_zufall, model_settings(model_cfg), severity_plan)
   }, format = "file"),
   tar_target(export_trackx_files, {
     dq_passed
