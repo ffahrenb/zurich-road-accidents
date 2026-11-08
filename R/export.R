@@ -32,7 +32,7 @@ export_public <- function(db_path, export_cfg, out_dir = "export/data") {
     COPY (
       SELECT q.quartier_nr, q.quartier, q.kreis_nr,
              round(avg(m.personenschaden_pro_1000), 2) AS rate,
-             sum(m.mit_personenschaden) AS personenschaden,
+             sum(m.mit_personenschaden)::INT AS personenschaden,
              st_transform(st_simplifypreservetopology(q.geom, 15), 'EPSG:2056', 'EPSG:4326', always_xy := TRUE) AS geom
       FROM stg_quartiere q
       LEFT JOIN mart_quartier m ON q.quartier_nr = m.quartier_nr AND m.jahr >= 2015
@@ -58,7 +58,10 @@ export_models <- function(sev, out_dir = "export/modell") {
 
 # Track X: statistical disclosure control before anything is written.
 export_trackx <- function(wx, export_cfg, out_dir = "export/trackx") {
-  if (is.null(wx)) return(character())
+  if (is.null(wx)) {
+    # Public track only: write nothing, keep (and keep tracking) committed files.
+    return(list.files(out_dir, pattern = "^wetter_(effekt|klassen)\\.csv$|^wetter_modell\\.json$", full.names = TRUE))
+  }
   k <- export_cfg$trackx$min_cell
   bins <- wx$bins
   bins <- bins[bins$unfaelle >= k & bins$stunden >= k, ]        # suppress small cells

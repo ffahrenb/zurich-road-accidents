@@ -1,0 +1,10 @@
+"modell","metrik","test","cv_mittel","cv_se"
+"Basislinie (immer Anteil)","roc_auc",0.5,,
+"Basislinie (immer Anteil)","pr_auc",0.255,,
+"Basislinie (immer Anteil)","brier_class",0.19,,
+"Logistische Regression","roc_auc",0.914,0.911,0.0018
+"Logistische Regression","pr_auc",0.801,0.795,0.0036
+"Logistische Regression","brier_class",0.097,0.097,7e-04
+"Random Forest","roc_auc",0.923,0.92,0.0014
+"Random Forest","pr_auc",0.832,0.826,0.0028
+"Random Forest","brier_class",0.089,0.091,6e-04

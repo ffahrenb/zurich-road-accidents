@@ -29,4 +29,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends python3-venv \
     && /opt/sqlfluff/bin/pip install --no-cache-dir sqlfluff==3.4.2 \
     && ln -s /opt/sqlfluff/bin/sqlfluff /usr/local/bin/sqlfluff
 
+# OpenBLAS thread oversubscription made glm()/glm.nb() ~10x-100x slower in containers.
+ENV OPENBLAS_NUM_THREADS=1
+
 WORKDIR /work

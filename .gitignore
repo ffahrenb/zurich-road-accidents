@@ -6,7 +6,7 @@ PLAN.md
 *unfaelle*.csv
 
 # --- data & pipeline state (rebuildable) ---
-data/
+/data/
 _targets/
 *.duckdb
 *.duckdb.wal

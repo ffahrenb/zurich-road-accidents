@@ -1,0 +1,8 @@
+{
+  "modell": "Negative Binomial-Regression (MASS::glm.nb)",
+  "formel": "Unfälle pro Stunde ~ Regen + Temperaturklasse + Stunde×Wochenende + Monat + Jahr",
+  "zeitraum": "2011–2021",
+  "n_stunden": 95915,
+  "referenzstation": "Zch_Stampfenbachstrasse",
+  "datenschutz": "Nur Modellkoeffizienten und Klassen mit mindestens 10 Fällen; keine Einzeldaten, keine Datumsangaben."
+}
