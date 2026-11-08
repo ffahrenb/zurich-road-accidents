@@ -1,0 +1,92 @@
+---
+title: "Karte"
+subtitle: "Wo sich Unfälle häufen – und welche Quartiere pro Einwohner:in auffallen"
+---
+
+```{r}
+#| include: false
+source("_helpers.R")
+library(mapgl)
+q <- rd("data/quartier.csv")
+jahr <- rd("data/jahr.csv")
+qr <- q |> filter(jahr >= 2015) |>
+  group_by(Quartier = quartier, Kreis = kreis_nr) |>
+  summarise(`Rate pro 1’000 und Jahr` = mean(personenschaden_pro_1000), `Einwohner (Mittel)` = mean(einwohner),
+            `Unfälle mit Personenschaden 2015–2024` = sum(mit_personenschaden), .groups = "drop") |>
+  arrange(desc(`Rate pro 1’000 und Jahr`))
+```
+
+Jeder Punkt ist ein Unfall mit seiner Koordinate aus der offenen Quelle. Die Karte zeigt **Jahr, Schwere und beteiligte Gruppen**, mehr nicht. Standardmässig sehen Sie die Dichte (Heatmap); zoomen Sie näher heran, erscheinen die einzelnen Unfälle. Ein Klick auf einen Punkt zeigt Jahr und Schwere.
+
+```{=html}
+<noscript><p class="note warn">Die Karte braucht JavaScript. Die Quartier-Raten stehen unten als Tabelle, die Unfälle pro Jahr auf der Seite <a href="wann.html">Wann</a>.</p></noscript>
+<form class="map-controls" onsubmit="return false" aria-label="Kartenfilter">
+  <fieldset><legend>Jahre</legend>
+    <label for="zm-y0">von <select id="zm-y0"></select></label>
+    <label for="zm-y1">bis <select id="zm-y1"></select></label>
+  </fieldset>
+  <fieldset><legend>Schwere</legend>
+    <label><input type="checkbox" name="zm-sev" value="0" checked> Sachschaden</label>
+    <label><input type="checkbox" name="zm-sev" value="1" checked> Leichtverletzte</label>
+    <label><input type="checkbox" name="zm-sev" value="2" checked> Schwerverletzte</label>
+    <label><input type="checkbox" name="zm-sev" value="3" checked> Getötete</label>
+  </fieldset>
+  <fieldset><legend>Beteiligt</legend>
+    <label><input type="radio" name="zm-mode" value="alle" checked> alle Unfälle</label>
+    <label><input type="radio" name="zm-mode" value="velo"> mit Velo / E-Bike</label>
+    <label><input type="radio" name="zm-mode" value="fuss"> mit Fussgänger:in</label>
+    <label><input type="radio" name="zm-mode" value="moto"> mit Motorrad</label>
+  </fieldset>
+  <fieldset><legend>Darstellung</legend>
+    <label><input type="radio" name="zm-view" value="heat" checked> Dichte (Heatmap)</label>
+    <label><input type="radio" name="zm-view" value="points"> Einzelpunkte</label>
+    <label><input type="checkbox" id="zm-qrt"> Quartier-Raten einblenden</label>
+  </fieldset>
+</form>
+<p id="zm-status" class="map-status" role="status" aria-live="polite"></p>
+```
+
+```{r}
+tags$div(class = "map-wrap", id = "zmap", role = "region",
+  `aria-label` = "Interaktive Karte der Strassenverkehrsunfälle in Zürich. Als Alternative steht unterhalb eine Tabelle der Quartier-Raten.",
+  maplibre(style = carto_style("positron"), center = c(8.5417, 47.3769), zoom = 11.3, height = "100%") |>
+    add_navigation_control(show_compass = FALSE, position = "top-right"))
+```
+
+```{=html}
+<div id="zm-legend" class="map-legend" aria-label="Legende"></div>
+<script src="assets/karte.js" defer></script>
+```
+
+::: {.note}
+**Hinweise zum Lesen.**
+
+- **Dichte ≠ Risiko.** Wo viele Menschen fahren oder gehen, passieren mehr Unfälle. Die Karte zeigt, *wo viel passiert*, nicht, *wo es gefährlich ist*.
+- **Quartier-Raten** sind Unfälle mit Personenschaden pro 1’000 Einwohner:innen und Jahr (Mittel 2015–2024). Ab 2015, weil sich die Erfassung damals geändert hat ([Strukturbruch](datenqualitaet.qmd#der-strukturbruch-2015)). Quartiere mit sehr wenigen Einwohnern (Hochschulen, City, Lindenhof) fallen stark auf, weil dort vor allem Pendler und Besucher verunfallen.
+- **Unfälle ohne Quartier** (5 von 66’051) lassen sich keinem Quartier zuordnen und fehlen in den Quartier-Raten ([DQ-U05](datenqualitaet.qmd#alle-prüfungen)).
+:::
+
+::: {.note}
+**Kartengrundlage und Datenschutz.** Die Hintergrundkarte kommt von CARTO (Positron bzw. Dark Matter, Daten © OpenStreetMap-Mitwirkende, © CARTO). Dafür fragt Ihr Browser die Kartenkacheln bei CARTO ab; das ist die einzige Verbindung zu Dritten auf dieser Website (siehe [Datenschutz](datenschutz.qmd)). Es werden keine Zugangsschlüssel und keine Cookies verwendet. Die Unfalldaten selbst laden direkt von dieser Website.
+:::
+
+## Als Tabelle (ohne Karte)
+
+```{r}
+tags$details(open = NA, class = "chart-table",
+  tags$summary("Quartier-Raten als Tabelle anzeigen"),
+  html_table(qr, digits = 1, tall = TRUE, label = "Quartier-Raten",
+             caption = "Unfälle mit Personenschaden pro 1’000 Einwohner:innen und Jahr, Mittel 2015–2024, absteigend sortiert."))
+```
+
+```{r}
+yr <- jahr |> group_by(Jahr = jahr) |>
+  summarise(Sachschaden = sum(unfaelle[schwere_kurz == "Sachschaden"]), Leichtverletzte = sum(unfaelle[schwere_kurz == "Leichtverletzte"]),
+            Schwerverletzte = sum(unfaelle[schwere_kurz == "Schwerverletzte"]), Getötete = sum(unfaelle[schwere_kurz == "Getötete"]),
+            `mit Velo` = sum(mit_velo), `mit Fussgänger:in` = sum(mit_fussgaenger), `mit Motorrad` = sum(mit_motorrad), .groups = "drop")
+tags$details(class = "chart-table",
+  tags$summary("Unfälle pro Jahr und Schwere (Summe der Kartenpunkte) als Tabelle anzeigen"),
+  html_table(yr, label = "Unfälle pro Jahr", caption = "Die Kartenpunkte summieren sich zu diesen Zahlen; Unfälle mit mehreren Beteiligten zählen in mehreren Spalten rechts."))
+```
+
+Die Rohdaten der Karte: [unfaelle_punkte.geojson](export/data/unfaelle_punkte.geojson) (Jahr, Schwere, Velo, Fussgänger, Motorrad je Punkt) und [quartiere.geojson](export/data/quartiere.geojson), beschrieben im [Datenwörterbuch](daten.qmd).

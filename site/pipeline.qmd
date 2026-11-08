@@ -1,0 +1,95 @@
+---
+title: "Pipeline & Methode"
+subtitle: "Von der offenen Quelle bis zur Website: jeder Schritt ist Code, jeder Code ist geprüft"
+---
+
+```{r}
+#| include: false
+source("_helpers.R")
+REPO <- "https://github.com/ffahrenb/zurich-road-accidents"
+```
+
+Die gesamte Auswertung ist eine **R- und SQL-Pipeline**: R steuert und prüft, die Fachlogik steht als lesbares SQL in DuckDB. Nichts wird von Hand angefasst; ein Befehl baut alles von den Rohdaten bis zu dieser Website.
+
+## Datenfluss
+
+```{mermaid}
+%%| fig-cap: "Datenfluss von den Quellen bis zu Website und Metadaten. Das Qualitäts-Gate stoppt bei einer verletzten STOP-Prüfung alles, was danach kommt."
+flowchart LR
+  subgraph Q["Quellen"]
+    CKAN["Open Data Stadt Zürich<br/>Unfälle, Meteo, Luft, Bevölkerung"]
+    WFS["Geoportal<br/>Quartiere, Schulen, Tempo"]
+    PRIV[("nicht öffentliche Datei<br/>nur lokal")]
+  end
+  CKAN --> SNAP["Snapshot + Manifest<br/>SHA-256"]
+  WFS --> SNAP
+  SNAP --> RAW["raw<br/>1:1-Kopie"]
+  RAW --> STG["staging<br/>typisiert, bereinigt"]
+  STG --> MART["mart<br/>angereichert, aggregiert"]
+  PRIV -.-> MART
+  RAW --> DQ{"DQ-Gate<br/>Verträge, SQL, Historie"}
+  STG --> DQ
+  MART --> DQ
+  DQ -->|STOP| HALT["Abbruch,<br/>keine Veröffentlichung"]
+  DQ -->|PASS / WARN| MOD["Modelle"]
+  DQ --> EXP["Exporte<br/>export/"]
+  MOD --> EXP
+  EXP --> PG{"Datenschutz-Gate"}
+  PG --> SITE["Website<br/>Quarto, GitHub Pages"]
+  EXP --> DCAT["Katalog<br/>DCAT-AP CH"]
+```
+
+## Schichten: raw, staging, mart
+
+- **raw:** 1:1-Kopie der Lieferung, nie verändert. Die Datenverträge prüfen hier, ob die Lieferung den Erwartungen entspricht.
+- **staging:** Typen, deutsche Spaltennamen, Geometrie in LV95 und **dokumentierte** Bereinigung (zum Beispiel unmögliche Messwerte auf leer setzen, ungültige Polygone reparieren).
+- **mart:** Anreicherung (Quartier, Schulnähe, Tempo, Wetter) und Aggregate. **Nur Marts erreichen den Export.**
+
+So lässt sich jeder Fehler einer Schicht zuordnen: Lieferfehler, Bereinigung oder Fachlogik. Details: [ADR 0003](`r REPO`/blob/main/docs/adr/0003-schichten-raw-staging-mart.md).
+
+## Reproduzierbarkeit
+
+| Was | Wie |
+|---|---|
+| Laufzeitumgebung | Container-Image `rocker/geospatial:4.5.1`, **per Digest fixiert** (`sha256:3c1eba86…`), kein beweglicher Tag |
+| R-Pakete | aus einem **datierten Paket-Snapshot** (Posit Package Manager, 30.10.2025); Liste in `docker/packages.txt`, das Image prüft, dass alles installiert ist |
+| Datenbank-Erweiterungen | `spatial` und `icu` beim Bau des Images installiert, zur Laufzeit wird nichts nachgeladen |
+| Orchestrierung | [`{targets}`](`r REPO`/blob/main/docs/adr/0002-targets.md): nur betroffene Schritte laufen neu, die Abhängigkeiten sind der Graph |
+| Daten | jeder Lauf zieht einen **datierten Snapshot** mit [Manifest und Prüfsummen](daten.qmd#manifest); derselbe Tag verwendet denselben Snapshot |
+| Stille Änderungen der Quelle | fallen über die Historienprüfungen auf ([Datenqualität](datenqualitaet.qmd#verlauf-und-stabilität)) |
+| Code-Stände | alle GitHub Actions auf **Commit-SHA** festgelegt, minimale Rechte |
+
+Ein einzelner Befehl: `make run`; alles zusammen mit Prüfungen und Website: `make all`.
+
+## Tests
+
+- **Unit-Tests (testthat)** für die Prüf-Engine, die SQL-Vorlagen und das Datenschutz-Gate.
+- **Tests mit absichtlich kaputten Daten:** Jede STOP-Prüfung wird mit einem Fixture geprüft, das genau diesen Fehler enthält ([Datenqualität](datenqualitaet.qmd#die-prüfungen-werden-selbst-getestet)).
+- **Datenschutz-Gate, das sich selbst testet:** 15 gezielt eingebaute Verstösse müssen es zum Scheitern bringen ([Datenschutz](datenschutz.qmd)).
+- **Lint:** `lintr` für R, `sqlfluff` (fest auf Version 3.4.2) für SQL.
+- **CI:** GitHub Actions führt bei jedem Push, jedem Pull Request und monatlich Lint, Tests, Pipeline, Datenschutz-Gate und den Bau dieser Website aus; veröffentlicht wird nur vom Hauptzweig.
+
+## Entscheide (ADR)
+
+Wichtige Entscheide sind als *Architecture Decision Records* festgehalten: Kontext, Entscheid, Konsequenzen.
+
+```{r}
+A <- tibble::tribble(
+  ~nr, ~file, ~titel, ~kurz,
+  "0001", "0001-duckdb.md", "DuckDB als Analyse-Datenbank", "Kein Server, SQL für die Fachlogik, räumliche Verknüpfungen, jederzeit neu baubar.",
+  "0002", "0002-targets.md", "{targets} als Orchestrierung", "Inkrementelle, reproduzierbare Läufe; das Qualitäts-Gate ist ein Knoten im Graph.",
+  "0003", "0003-schichten-raw-staging-mart.md", "Schichten raw, staging, mart", "Fehler dort finden, wo sie entstehen; nur geprüfte Marts werden exportiert.",
+  "0004", "0004-zwei-datenpfade-datenschutz.md", "Zwei Datenpfade und Datenschutz", "Öffentlicher Pfad vollständig in CI; privater Pfad nur lokal, nur Modellergebnisse werden veröffentlicht.",
+  "0005", "0005-datenqualitaet-als-freigabe.md", "Datenqualität als Freigabe-Gate", "STOP bricht ab, WARN macht sichtbar; erkennen, reparieren, verifizieren."
+)
+tags$div(class = "dl", lapply(seq_len(nrow(A)), function(i)
+  tags$a(href = paste0(REPO, "/blob/main/docs/adr/", A$file[i]), tags$strong(paste("ADR", A$nr[i], "·", A$titel[i])), tags$span(A$kurz[i]))))
+```
+
+Weitere Dokumentation im [Repository](`r REPO`): Pipeline, Datenqualität (Anleitung für neue Prüfungen), Datenschutz.
+
+## Grenzen der Methode
+
+- Die **Wetter-Ergebnisse** beruhen auf einer nicht öffentlichen Datei mit genauen Unfallzeitpunkten. Dritte können sie nicht nachrechnen; veröffentlicht sind Methode, Koeffizienten und grobe Klassen.
+- Das **Schweremodell** ist ein Erklärungsmodell, kein Prognosemodell ([Schwere](schwere.qmd)).
+- Der **Strukturbruch 2015** liegt in der Quelle; die Pipeline macht ihn sichtbar, sie kann ihn nicht beheben ([Datenqualität](datenqualitaet.qmd#der-strukturbruch-2015)).

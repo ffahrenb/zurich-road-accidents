@@ -1,0 +1,219 @@
+---
+title: "Datenqualität"
+subtitle: "Jede Veröffentlichung muss erst durch automatische Prüfungen. Hier ist das Ergebnis des letzten Laufs, Prüfung für Prüfung."
+---
+
+```{r}
+#| include: false
+source("_helpers.R")
+dq <- rd("dq/dq_ergebnisse.csv")
+verlauf <- rd("dq/dq_verlauf.csv")
+snap <- rd("dq/snapshot_history.csv")
+jahr <- rd("data/jahr.csv")
+dq <- dq |> mutate(status2 = ifelse(status %in% c("PASS", "WARN"), status, "FAIL"))
+n_all <- nrow(dq); n_stop <- sum(dq$schwere == "STOP"); n_warn_chk <- sum(dq$schwere == "WARN")
+n_pass <- sum(dq$status2 == "PASS"); n_warn <- sum(dq$status2 == "WARN"); n_fail <- sum(dq$status2 == "FAIL")
+stop_fail <- sum(dq$schwere == "STOP" & dq$status2 != "PASS")
+run_date <- format(as.Date(max(dq$snapshot)), "%d.%m.%Y")
+sev_rank <- c(PASS = 1, WARN = 2, FAIL = 3)
+```
+
+## Auf einen Blick
+
+```{r}
+tiles(
+  tile(n_all, "automatische Prüfungen", sprintf("%d mit STOP-Wirkung, %d mit WARN-Wirkung", n_stop, n_warn_chk)),
+  tile(stop_fail, "verletzte STOP-Prüfungen", "Bei mehr als 0 würde nichts veröffentlicht."),
+  tile(n_warn, if (n_warn == 1) "Warnung" else "Warnungen", "Sichtbar gemacht, blockiert nicht. Details weiter unten."),
+  tile(run_date, "Stand des Laufs", "Daten-Snapshot und Prüflauf")
+)
+```
+
+::: {.note}
+**So lesen Sie diese Seite.** Eine «Prüfung» ist eine Regel, die die Daten automatisch bestehen müssen, zum Beispiel «Jede Unfall-ID kommt genau einmal vor». Das Ergebnis ist immer ein Symbol *und* ein Wort: ✓ **Bestanden**, ▲ **Warnung**, ✕ **Gestoppt**. Farben allein bedeuten nichts.
+:::
+
+### Scorecard: Quelle × Dimension
+
+```{r}
+SRC <- tibble::tribble(
+  ~quelle, ~name, ~sub,
+  "unfaelle", "Strassenverkehrsunfälle", "Stadt Zürich / ASTRA · CC BY 4.0",
+  "meteo", "Meteo (Stundenmittel)", "Umwelt- und Gesundheitsschutz Zürich · CC0",
+  "luft", "Luftschadstoffe", "Umwelt- und Gesundheitsschutz Zürich · CC0",
+  "bevoelkerung", "Bevölkerung nach Quartier", "Statistik Stadt Zürich · CC0",
+  "quartiere", "Statistische Quartiere (Geodaten)", "Geomatik + Vermessung · CC0",
+  "schulen", "Schulanlagen (Geodaten)", "Schul- und Sportdepartement · CC0",
+  "tempo", "Signalisierte Geschwindigkeiten (Geodaten)", "Stadt Zürich · CC0",
+  "privat", "Nicht öffentliche Zusatzdatei", "nur lokal in der Pipeline, nie veröffentlicht"
+)
+worst <- function(s) names(sev_rank)[max(sev_rank[s])]
+cards <- lapply(seq_len(nrow(SRC)), function(i) {
+  q <- SRC$quelle[i]; d <- dq |> filter(quelle == q)
+  if (!nrow(d)) return(NULL)
+  dims <- d |> group_by(dimension) |> summarise(st = worst(status2), n = n(), .groups = "drop")
+  tags$div(class = "card-q",
+    tags$h3(SRC$name[i]), tags$div(class = "src", SRC$sub[i]),
+    status_chip(worst(d$status2), label = sprintf("%s · %d %s", STATUS[[worst(d$status2)]]$label, nrow(d), if (nrow(d) == 1) "Prüfung" else "Prüfungen")),
+    tags$ul(lapply(seq_len(nrow(dims)), function(j)
+      tags$li(tags$span(class = "d", dims$dimension[j]),
+              tags$span(status_chip(dims$st[j], label = sprintf("%s (%d)", STATUS[[dims$st[j]]]$label, dims$n[j])))))))
+})
+tags$div(class = "cards", role = "list", `aria-label` = "Scorecard je Datenquelle", cards)
+```
+
+Zahl in Klammern: Anzahl Prüfungen in dieser Dimension. Eine Zelle zeigt den schlechtesten Status ihrer Prüfungen. Dimensionen, die für eine Quelle nicht geprüft werden, fehlen bewusst: eine leere Zelle ist ehrlicher als ein erfundenes «Bestanden».
+
+## Alle Prüfungen
+
+```{r}
+chk <- dq |>
+  mutate(
+    Ergebnis = vapply(status2, chip_html, ""),
+    Schwere = ifelse(schwere == "STOP", '<span class="pill stop">STOP</span>', '<span class="pill warn">WARN</span>'),
+    auff = ifelse(n_failed == 0, "–", sprintf("%s (%s %%)", fi(n_failed), fdec(100 * n_failed / n_tested, 2))),
+    tol = ifelse(toleranz_pct == 0, "0", fdec(toleranz_pct, 1)),
+    detail = ifelse(is.na(detail), "", detail),
+    qname = SRC$name[match(quelle, SRC$quelle)]
+  ) |>
+  transmute(ID = check_id, Quelle = qname, Dimension = dimension, Schwere, Prüfung = titel_de,
+            Ergebnis, Geprüft = n_tested, `Auffällig` = auff, `Toleranz %` = tol, Hinweis = detail)
+tbl_chk <- chk
+tbl_chk$Geprüft <- fi(tbl_chk$Geprüft)
+html_table(tbl_chk, html_cols = c("Ergebnis", "Schwere"), tall = TRUE, cls = "wide",
+           caption = sprintf("%d Prüfungen, Stand %s. «Auffällig» = Zeilen, die die Regel verletzen; «Toleranz» = Anteil, bis zu dem die Prüfung trotzdem als bestanden gilt.", n_all, run_date),
+           label = "Alle Datenqualitätsprüfungen")
+```
+
+Die gleiche Tabelle als Datei: [dq_ergebnisse.csv](export/dq/dq_ergebnisse.csv) (zweisprachig, mit Laufzeitpunkt).
+
+## STOP oder WARN?
+
+::::: {.two}
+:::: {.note .stop}
+**STOP: Der Datenstand ist unbrauchbar.** Beispiele: doppelte Unfall-IDs, Koordinaten ausserhalb von Zürich, fehlende Pflichtfelder, ein Datenbestand, der um mehr als 10 % geschrumpft ist. Wird eine STOP-Prüfung verletzt, bricht die Pipeline ab (`dq_gate()`). Modelle, Exporte und diese Website werden dann gar nicht erst gebaut.
+::::
+:::: {.note .warn}
+**WARN: auffällig, aber nutzbar.** Beispiele: einzelne Messwerte ausserhalb des plausiblen Bereichs, ein Strukturbruch in der Zeitreihe. Eine Warnung steht sichtbar in diesem Bericht und blockiert nicht. Sie ist ein Hinweis an Leserinnen und Leser, nicht an die Maschine.
+::::
+:::::
+
+Welche Schwere eine Prüfung bekommt, ist eine fachliche Entscheidung und gehört ins Review (ADR 0005). Im Zweifel gilt WARN: Zu strenge STOP-Regeln würden Läufe bei harmlosen Änderungen der Quelle blockieren. Jede Prüfung kann eine **Toleranz** haben, zum Beispiel 1 %: Bis dahin gilt sie als bestanden, die Zahl der Auffälligkeiten bleibt aber in der Tabelle sichtbar. Kann eine Prüfung gar nicht ausgeführt werden, gilt sie als nicht bestanden.
+
+## Erkennen, reparieren, prüfen
+
+Fehler werden nicht stillschweigend korrigiert. Das Muster ist immer dasselbe: **Erkennen** (eine Prüfung findet den Fehler), **Reparieren** (eine dokumentierte Bereinigung in der Staging-Schicht, nie im Rohdatensatz), **Prüfen** (eine zweite Prüfung auf dem bereinigten Stand beweist, dass die Reparatur greift).
+
+```{r}
+g <- function(id) dq[dq$check_id == id, ]
+case <- function(title, a, fix, b, note) {
+  tags$div(class = "steps", `aria-label` = title,
+    tags$div(tags$h3("Erkennen"), tags$p(HTML(a$text)), status_chip(a$st, label = a$label), tags$p(tags$code(a$id))),
+    tags$div(tags$h3("Reparieren"), tags$p(HTML(fix))),
+    tags$div(tags$h3("Prüfen"), tags$p(HTML(b$text)), status_chip(b$st, label = b$label), tags$p(tags$code(b$id))))
+}
+g1 <- g("DQ-G01"); g3 <- g("DQ-G03"); m2 <- g("DQ-M02"); m5 <- g("DQ-M05")
+tagList(
+  tags$h3("Beispiel 1: Ungültige Quartier-Polygone"),
+  case("Geometrien",
+       list(id = "DQ-G01 (WARN)", st = g1$status2, label = sprintf("%d von %s Geometrien ungültig", g1$n_failed, fi(g1$n_tested)),
+            text = sprintf("Von %s geprüften Geometrien (Quartiere, Tempozonen) sind <strong>%d</strong> ungültig (%s).", fi(g1$n_tested), g1$n_failed, g1$detail)),
+       "Beim Einlesen in die Staging-Schicht werden sie mit <code>ST_MakeValid</code> repariert. Die Rohdaten bleiben unverändert.",
+       list(id = "DQ-G03 (STOP)", st = g3$status2, label = sprintf("%d von %s ungültig", g3$n_failed, fi(g3$n_tested)),
+            text = sprintf("Nach der Reparatur sind von %s Geometrien <strong>%d</strong> ungültig. Wäre es mehr als 0, würde die Pipeline stoppen.", fi(g3$n_tested), g3$n_failed))),
+  tags$h3("Beispiel 2: Unmögliche Messwerte im Wetter"),
+  case("Meteo",
+       list(id = "DQ-M02 (WARN)", st = m2$status2, label = sprintf("%d von %s Messwerten auffällig", m2$n_failed, fi(m2$n_tested)),
+            text = sprintf("Unter %s Rohwerten sind <strong>%d</strong> physikalisch unmöglich (%s).", fi(m2$n_tested), m2$n_failed,
+                           gsub("Feuchte > 100.5 %", "Luftfeuchte über 100 %", gsub("Regendauer > 60 min/h", "mehr als 60 Minuten Regen pro Stunde", m2$detail)))),
+       "Diese Werte werden in der Staging-Schicht auf <em>leer</em> (NULL) gesetzt, nie «geschätzt» oder geglättet. Lücken bleiben als Lücken sichtbar.",
+       list(id = "DQ-M05 (STOP)", st = m5$status2, label = sprintf("%d von %s ausserhalb", m5$n_failed, fi(m5$n_tested)),
+            text = sprintf("Nach der Bereinigung liegt keiner von %s geprüften Werten mehr ausserhalb der plausiblen Bereiche (%d).", fi(m5$n_tested), m5$n_failed)))
+)
+```
+
+## Der Strukturbruch 2015 {#der-strukturbruch-2015}
+
+```{r}
+#| include: false
+sn <- snap |> filter(snapshot == max(snapshot)) |> arrange(jahr) |>
+  mutate(yoy = 100 * (n / lag(n) - 1), phase = factor(ifelse(jahr < 2015, "bis 2014", "ab 2015"), levels = c("bis 2014", "ab 2015")),
+         tip = sprintf("%d: %s Unfälle%s", jahr, fi(n), ifelse(is.na(yoy), "", sprintf(" (%s%s %% gegenüber Vorjahr)", ifelse(yoy >= 0, "+", "−"), fdec(abs(yoy), 0)))))
+y15 <- sn$yoy[sn$jahr == 2015]
+jr2 <- jahr |> group_by(jahr) |> summarise(inj = sum(unfaelle[schwere_kurz != "Sachschaden"]), sach = sum(unfaelle[schwere_kurz == "Sachschaden"]), .groups = "drop")
+inj15 <- 100 * (jr2$inj[jr2$jahr == 2015] / jr2$inj[jr2$jahr == 2014] - 1)
+sach15 <- 100 * (jr2$sach[jr2$jahr == 2015] / jr2$sach[jr2$jahr == 2014] - 1)
+```
+
+```{r}
+#| label: c-bruch
+plot_bruch <- function(v) {
+  ggplot(sn, aes(jahr, n, fill = phase)) +
+    geom_col_interactive(aes(tooltip = tip, data_id = jahr), width = 0.62) +
+    scale_fill_manual(values = setNames(v$cat[1:2], levels(sn$phase))) +
+    scale_x_continuous(breaks = 2011:2024, labels = function(x) substr(x, 3, 4)) +
+    scale_y_continuous(labels = label_number(big.mark = "’"), expand = expansion(mult = c(0, 0.05))) +
+    labs(x = "Unfalljahr (zweistellig)", y = "erfasste Unfälle") +
+    theme_zh(v) + theme(panel.grid.major.x = element_blank())
+}
+chart(plot_bruch,
+  headline = sprintf("2015 steigt die Zahl der erfassten Unfälle um %s %% – ein Sprung in der Statistik, nicht auf der Strasse.", round(y15)),
+  alt = sprintf("Säulendiagramm der erfassten Unfälle pro Jahr 2011 bis 2024. Bis 2014 rund 3300 bis 3400 pro Jahr, 2015 %s, ab 2016 über 5000.", fi(sn$n[sn$jahr == 2015])),
+  caption = "Erfasste Unfälle pro Jahr (Snapshot-Stand). Zwei Farben trennen die Zeit vor und nach dem Sprung.",
+  tbl = html_table(sn |> transmute(Jahr = jahr, Unfälle = n, `Veränderung zum Vorjahr %` = yoy), digits = 1, label = "Erfasste Unfälle pro Jahr"),
+  h = 3.4)
+```
+
+Die Prüfung **DQ-U07** (WARN) meldet automatisch jede Jahresveränderung über ±25 %. Sie schlägt genau einmal an: 2015, +38 %. Was wir daraus schliessen:
+
+- Der Sprung betrifft fast nur **Sachschaden-Unfälle** (`r paste0("+", round(sach15), " %")`); Unfälle mit Verletzten stiegen im gleichen Jahr nur um `r paste0("+", round(inj15), " %")`. Die Erfassungspraxis hat sich geändert: Seither werden deutlich mehr Unfälle mit reinem Sachschaden aufgenommen. Ein echter Anstieg der Unfälle würde sich auch bei den Verletzten zeigen.
+- Das Niveau bleibt danach hoch. Es gibt keinen «Rückgang» auf den alten Wert, der Bruch ist dauerhaft.
+- Konsequenz für alle Auswertungen: Reihen über 2015 hinweg nur mit diesem Hinweis lesen. Für Vergleiche über die Zeit sind **Unfälle mit Personenschaden** die robustere Zahl. Die Quartier-Raten auf der Karte beginnen deshalb erst 2015 und zählen nur Unfälle mit Personenschaden.
+
+Die Prüfung korrigiert nichts: Der Bruch ist ein *Befund über die Quelle*, keine Fehler, die wir beheben könnten. Das Gate lässt ihn bewusst als WARN durch, damit er sichtbar bleibt statt versteckt zu werden.
+
+## Verlauf und Stabilität
+
+```{r}
+runs <- verlauf |> mutate(status2 = ifelse(status %in% c("PASS", "WARN"), status, "FAIL")) |>
+  group_by(run_utc, snapshot) |>
+  summarise(pass = sum(status2 == "PASS"), warn = sum(status2 == "WARN"), fail = sum(status2 == "FAIL"), .groups = "drop") |>
+  arrange(desc(run_utc)) |>
+  transmute(Lauf = format(as.POSIXct(run_utc, format = "%Y-%m-%dT%H:%M:%SZ", tz = "UTC"), "%d.%m.%Y %H:%M UTC"), Snapshot = as.character(snapshot),
+            Bestanden = pass, Warnungen = warn, Gestoppt = fail)
+html_table(runs, caption = "Jeder Lauf hängt seine Ergebnisse an dq_verlauf.csv an.", label = "Verlauf der Prüfläufe")
+```
+
+Bisher liegt **ein Lauf** vor (`r nrow(runs)`). Der Verlauf wächst mit jedem Lauf; dann zeigt diese Tabelle, ob Prüfungen schlechter werden. Zwei Prüfungen vergleichen schon heute mit dem *vorherigen Snapshot* der Quelle: **DQ-S01** (WARN) meldet, wenn sich Jahreszahlen um mehr als 1 % ändern, **DQ-S02** (STOP) bricht ab, wenn der Datenbestand um mehr als 10 % schrumpft. Hintergrund: Amtliche Datensätze ändern sich manchmal ohne Ankündigung, bei einem amtlichen Datensatz schrumpfte der Bestand einmal von 180’000 auf 55’000 Zeilen. Beim ersten Lauf gibt es noch keinen Vergleichsstand; die Referenz wurde angelegt (siehe Hinweis in der Tabelle oben).
+
+## Datenverträge
+
+Für die drei Kerndatensätze gibt es zusätzlich einen **Datenvertrag** (Spalten, Pflichtfelder, Wertelisten, Bereiche), geprüft mit pointblank. Die vollständigen Berichte:
+
+```{r}
+ct <- dq |> filter(art == "pointblank")
+rep <- c(unfaelle = "Strassenverkehrsunfälle", meteo = "Meteo", bevoelkerung = "Bevölkerung")
+tags$div(class = "dl", lapply(names(rep), function(q) {
+  n <- ct$n_tested[ct$quelle == q]
+  tags$a(href = sprintf("export/dq/vertrag_%s.html", q),
+         tags$strong(sprintf("Vertrag %s", rep[[q]])),
+         tags$span(sprintf("%d Regeln, alle bestanden · HTML-Bericht", n)))
+}))
+```
+
+## Die Prüfungen werden selbst getestet
+
+Eine Prüfung, die nie fehlgeschlagen ist, beweist nichts. Deshalb baut die Testsuite eine kleine Datenbank mit **absichtlich kaputten Daten**, lässt die echten Prüfdateien laufen und erwartet genau eine bestimmte Reaktion:
+
+```{r}
+html_table(tibble::tribble(
+  ~`Defekt im Testdatensatz`, ~Erwartung,
+  "doppelte Unfall-ID", "DQ-U01 stoppt",
+  "Pflichtfeld leer", "DQ-U02 stoppt",
+  "Koordinate ausserhalb von Zürich", "DQ-U04 stoppt",
+  "Temperatur 99.9 Grad nach der Bereinigung", "DQ-M05 stoppt",
+  "Datenbestand um mehr als 10 % kleiner als im letzten Snapshot", "DQ-S02 stoppt, DQ-S01 warnt"
+), label = "Tests mit kaputten Daten")
+```
+
+Saubere Testdaten ergeben nur «Bestanden», ein Defekt löst nur die zuständige Prüfung aus, und das Gate bricht bei STOP ab und lässt WARN durch. Dasselbe Prinzip gilt für das [Datenschutz-Gate](datenschutz.qmd). Mehr dazu auf der Seite [Pipeline & Methode](pipeline.qmd).

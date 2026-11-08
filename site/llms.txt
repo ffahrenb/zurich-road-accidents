@@ -1,0 +1,54 @@
+# Unfälle Zürich – Strassenverkehrsunfälle 2011–2024
+
+> Offene Auswertung von 66'051 Strassenverkehrsunfällen der Stadt Zürich (2011–2024). R+SQL-Pipeline (DuckDB), 33 automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, offene Exporte. Daten: Stadt Zürich Open Data / ASTRA, CC BY 4.0. Code: MIT.
+
+Hinweise für Maschinen und Menschen: Die Zahl der erfassten Unfälle springt 2015 um +38 % (Änderung der Erfassungspraxis, vor allem Sachschaden), das ist kein realer Anstieg (Prüfung DQ-U07, Status WARN). Das Schweremodell zeigt Zusammenhänge, keine Ursachen, und ist kein Prognosewerkzeug. Wetter-Effekte sind Verhältnisse (IRR) pro Stunde, keine Kausalaussagen.
+
+## Seiten
+
+- [Übersicht](https://ffahrenb.github.io/zurich-road-accidents/): Kennzahlen und Kernaussagen
+- [Datenqualität](https://ffahrenb.github.io/zurich-road-accidents/datenqualitaet.html): Scorecard, alle Prüfungen, STOP vs. WARN, Strukturbruch 2015
+- [Karte](https://ffahrenb.github.io/zurich-road-accidents/karte.html): interaktive Karte, Quartier-Raten
+- [Wann](https://ffahrenb.github.io/zurich-road-accidents/wann.html): Stunde × Wochentag, Jahrestrends
+- [Wo](https://ffahrenb.github.io/zurich-road-accidents/wo.html): Quartiere, Tempoklassen, Schulnähe
+- [Wetter](https://ffahrenb.github.io/zurich-road-accidents/wetter.html): Regen und Temperatur (negative Binomial, IRR)
+- [Schwere](https://ffahrenb.github.io/zurich-road-accidents/schwere.html): Modell zur Unfallschwere, ehrlich eingeordnet
+- [Daten & Metadaten](https://ffahrenb.github.io/zurich-road-accidents/daten.html): Downloads, DCAT-AP CH, Datenwörterbuch, Manifest
+- [Pipeline & Methode](https://ffahrenb.github.io/zurich-road-accidents/pipeline.html): Lineage, Reproduzierbarkeit, Tests, ADRs
+- [Datenschutz](https://ffahrenb.github.io/zurich-road-accidents/datenschutz.html): Privacy by Design
+- [English summary](https://ffahrenb.github.io/zurich-road-accidents/en/index.html)
+
+## Datendateien (maschinenlesbar)
+
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/jahr.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/quartier.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/quartiere.geojson
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/tempo.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/unfaelle_punkte.geojson
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/unfaelle.parquet
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/wetter_monat.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/data/zeitmuster.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/dq_ergebnisse.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/dq_verlauf.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/manifest.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/snapshot_history.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/meta/katalog.jsonld
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_kalibrierung.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_metriken.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_odds_ratios.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/modell/schwere_wichtigkeit.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/trackx/wetter_effekt.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/trackx/wetter_klassen.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/trackx/wetter_modell.json
+
+## Berichte (Datenverträge, HTML)
+
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/vertrag_bevoelkerung.html
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/vertrag_meteo.html
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/vertrag_unfaelle.html
+
+## Quelle und Lizenz
+
+- Quelle: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0 (Unfälle); weitere Quellen CC0. Bitte bei Weiterverwendung nennen.
+- Repository: https://github.com/ffahrenb/zurich-road-accidents

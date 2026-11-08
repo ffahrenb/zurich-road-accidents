@@ -1,0 +1,171 @@
+---
+title: "Unfallschwere: Was geht mit Verletzten einher?"
+subtitle: "Ein Modell, das Zusammenhänge sichtbar macht – und was es nicht kann"
+---
+
+```{r}
+#| include: false
+source("_helpers.R")
+met <- rd("modell/schwere_metriken.csv")
+kal <- rd("modell/schwere_kalibrierung.csv")
+orr <- rd("modell/schwere_odds_ratios.csv")
+imp <- rd("modell/schwere_wichtigkeit.csv")
+n_test <- sum(kal$n)
+prev <- met$test[met$modell == "Basislinie (immer Anteil)" & met$metrik == "pr_auc"]
+```
+
+::: {.note .warn}
+**Bitte zuerst lesen.**
+
+- **Frage:** Bei welchen Unfällen gibt es Verletzte oder Tote, bei welchen bleibt es beim Sachschaden? Das Modell sagt voraus, ob ein *bereits geschehener* Unfall Personenschaden hatte (`r fp(100 * prev, 1)` aller Unfälle).
+- **Es zeigt Zusammenhänge, keine Ursachen.** Dass Velo-Unfälle öfter Verletzte fordern, heisst nicht, dass Velo fahren «die Ursache» ist. Auch die Meldepraxis spielt mit: Ein Velo-Sturz ohne Verletzte wird vermutlich seltener erfasst als ein Blechschaden zwischen Autos.
+- **Es ist kein Prognosewerkzeug.** Es kann weder einen künftigen Unfall noch dessen Schwere im Einzelfall vorhersagen und darf nicht für Entscheide über Personen oder Orte verwendet werden.
+- **Hauptbefund:** Das Modell lernt vor allem, dass Unfälle mit **Velo, Motorrad oder Fussgänger:innen** viel öfter Verletzte fordern. Tageszeit, Wochentag und Quartier tragen fast nichts bei.
+:::
+
+## Wie gut ist das Modell?
+
+Vor dem Rechnen wurden die Daten **einmal** in einen Trainingsteil (80 %) und einen Testteil (20 %, rund `r fi(round(n_test, -2))` Unfälle) getrennt. Die Kreuzvalidierung (5 Teile) lief nur auf dem Trainingsteil, der Testteil wurde ein einziges Mal ausgewertet. Verglichen werden zwei Modelle, eine **logistische Regression** (gut erklärbar) und ein **Random Forest** (flexibler), mit einer **Basislinie**, die für jeden Unfall einfach den Durchschnitt rät.
+
+```{r}
+#| include: false
+MN <- c(roc_auc = "ROC-AUC (höher ist besser)", pr_auc = "PR-AUC (höher ist besser)", brier_class = "Brier-Score (tiefer ist besser)")
+mm <- met |> mutate(modell = factor(modell, levels = c("Basislinie (immer Anteil)", "Logistische Regression", "Random Forest")),
+                    metrik_l = factor(MN[metrik], levels = MN),
+                    tip = sprintf("%s – %s: %s (Testmenge)%s", modell, sub(" \\(.*", "", MN[metrik]), fdec(test, 3),
+                                  ifelse(is.na(cv_mittel), "", sprintf("; Kreuzvalidierung %s ± %s", fdec(cv_mittel, 3), fdec(cv_se, 3)))))
+g <- function(m, k) met$test[met$modell == m & met$metrik == k]
+```
+
+```{r}
+#| label: c-metriken
+plot_met <- function(v) {
+  ggplot(mm, aes(test, modell, fill = modell)) +
+    geom_col_interactive(aes(tooltip = tip, data_id = paste(modell, metrik)), width = 0.65) +
+    geom_text(aes(label = fdec(test, 3)), hjust = -0.15, size = 3.3, colour = v$ink) +
+    facet_wrap(~metrik_l, ncol = 1, scales = "free_x") +
+    scale_fill_manual(values = c("Basislinie (immer Anteil)" = if (v$name == "light") "#9c9b95" else "#6f6e69", "Logistische Regression" = v$cat[1], "Random Forest" = v$cat[2])) +
+    scale_x_continuous(limits = c(0, 1.12), breaks = seq(0, 1, 0.25), expand = c(0, 0)) +
+    scale_y_discrete(limits = rev, labels = function(x) sub(" \\(immer Anteil\\)", "", x)) +
+    labs(x = NULL, y = NULL) +
+    theme_zh(v) + theme(panel.grid.major.y = element_blank(), legend.position = "none")
+}
+chart(plot_met,
+  headline = sprintf("Der Random Forest trennt Unfälle mit und ohne Verletzte deutlich besser als Raten: ROC-AUC %s statt %s.", fdec(g("Random Forest", "roc_auc"), 2), fdec(g("Basislinie (immer Anteil)", "roc_auc"), 2)),
+  alt = sprintf("Drei Balkengruppen, je eine pro Kennzahl, für Basislinie, logistische Regression und Random Forest. ROC-AUC: 0.50, %s, %s. PR-AUC: %s, %s, %s. Brier-Score (tiefer ist besser): %s, %s, %s.",
+                fdec(g("Logistische Regression", "roc_auc"), 3), fdec(g("Random Forest", "roc_auc"), 3),
+                fdec(g("Basislinie (immer Anteil)", "pr_auc"), 3), fdec(g("Logistische Regression", "pr_auc"), 3), fdec(g("Random Forest", "pr_auc"), 3),
+                fdec(g("Basislinie (immer Anteil)", "brier_class"), 3), fdec(g("Logistische Regression", "brier_class"), 3), fdec(g("Random Forest", "brier_class"), 3)),
+  caption = "Kennzahlen auf dem Testteil. ROC-AUC: Wahrscheinlichkeit, dass ein zufälliger Unfall mit Verletzten ein höheres Risiko erhält als ein zufälliger ohne (0.5 = Raten, 1 = perfekt). PR-AUC: wie gut die Unfälle mit Verletzten gefunden werden, ohne viele Fehlalarme (Basislinie = Anteil der Verletzten-Unfälle). Brier-Score: mittlere quadratische Abweichung der Wahrscheinlichkeiten (tiefer = besser). Die Kreuzvalidierung liegt jeweils sehr nahe an den Testwerten, das Modell ist also nicht auf die Testmenge «zugeschnitten».",
+  tbl = html_table(met |> transmute(Modell = modell, Kennzahl = sub(" \\(.*", "", MN[metrik]), Testmenge = test, `Kreuzvalidierung (Mittel)` = cv_mittel, `Standardfehler` = cv_se), digits = 3, label = "Modellkennzahlen"),
+  h = 4.6)
+```
+
+Der Abstand zur Basislinie ist gross. Gleichzeitig steckt der Gewinn fast vollständig in wenigen Merkmalen (siehe unten). Ein Modell, das «Velo, Motorrad, Fussgänger» kennt, ist deutlich besser als eines ohne; ein schlauer Algorithmus allein ist es nicht.
+
+## Stimmen die Wahrscheinlichkeiten?
+
+```{r}
+#| include: false
+kal2 <- kal |> mutate(tip = sprintf("Vorhergesagt %s %%, beobachtet %s %% (%s Unfälle im Bereich %s)", fdec(100 * vorhergesagt, 0), fdec(100 * beobachtet, 0), fi(n), bin))
+dmax <- max(abs(kal2$vorhergesagt - kal2$beobachtet))
+```
+
+```{r}
+#| label: c-kalibrierung
+plot_kal <- function(v) {
+  ggplot(kal2, aes(vorhergesagt, beobachtet)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", linewidth = 0.5, colour = v$muted) +
+    geom_line(colour = v$cat[2], linewidth = 0.75) +
+    geom_point_interactive(aes(tooltip = tip, data_id = bin), colour = v$cat[2], size = 3) +
+    scale_x_continuous(limits = c(0, 1), labels = function(x) paste0(100 * x, " %")) +
+    scale_y_continuous(limits = c(0, 1), labels = function(x) paste0(100 * x, " %")) +
+    coord_fixed() +
+    labs(x = "vorhergesagte Wahrscheinlichkeit für Personenschaden", y = "tatsächlicher Anteil") +
+    theme_zh(v)
+}
+chart(plot_kal,
+  headline = sprintf("Die vorhergesagten Wahrscheinlichkeiten stimmen gut mit der Wirklichkeit überein (grösste Abweichung %s Prozentpunkte).", fdec(100 * dmax, 0)),
+  alt = "Kalibrierungsdiagramm des Random Forest: Zehn Punkte liegen nahe der Diagonalen von links unten nach rechts oben. Bei hohen Vorhersagen liegt der tatsächliche Anteil leicht über der Vorhersage.",
+  caption = "Random Forest auf dem Testteil, Unfälle gruppiert nach vorhergesagter Wahrscheinlichkeit (Dezile). Auf der Diagonalen (gestrichelt) wäre die Vorhersage perfekt. Im mittleren bis oberen Bereich ist das Modell etwas zu vorsichtig.",
+  tbl = html_table(kal |> transmute(Bereich = bin, Vorhergesagt = vorhergesagt, Beobachtet = beobachtet, Unfälle = n), digits = 3, label = "Kalibrierung"),
+  w = 4.6, h = 4.8)
+```
+
+## Welche Merkmale gehen mit Verletzten einher?
+
+Die logistische Regression liefert **Chancenverhältnisse (Odds Ratios)**. Ein Wert von 36 bei «Velo beteiligt» heisst: Die *Chance* auf Personenschaden ist bei einem Velo-Unfall rund 36-mal so hoch wie bei einem Unfall ohne Velo, bei sonst gleichen Merkmalen. Ein Wert von 1 heisst: kein Zusammenhang; unter 1: seltener Personenschaden. Die Balken sind 95-%-Intervalle.
+
+```{r}
+#| include: false
+LAB <- c(mit_velo = "Velo / E-Bike beteiligt", mit_fussgaenger = "Fussgänger:in beteiligt", mit_motorrad = "Motorrad beteiligt",
+         nacht = "Nacht (22–6 Uhr)", nahe_schule = "Volksschule im Umkreis von 200 m", jahr = "je späteres Jahr",
+         typ_Andere = "Typ: andere", typ_Auffahrunfall = "Typ: Auffahrunfall", typ_Einbiegeunfall = "Typ: Einbiegeunfall",
+         typ_Frontalkollision = "Typ: Frontalkollision", typ_Fussgängerunfall = "Typ: Fussgängerunfall", typ_Parkierunfall = "Typ: Parkierunfall",
+         `typ_Schleuder..oder.Selbstunfall` = "Typ: Schleuder-/Selbstunfall", typ_Tierunfall = "Typ: Tierunfall",
+         `typ_Überholunfall.oder.Fahrstreifenwechsel` = "Typ: Überholen/Spurwechsel", `typ_Überqueren.der.Fahrbahn` = "Typ: Überqueren der Fahrbahn",
+         strassenart_Hauptstrasse = "Hauptstrasse", strassenart_Nebenstrasse = "Nebenstrasse",
+         `tempo_klasse_Tempo.50` = "Tempo 50", `tempo_klasse_Tempo.60.` = "Tempo 60+", tempo_klasse_unbekannt = "Tempo unbekannt")
+GRP <- function(t) ifelse(grepl("^mit_", t), "Beteiligte", ifelse(grepl("^typ_", t), "Unfalltyp", ifelse(grepl("^(strassenart|tempo)", t), "Strasse und Tempo", "Zeit und Umfeld")))
+orp <- orr |> filter(term %in% names(LAB)) |>
+  mutate(lab = LAB[term], grp = factor(GRP(term), levels = c("Beteiligte", "Unfalltyp", "Strasse und Tempo", "Zeit und Umfeld"))) |>
+  arrange(odds_ratio) |> mutate(lab = factor(lab, levels = lab),
+    tip = sprintf("%s: Chancenverhältnis %s (95-%%-Intervall %s–%s)", lab, fdec(odds_ratio, 2), fdec(ci_low, 2), fdec(ci_high, 2)))
+or_velo <- orr$odds_ratio[orr$term == "mit_velo"]; or_park <- orr$odds_ratio[orr$term == "typ_Parkierunfall"]
+```
+
+```{r}
+#| label: c-odds
+plot_or <- function(v) {
+  ggplot(orp, aes(odds_ratio, lab, colour = grp)) +
+    geom_vline(xintercept = 1, linewidth = 0.5, colour = v$muted) +
+    geom_segment_interactive(aes(x = ci_low, xend = ci_high, yend = lab, tooltip = tip, data_id = term), linewidth = 0.75) +
+    geom_point_interactive(aes(tooltip = tip, data_id = term), size = 2.4) +
+    scale_colour_manual(values = setNames(v$cat[1:4], levels(orp$grp))) +
+    scale_x_log10(breaks = c(0.1, 0.3, 1, 3, 10, 30), labels = function(x) fdec(x, ifelse(x < 1, 1, 0))) +
+    guides(colour = guide_legend(nrow = 2)) +
+    labs(x = "Chancenverhältnis (logarithmische Skala; 1 = kein Zusammenhang)", y = NULL) +
+    theme_zh(v, base = 10.5)
+}
+chart(plot_or,
+  headline = sprintf("Velo (×%s), Fussgänger und Motorrad stechen heraus; Parkierunfälle enden fast nie mit Verletzten (×%s).", round(or_velo), fdec(or_park, 2)),
+  alt = "Forest-Plot der Chancenverhältnisse auf logarithmischer Skala. Ganz rechts Velo, Fussgängerunfall, Typ andere, Fussgänger und Motorrad mit Werten zwischen 8 und 36. Ganz links Parkierunfall und Überholunfall mit Werten unter 0.2.",
+  caption = "Logistische Regression, alle Unfälle. Referenz: Unfalltyp «Abbiegeunfall», Strassenart «andere», Tempo 30 oder tiefer. «Je späteres Jahr» (0.95) spiegelt vor allem den Strukturbruch 2015: Seither werden mehr reine Sachschaden-Unfälle erfasst, der Anteil mit Verletzten sinkt dadurch. Stunde, Monat, Wochentag und Stadtkreis stehen in der Tabelle; sie liegen alle nahe bei 1 oder haben sehr breite Intervalle.",
+  tbl = html_table(orr |> transmute(Merkmal = term, `Chancenverhältnis` = odds_ratio, `Intervall von` = ci_low, `Intervall bis` = ci_high, `p-Wert` = p_value), digits = 3, tall = TRUE, label = "Chancenverhältnisse"),
+  h = 6.4, inv = "opacity:.5;")
+```
+
+## Was nutzt der Random Forest wirklich?
+
+```{r}
+#| include: false
+LAB2 <- c(LAB, `typ_Schleuder..oder.Selbstunfall` = "Typ: Schleuder-/Selbstunfall", stunde = "Stunde", monat = "Monat")
+ip <- imp |> mutate(lab = ifelse(merkmal %in% names(LAB2), LAB2[merkmal], merkmal)) |>
+  slice_max(wichtigkeit, n = 10) |> arrange(wichtigkeit) |> mutate(lab = factor(lab, levels = lab),
+    tip = sprintf("%s: Wichtigkeit %s", lab, fdec(wichtigkeit, 3)))
+```
+
+```{r}
+#| label: c-wichtigkeit
+plot_imp <- function(v) {
+  ggplot(ip, aes(wichtigkeit, lab)) +
+    geom_col_interactive(aes(tooltip = tip, data_id = merkmal), fill = v$cat[2], width = 0.6) +
+    scale_x_continuous(expand = expansion(mult = c(0, 0.05))) +
+    labs(x = "Wichtigkeit (Verlust an Treffern, wenn das Merkmal durchmischt wird)", y = NULL) +
+    theme_zh(v) + theme(panel.grid.major.y = element_blank())
+}
+chart(plot_imp,
+  headline = "Velo, Motorrad und Fussgänger sind die wichtigsten Merkmale; Tageszeit, Wochentag und Quartier zählen kaum.",
+  alt = "Balkendiagramm der zehn wichtigsten Merkmale des Random Forest. Der Balken für Velo beteiligt ist mehr als dreimal so lang wie der nächste, danach folgen Motorrad und Fussgänger.",
+  caption = "Permutationswichtigkeit des Random Forest: Wie stark verschlechtern sich die Vorhersagen, wenn die Werte eines Merkmals durcheinandergewürfelt werden? Höher = wichtiger. Zehn wichtigste Merkmale; die vollständige Liste steht in der Tabelle.",
+  tbl = html_table(imp |> transmute(Merkmal = merkmal, Wichtigkeit = wichtigkeit), digits = 5, tall = TRUE, label = "Wichtigkeit aller Merkmale"),
+  h = 4)
+```
+
+## Was daraus folgt – und was nicht
+
+**Folgt:** Wer Verkehrssicherheit nach Schweregrad betrachtet, sollte *ungeschützte Verkehrsteilnehmende* (zu Fuss, Velo, Motorrad) gesondert anschauen. Ihre Unfälle gehen viel häufiger mit Verletzten einher, unabhängig von Tageszeit, Wochentag oder Quartier.
+
+**Folgt nicht:** dass sich Schweregrade im Einzelfall vorhersagen lassen; dass Tempo 50 «gefährlicher» ist als Tempo 30 (die Odds Ratios dafür sind Zusammenhänge zwischen verschiedenen Strassen, siehe [Wo](wo.qmd)); dass Quartiere oder Uhrzeiten keine Rolle spielen (sie tragen im Modell wenig bei, das Modell sieht aber weder Verkehrsmenge noch Unfallhergang). Die Frage «Was verhindert Verletzte?» braucht andere Daten und Methoden als dieses Modell.
+
+Das Vorgehen ist vollständig dokumentiert und reproduzierbar ([Pipeline & Methode](pipeline.qmd)). Alle Ergebnisse als Dateien: [Daten & Metadaten](daten.qmd).

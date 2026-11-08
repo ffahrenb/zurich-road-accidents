@@ -1,0 +1,128 @@
+---
+title: "Wo passieren Unfälle?"
+subtitle: "Quartiere, signalisierte Geschwindigkeit und Schulnähe"
+---
+
+```{r}
+#| include: false
+source("_helpers.R")
+q <- rd("data/quartier.csv")
+tempo <- rd("data/tempo.csv")
+con <- DBI::dbConnect(duckdb::duckdb())
+u <- DBI::dbGetQuery(con, sprintf("SELECT wochentag, stunde, personenschaden, mit_fussgaenger, mit_velo, nahe_schule FROM read_parquet('%s')", file.path(EX, "data", "unfaelle.parquet")))
+DBI::dbDisconnect(con, shutdown = TRUE)
+```
+
+Eine Karte mit den einzelnen Unfallorten finden Sie auf der Seite [Karte](karte.qmd). Hier stehen die Vergleiche.
+
+## Quartiere
+
+```{r}
+#| include: false
+qr <- q |> filter(jahr >= 2015) |>
+  group_by(quartier_nr, quartier) |>
+  summarise(rate = mean(personenschaden_pro_1000), einw = mean(einwohner), faelle = sum(mit_personenschaden), .groups = "drop") |>
+  mutate(klein = einw < 2000,
+         grp = factor(ifelse(klein, "unter 2’000 Einwohner:innen: Rate wenig aussagekräftig", "ab 2’000 Einwohner:innen"),
+                      levels = c("ab 2’000 Einwohner:innen", "unter 2’000 Einwohner:innen: Rate wenig aussagekräftig")),
+         tip = sprintf("%s: %s pro 1’000 Einw. und Jahr (%s Unfälle mit Personenschaden 2015–2024, rund %s Einwohner:innen)", quartier, fdec(rate, 1), fi(faelle), fi(round(einw, -1)))) |>
+  arrange(desc(rate))
+qr$quartier_f <- factor(qr$quartier, levels = rev(qr$quartier))
+top_klein <- qr |> filter(klein) |> pull(quartier)
+top_w <- qr |> filter(!klein) |> slice_head(n = 3) |> pull(quartier)
+```
+
+```{r}
+#| label: c-quartiere
+plot_q <- function(v) {
+  ggplot(qr, aes(rate, quartier_f, fill = grp)) +
+    geom_col_interactive(aes(tooltip = tip, data_id = quartier_nr), width = 0.7) +
+    geom_text(aes(label = fdec(rate, 1)), hjust = -0.2, size = 3, colour = v$muted) +
+    scale_fill_manual(values = setNames(v$cat[c(1, 2)], levels(qr$grp))) +
+    scale_x_continuous(expand = expansion(mult = c(0, 0.12)), labels = label_number(big.mark = "’")) +
+    labs(x = "Unfälle mit Personenschaden pro 1’000 Einw. und Jahr", y = NULL) +
+    theme_zh(v, base = 10.5) + theme(panel.grid.major.y = element_blank(), legend.direction = "vertical")
+}
+chart(plot_q,
+  headline = sprintf("Am höchsten ist die Rate in %s – dort wohnen kaum Menschen, es sind viele unterwegs.", paste(top_klein, collapse = ", ")),
+  alt = sprintf("Balkendiagramm der 34 Stadtquartiere nach Unfällen mit Personenschaden pro 1000 Einwohner und Jahr, Durchschnitt 2015 bis 2024. Spitzenreiter sind %s, mit grossem Abstand.", paste(top_klein, collapse = ", ")),
+  caption = sprintf("Mittel der jährlichen Raten 2015–2024 (Unfälle mit Personenschaden je 1’000 Einwohner:innen). Orange: Quartiere mit weniger als 2’000 Einwohner:innen; dort teilen wenige Menschen viele Unfälle von Pendlern und Besuchern, die Rate sagt wenig über das Risiko der Wohnbevölkerung. Unter den übrigen Quartieren führen %s.", paste(top_w, collapse = ", ")),
+  tbl = html_table(qr |> transmute(Quartier = quartier, `Rate pro 1’000` = rate, `Einwohner (Mittel)` = einw, `Unfälle mit Personenschaden 2015–2024` = faelle), digits = 1, tall = TRUE, label = "Raten nach Quartier"),
+  h = 8.2, inv = "opacity:.5;")
+```
+
+::: {.note}
+**Warum «pro Einwohner»?** Damit grosse und kleine Quartiere vergleichbar werden. Der Nachteil: Die Rate misst Unfälle *am Ort*, geteilt durch die Menschen, die dort *wohnen*. Wer im Quartier verunfallt, muss nicht dort wohnen. Darum sind Innenstadtquartiere mit wenig Bewohnern rechnerisch «gefährlich». Sie zeigen vor allem, wo viel Verkehr ist. Die Raten beginnen erst 2015 und zählen nur Unfälle mit Personenschaden, wegen des [Strukturbruchs 2015](datenqualitaet.qmd#der-strukturbruch-2015).
+:::
+
+## Signalisierte Geschwindigkeit
+
+```{r}
+#| include: false
+tp <- tempo |> mutate(
+  klasse = factor(tempo_klasse, levels = c("Tempo 30 oder tiefer", "Tempo 50", "Tempo 60+", "unbekannt")),
+  tip = sprintf("%s: %s %% der Unfälle mit Personenschaden (%s von %s)", tempo_klasse, fdec(anteil_personenschaden_pct, 1), fi(mit_personenschaden), fi(unfaelle)))
+t30 <- tp$anteil_personenschaden_pct[tp$tempo_klasse == "Tempo 30 oder tiefer"]
+t50 <- tp$anteil_personenschaden_pct[tp$tempo_klasse == "Tempo 50"]
+```
+
+```{r}
+#| label: c-tempo
+plot_t <- function(v) {
+  ggplot(tp, aes(klasse, anteil_personenschaden_pct)) +
+    geom_col_interactive(aes(tooltip = tip, data_id = tempo_klasse), fill = v$cat[1], width = 0.55) +
+    geom_text(aes(label = paste0(fdec(anteil_personenschaden_pct, 1), " %")), vjust = -0.5, size = 3.6, colour = v$ink) +
+    scale_y_continuous(limits = c(0, 38), expand = c(0, 0), labels = function(x) paste0(x, " %")) +
+    scale_x_discrete(labels = function(x) gsub(" oder tiefer", "\noder tiefer", x)) +
+    labs(x = "Signalisierte Geschwindigkeit am nächsten Strassenabschnitt", y = "Anteil mit Personenschaden") +
+    theme_zh(v) + theme(panel.grid.major.x = element_blank())
+}
+chart(plot_t,
+  headline = sprintf("Bei Tempo 50 enden %s der Unfälle mit Verletzten, bei Tempo 30 oder tiefer %s.", fp(t50, 1), fp(t30, 1)),
+  alt = sprintf("Balkendiagramm: Anteil der Unfälle mit Personenschaden nach signalisierter Geschwindigkeit. Tempo 30 oder tiefer %s, Tempo 50 %s, Tempo 60 und mehr %s, unbekannt %s.",
+                fp(t30, 1), fp(t50, 1), fp(tp$anteil_personenschaden_pct[3], 1), fp(tp$anteil_personenschaden_pct[4], 1)),
+  caption = "Anteil der Unfälle mit Personenschaden an allen Unfällen der Klasse, 2011–2024. Die Klasse folgt dem nächsten Strassenabschnitt mit signalisierter Geschwindigkeit (höchstens 25 m entfernt); 6 % der Unfälle lassen sich keinem Abschnitt zuordnen («unbekannt», Prüfung DQ-U06).",
+  tbl = html_table(tp |> transmute(Klasse = tempo_klasse, Unfälle = unfaelle, `mit Personenschaden` = mit_personenschaden, `Anteil %` = anteil_personenschaden_pct), label = "Unfälle nach Tempoklasse"),
+  h = 3.6)
+```
+
+::: {.note .warn}
+**Kein Beweis für die Wirkung von Tempo 30.** Tempo-30-Strassen sind meist Quartierstrassen mit wenig Verkehr, Tempo-50-Strassen sind Hauptachsen mit Trams, Lastwagen und Velos. Die Zahlen vergleichen also verschiedene Strassen, nicht dieselbe Strasse vor und nach einer Tempoänderung. Ausserdem stammen die Tempozonen aus dem aktuellen Geodatensatz, nicht aus dem Stand am Unfalltag.
+:::
+
+## Nähe zu Schulen
+
+```{r}
+#| include: false
+sc <- u |> group_by(nahe_schule) |>
+  summarise(n = n(), `Mit Personenschaden` = 100 * mean(personenschaden), `Mit Fussgänger:in` = 100 * mean(mit_fussgaenger),
+            `Mit Velo` = 100 * mean(mit_velo), .groups = "drop") |>
+  mutate(grp = factor(ifelse(nahe_schule, "bis 200 m von einer Volksschule", "weiter weg"),
+                      levels = c("bis 200 m von einer Volksschule", "weiter weg")))
+share_near <- 100 * mean(u$nahe_schule)
+scl <- sc |> pivot_longer(c(`Mit Personenschaden`, `Mit Fussgänger:in`, `Mit Velo`), names_to = "mass", values_to = "pct") |>
+  mutate(mass = factor(mass, levels = c("Mit Personenschaden", "Mit Fussgänger:in", "Mit Velo")),
+         tip = sprintf("%s – %s: %s %% (von %s Unfällen)", grp, mass, fdec(pct, 1), fi(n)))
+sw <- u |> filter(wochentag <= 5, stunde %in% c(7, 8, 15, 16)) |> summarise(a = 100 * mean(nahe_schule)) |> pull(a)
+```
+
+```{r}
+#| label: c-schule
+plot_s <- function(v) {
+  ggplot(scl, aes(mass, pct, fill = grp)) +
+    geom_col_interactive(aes(tooltip = tip, data_id = paste(grp, mass)), position = position_dodge(width = 0.7), width = 0.62) +
+    geom_text(aes(label = paste0(fdec(pct, 1), " %")), position = position_dodge(width = 0.7), vjust = -0.5, size = 3.3, colour = v$ink) +
+    scale_fill_manual(values = setNames(v$cat[c(1, 2)], levels(sc$grp))) +
+    scale_y_continuous(limits = c(0, 31), expand = c(0, 0), labels = function(x) paste0(x, " %")) +
+    labs(x = NULL, y = "Anteil der Unfälle") +
+    theme_zh(v) + theme(panel.grid.major.x = element_blank())
+}
+chart(plot_s,
+  headline = sprintf("Rund jeder fünfte Unfall (%s) liegt nahe einer Volksschule; schwerer sind diese Unfälle nicht.", fp(share_near, 0)),
+  alt = "Gruppierte Balken: Anteil der Unfälle mit Personenschaden, mit Fussgängerbeteiligung und mit Velobeteiligung, getrennt nach Unfällen bis 200 Meter von einer Volksschule und weiter weg. Die Werte sind in beiden Gruppen fast gleich.",
+  caption = "Schulnähe = Volksschule im Umkreis von 200 m des Unfallorts (Luftlinie). Der Vergleich sagt nichts über den Schulweg: Wir kennen weder Alter der Beteiligten noch Verkehrsmenge.",
+  tbl = html_table(scl |> transmute(Gruppe = grp, Kennzahl = mass, `Anteil %` = pct, `Unfälle in Gruppe` = n), label = "Schulnähe"),
+  h = 3.6)
+```
+
+Auch zu typischen Schulwegzeiten (Montag bis Freitag, 7–9 Uhr und 15–17 Uhr) liegt der Anteil der Unfälle nahe Schulen bei `r fp(sw, 0)`, also nicht höher als sonst. Ein Radius von 200 m um alle Volksschulen deckt einen grossen Teil des dicht bebauten Stadtgebiets ab; deshalb ist die Aussage schwach. Wer Schulwege beurteilen will, braucht feinere Daten (Wegnetz, Alter, Verkehrsmenge).
