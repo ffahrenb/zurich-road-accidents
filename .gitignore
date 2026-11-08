@@ -29,3 +29,6 @@ renv/staging/
 renv/local/
 .DS_Store
 .claude/
+
+# staged export artifact (CI)
+/export-artifact/

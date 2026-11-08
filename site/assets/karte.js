@@ -27,16 +27,24 @@
     view: document.querySelectorAll('input[name=zm-view]'),
     qrt: document.getElementById('zm-qrt')
   };
-  var state = { y0: 2011, y1: 2024, sev: [0, 1, 2, 3], mode: 'alle', view: 'heat', qrt: false };
+  var state = { y0: 0, y1: 0, sev: [0, 1, 2, 3], mode: 'alle', view: 'heat', qrt: false };
   var data = null, quartiere = null, map = null;
   var abs = function (p) { return new URL('export/data/' + p, document.baseURI).href; };
   var isDark = function () { return document.body.classList.contains('quarto-dark'); };
   var pal = function () { return isDark() ? PALETTE.dark : PALETTE.light; };
 
-  [ui.y0, ui.y1].forEach(function (sel, k) {
-    for (var y = 2011; y <= 2024; y++) { var o = document.createElement('option'); o.value = y; o.textContent = y; sel.appendChild(o); }
-    sel.value = k ? 2024 : 2011;
-  });
+  // The year range comes from the data (property j of the point features), never from the script.
+  var yMax = 0;
+  function initYears() {
+    var lo = Infinity, hi = -Infinity;
+    data.features.forEach(function (f) { var j = f.properties.j; if (j < lo) lo = j; if (j > hi) hi = j; });
+    yMax = hi;
+    state.y0 = lo; state.y1 = hi;
+    [ui.y0, ui.y1].forEach(function (sel, k) {
+      for (var y = lo; y <= hi; y++) { var o = document.createElement('option'); o.value = y; o.textContent = y; sel.appendChild(o); }
+      sel.value = k ? hi : lo;
+    });
+  }
 
   function setStatus(t) { if (ui.status) ui.status.textContent = t; }
 
@@ -116,7 +124,7 @@
     h += '<span><strong>Einzelpunkte (ab Zoomstufe 14 oder im Modus «Einzelpunkte»):</strong></span>';
     SEV.forEach(function (s, i) { h += '<span><i style="background:' + P.sev[i] + ';width:.8rem;height:.8rem;border-radius:50%"></i>' + s + '</span>'; });
     if (state.qrt) {
-      h += '<span style="flex-basis:100%"></span><span><strong>Quartiere, Unfälle mit Personenschaden pro 1’000 Einw. und Jahr (2015–2024):</strong></span>';
+      h += '<span style="flex-basis:100%"></span><span><strong>Quartiere, Unfälle mit Personenschaden pro 1’000 Einw. und Jahr (2015–' + yMax + '):</strong></span>';
       BREAK_LABELS.forEach(function (l, i) { h += '<span><i style="background:' + P.choro[i] + '"></i>' + l + '</span>'; });
     }
     ui.legend.innerHTML = h;
@@ -183,6 +191,7 @@
                fetch(abs('quartiere.geojson')).then(function (r) { return r.json(); })])
     .then(function (res) {
       data = res[0]; quartiere = res[1];
+      initYears();
       var tries = 0, t = setInterval(function () {
         var w = root.querySelector('.html-widget');
         if (w && w.map) { clearInterval(t); start(w); }

@@ -136,7 +136,7 @@ tagList(
 
 ```{r}
 #| include: false
-sn <- snap |> filter(snapshot == max(snapshot)) |> arrange(jahr) |>
+sn <- snap |> filter(snapshot == max(snapshot), jahr >= yr_from, jahr <= yr_to) |> arrange(jahr) |>
   mutate(yoy = 100 * (n / lag(n) - 1), phase = factor(ifelse(jahr < 2015, "bis 2014", "ab 2015"), levels = c("bis 2014", "ab 2015")),
          tip = sprintf("%d: %s Unfälle%s", jahr, fi(n), ifelse(is.na(yoy), "", sprintf(" (%s%s %% gegenüber Vorjahr)", ifelse(yoy >= 0, "+", "−"), fdec(abs(yoy), 0)))))
 y15 <- sn$yoy[sn$jahr == 2015]
@@ -151,14 +151,14 @@ plot_bruch <- function(v) {
   ggplot(sn, aes(jahr, n, fill = phase)) +
     geom_col_interactive(aes(tooltip = tip, data_id = jahr), width = 0.62) +
     scale_fill_manual(values = setNames(v$cat[1:2], levels(sn$phase))) +
-    scale_x_continuous(breaks = 2011:2024, labels = function(x) substr(x, 3, 4)) +
+    scale_x_continuous(breaks = yr_from:yr_to, labels = function(x) substr(x, 3, 4)) +
     scale_y_continuous(labels = label_number(big.mark = "’"), expand = expansion(mult = c(0, 0.05))) +
     labs(x = "Unfalljahr (zweistellig)", y = "erfasste Unfälle") +
     theme_zh(v) + theme(panel.grid.major.x = element_blank())
 }
 chart(plot_bruch,
   headline = sprintf("2015 steigt die Zahl der erfassten Unfälle um %s %% – ein Sprung in der Statistik, nicht auf der Strasse.", round(y15)),
-  alt = sprintf("Säulendiagramm der erfassten Unfälle pro Jahr 2011 bis 2024. Bis 2014 rund 3300 bis 3400 pro Jahr, 2015 %s, ab 2016 über 5000.", fi(sn$n[sn$jahr == 2015])),
+  alt = sprintf("Säulendiagramm der erfassten Unfälle pro Jahr %s. Bis 2014 rund 3300 bis 3400 pro Jahr, 2015 %s, ab 2016 über 5000.", yr_span_bis, fi(sn$n[sn$jahr == 2015])),
   caption = "Erfasste Unfälle pro Jahr (Snapshot-Stand). Zwei Farben trennen die Zeit vor und nach dem Sprung.",
   tbl = html_table(sn |> transmute(Jahr = jahr, Unfälle = n, `Veränderung zum Vorjahr %` = yoy), digits = 1, label = "Erfasste Unfälle pro Jahr"),
   h = 3.4)
@@ -184,7 +184,7 @@ runs <- verlauf |> mutate(status2 = ifelse(status %in% c("PASS", "WARN"), status
 html_table(runs, caption = "Jeder Lauf hängt seine Ergebnisse an dq_verlauf.csv an.", label = "Verlauf der Prüfläufe")
 ```
 
-Bisher liegt **ein Lauf** vor (`r nrow(runs)`). Der Verlauf wächst mit jedem Lauf; dann zeigt diese Tabelle, ob Prüfungen schlechter werden. Zwei Prüfungen vergleichen schon heute mit dem *vorherigen Snapshot* der Quelle: **DQ-S01** (WARN) meldet, wenn sich Jahreszahlen um mehr als 1 % ändern, **DQ-S02** (STOP) bricht ab, wenn der Datenbestand um mehr als 10 % schrumpft. Hintergrund: Amtliche Datensätze ändern sich manchmal ohne Ankündigung, bei einem amtlichen Datensatz schrumpfte der Bestand einmal von 180’000 auf 55’000 Zeilen. Beim ersten Lauf gibt es noch keinen Vergleichsstand; die Referenz wurde angelegt (siehe Hinweis in der Tabelle oben).
+`r if (nrow(runs) == 1) 'Bisher liegt **ein Lauf** vor (1).' else sprintf('Bisher liegen **%d Läufe** vor.', nrow(runs))` Der Verlauf wächst mit jedem Lauf (der monatliche Lauf auf GitHub schreibt ihn ins Repository zurück); dann zeigt diese Tabelle, ob Prüfungen schlechter werden. Drei Prüfungen vergleichen mit dem *vorherigen Snapshot* der Quelle: **DQ-S01** (WARN) meldet, wenn sich Jahreszahlen um mehr als 1 % ändern, **DQ-S02** (STOP) bricht ab, wenn der Datenbestand um mehr als 10 % schrumpft, **DQ-S04** (STOP) bricht ab, wenn der veröffentlichte Jahresbereich kleiner wird (neue Jahre kommen automatisch dazu, nie fallen welche weg; ein unvollständiges neuestes Jahr meldet **DQ-S03** als Warnung). Hintergrund: Amtliche Datensätze ändern sich manchmal ohne Ankündigung, bei einem amtlichen Datensatz schrumpfte der Bestand einmal von 180’000 auf 55’000 Zeilen. Beim ersten Lauf gibt es noch keinen Vergleichsstand; die Referenz wurde angelegt (siehe Hinweis in der Tabelle oben).
 
 ## Datenverträge
 

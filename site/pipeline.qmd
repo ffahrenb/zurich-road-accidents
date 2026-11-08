@@ -67,7 +67,7 @@ Ein einzelner Befehl: `make run`; alles zusammen mit Prüfungen und Website: `ma
 - **Tests mit absichtlich kaputten Daten:** Jede STOP-Prüfung wird mit einem Fixture geprüft, das genau diesen Fehler enthält ([Datenqualität](datenqualitaet.qmd#die-prüfungen-werden-selbst-getestet)).
 - **Datenschutz-Gate, das sich selbst testet:** 15 gezielt eingebaute Verstösse müssen es zum Scheitern bringen ([Datenschutz](datenschutz.qmd)).
 - **Lint:** `lintr` für R, `sqlfluff` (fest auf Version 3.4.2) für SQL.
-- **CI:** GitHub Actions führt bei jedem Push, jedem Pull Request und monatlich Lint, Tests, Pipeline, Datenschutz-Gate und den Bau dieser Website aus; veröffentlicht wird nur vom Hauptzweig.
+- **CI:** GitHub Actions führt bei jedem Push, jedem Pull Request und monatlich Lint, Tests, Pipeline, Datenschutz-Gate und den Bau dieser Website aus; veröffentlicht wird nur vom Hauptzweig. Der monatliche Lauf nimmt neue Datenjahre automatisch auf (Jahresbereich aus den Quellen, ein unvollständiges neuestes Jahr wird ausgelassen) und schreibt seine Ergebnisse (`export/`) ins Repository zurück, damit der Prüfverlauf wächst.
 
 ## Entscheide (ADR)
 
@@ -80,7 +80,8 @@ A <- tibble::tribble(
   "0002", "0002-targets.md", "{targets} als Orchestrierung", "Inkrementelle, reproduzierbare Läufe; das Qualitäts-Gate ist ein Knoten im Graph.",
   "0003", "0003-schichten-raw-staging-mart.md", "Schichten raw, staging, mart", "Fehler dort finden, wo sie entstehen; nur geprüfte Marts werden exportiert.",
   "0004", "0004-zwei-datenpfade-datenschutz.md", "Zwei Datenpfade und Datenschutz", "Öffentlicher Pfad vollständig in CI; privater Pfad nur lokal, nur Modellergebnisse werden veröffentlicht.",
-  "0005", "0005-datenqualitaet-als-freigabe.md", "Datenqualität als Freigabe-Gate", "STOP bricht ab, WARN macht sichtbar; erkennen, reparieren, verifizieren."
+  "0005", "0005-datenqualitaet-als-freigabe.md", "Datenqualität als Freigabe-Gate", "STOP bricht ab, WARN macht sichtbar; erkennen, reparieren, verifizieren."),
+  "0006", "0006-automatische-aktualisierung-und-persistenz.md", "Automatische Aktualisierung und Persistenz", "Jahresbereich aus den Quellen, nie rückwärts; der monatliche Lauf schreibt export/ ins Repository zurück."
 )
 tags$div(class = "dl", lapply(seq_len(nrow(A)), function(i)
   tags$a(href = paste0(REPO, "/blob/main/docs/adr/", A$file[i]), tags$strong(paste("ADR", A$nr[i], "·", A$titel[i])), tags$span(A$kurz[i]))))

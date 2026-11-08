@@ -2,7 +2,8 @@
 # Every source is fetched from the official publisher, never from a copy.
 ckan_base: https://data.stadt-zuerich.ch/api/3/action
 wfs_base: https://www.ogd.stadt-zuerich.ch/wfs/geoportal
-years: {from: 2011, to: 2024}
+# to: auto = latest year for which ALL inputs exist (R/years.R, docs/pipeline.md); a number pins it.
+years: {from: 2011, to: auto}
 
 sources:
   unfaelle:

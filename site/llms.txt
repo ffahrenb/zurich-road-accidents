@@ -1,6 +1,6 @@
 # Unfälle Zürich – Strassenverkehrsunfälle 2011–2024
 
-> Offene Auswertung von 66'051 Strassenverkehrsunfällen der Stadt Zürich (2011–2024). R+SQL-Pipeline (DuckDB), 33 automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, offene Exporte. Daten: Stadt Zürich Open Data / ASTRA, CC BY 4.0. Code: MIT.
+> Offene Auswertung von 66'051 Strassenverkehrsunfällen der Stadt Zürich (2011–2024). R+SQL-Pipeline (DuckDB), 37 automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, offene Exporte. Daten: Stadt Zürich Open Data / ASTRA, CC BY 4.0. Code: MIT.
 
 Hinweise für Maschinen und Menschen: Die Zahl der erfassten Unfälle springt 2015 um +38 % (Änderung der Erfassungspraxis, vor allem Sachschaden), das ist kein realer Anstieg (Prüfung DQ-U07, Status WARN). Das Schweremodell zeigt Zusammenhänge, keine Ursachen, und ist kein Prognosewerkzeug. Wetter-Effekte sind Verhältnisse (IRR) pro Stunde, keine Kausalaussagen.
 
@@ -30,6 +30,7 @@ Hinweise für Maschinen und Menschen: Die Zahl der erfassten Unfälle springt 20
 - https://ffahrenb.github.io/zurich-road-accidents/export/data/zeitmuster.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/dq/dq_ergebnisse.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/dq/dq_verlauf.csv
+- https://ffahrenb.github.io/zurich-road-accidents/export/dq/jahresbereich.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/dq/manifest.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/dq/snapshot_history.csv
 - https://ffahrenb.github.io/zurich-road-accidents/export/meta/datenwoerterbuch.csv

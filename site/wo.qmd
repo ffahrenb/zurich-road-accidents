@@ -25,7 +25,7 @@ qr <- q |> filter(jahr >= 2015) |>
   mutate(klein = einw < 2000,
          grp = factor(ifelse(klein, "unter 2’000 Einwohner:innen: Rate wenig aussagekräftig", "ab 2’000 Einwohner:innen"),
                       levels = c("ab 2’000 Einwohner:innen", "unter 2’000 Einwohner:innen: Rate wenig aussagekräftig")),
-         tip = sprintf("%s: %s pro 1’000 Einw. und Jahr (%s Unfälle mit Personenschaden 2015–2024, rund %s Einwohner:innen)", quartier, fdec(rate, 1), fi(faelle), fi(round(einw, -1)))) |>
+         tip = sprintf("%s: %s pro 1’000 Einw. und Jahr (%s Unfälle mit Personenschaden %s, rund %s Einwohner:innen)", quartier, fdec(rate, 1), fi(faelle), yr_q, fi(round(einw, -1)))) |>
   arrange(desc(rate))
 qr$quartier_f <- factor(qr$quartier, levels = rev(qr$quartier))
 top_klein <- qr |> filter(klein) |> pull(quartier)
@@ -45,9 +45,9 @@ plot_q <- function(v) {
 }
 chart(plot_q,
   headline = sprintf("Am höchsten ist die Rate in %s – dort wohnen kaum Menschen, es sind viele unterwegs.", paste(top_klein, collapse = ", ")),
-  alt = sprintf("Balkendiagramm der 34 Stadtquartiere nach Unfällen mit Personenschaden pro 1000 Einwohner und Jahr, Durchschnitt 2015 bis 2024. Spitzenreiter sind %s, mit grossem Abstand.", paste(top_klein, collapse = ", ")),
-  caption = sprintf("Mittel der jährlichen Raten 2015–2024 (Unfälle mit Personenschaden je 1’000 Einwohner:innen). Orange: Quartiere mit weniger als 2’000 Einwohner:innen; dort teilen wenige Menschen viele Unfälle von Pendlern und Besuchern, die Rate sagt wenig über das Risiko der Wohnbevölkerung. Unter den übrigen Quartieren führen %s.", paste(top_w, collapse = ", ")),
-  tbl = html_table(qr |> transmute(Quartier = quartier, `Rate pro 1’000` = rate, `Einwohner (Mittel)` = einw, `Unfälle mit Personenschaden 2015–2024` = faelle), digits = 1, tall = TRUE, label = "Raten nach Quartier"),
+  alt = sprintf("Balkendiagramm der 34 Stadtquartiere nach Unfällen mit Personenschaden pro 1000 Einwohner und Jahr, Durchschnitt %s. Spitzenreiter sind %s, mit grossem Abstand.", yr_q_bis, paste(top_klein, collapse = ", ")),
+  caption = sprintf("Mittel der jährlichen Raten %s (Unfälle mit Personenschaden je 1’000 Einwohner:innen). Orange: Quartiere mit weniger als 2’000 Einwohner:innen; dort teilen wenige Menschen viele Unfälle von Pendlern und Besuchern, die Rate sagt wenig über das Risiko der Wohnbevölkerung. Unter den übrigen Quartieren führen %s.", yr_q, paste(top_w, collapse = ", ")),
+  tbl = html_table(qr |> transmute(Quartier = quartier, `Rate pro 1’000` = rate, `Einwohner (Mittel)` = einw, !!col_faelle_q := faelle), digits = 1, tall = TRUE, label = "Raten nach Quartier"),
   h = 8.2, inv = "opacity:.5;")
 ```
 
@@ -81,7 +81,7 @@ chart(plot_t,
   headline = sprintf("Bei Tempo 50 enden %s der Unfälle mit Verletzten, bei Tempo 30 oder tiefer %s.", fp(t50, 1), fp(t30, 1)),
   alt = sprintf("Balkendiagramm: Anteil der Unfälle mit Personenschaden nach signalisierter Geschwindigkeit. Tempo 30 oder tiefer %s, Tempo 50 %s, Tempo 60 und mehr %s, unbekannt %s.",
                 fp(t30, 1), fp(t50, 1), fp(tp$anteil_personenschaden_pct[3], 1), fp(tp$anteil_personenschaden_pct[4], 1)),
-  caption = "Anteil der Unfälle mit Personenschaden an allen Unfällen der Klasse, 2011–2024. Die Klasse folgt dem nächsten Strassenabschnitt mit signalisierter Geschwindigkeit (höchstens 25 m entfernt); 6 % der Unfälle lassen sich keinem Abschnitt zuordnen («unbekannt», Prüfung DQ-U06).",
+  caption = paste0("Anteil der Unfälle mit Personenschaden an allen Unfällen der Klasse, ", yr_span, ". Die Klasse folgt dem nächsten Strassenabschnitt mit signalisierter Geschwindigkeit (höchstens 25 m entfernt); 6 % der Unfälle lassen sich keinem Abschnitt zuordnen («unbekannt», Prüfung DQ-U06)."),
   tbl = html_table(tp |> transmute(Klasse = tempo_klasse, Unfälle = unfaelle, `mit Personenschaden` = mit_personenschaden, `Anteil %` = anteil_personenschaden_pct), label = "Unfälle nach Tempoklasse"),
   h = 3.6)
 ```
