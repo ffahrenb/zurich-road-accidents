@@ -17,10 +17,12 @@ list(
 
   # --- 2 warehouse: raw -> staging -> mart (SQL) ----------------------------
   tar_files_input(sql_files, list.files(c("sql/raw", "sql/staging", "sql/mart"), "\\.sql$", full.names = TRUE)),
+  # Private Track X input: tracked as a value so toggling the env var rebuilds the warehouse.
+  tar_target(private_path, Sys.getenv("ZH_PRIVATE_ACCIDENTS"), cue = tar_cue(mode = "always")),
   tar_target(
     warehouse,
     build_warehouse(manifest, cfg, sql_files, "data/warehouse.duckdb",
-                    private_path = Sys.getenv("ZH_PRIVATE_ACCIDENTS")),
+                    private_path = private_path),
     format = "file"
   ),
 
