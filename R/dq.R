@@ -146,7 +146,8 @@ check_snapshot_delta <- function(con, history_file, snapshot_date) {
 
 # Published year range (R/years.R) against the committed range history. The range is part of the
 # release: a smaller range than the previous snapshot publishes less than before, so it stops.
-#  DQ-S03 WARN  newest accident year looked partial (< 80 % of the year before) and was excluded
+#  DQ-S03 WARN  trailing accident year(s) looked partial (< 80 % of the year before, checked
+#               iteratively) or follow a gap in the accident years, and were excluded
 #  DQ-S04 STOP  resolved range shrank against the previous snapshot (coverage never goes backwards)
 #  DQ-S05 WARN  a per-year source (meteo, luft) ends before the newest complete accident year
 # The history row of a run that violates DQ-S04 is NOT written, so a rerun cannot "heal" the
@@ -155,7 +156,12 @@ check_year_range <- function(years_info, range_file, snapshot_date) {
   cur <- years_info
   cur$snapshot <- as.character(snapshot_date)
   cur$begrenzt_durch[is.na(cur$begrenzt_durch)] <- ""   # an all-empty CSV column reads back as NA
+  cur$ausgeschlossene_jahre <- if (is.null(cur$ausgeschlossene_jahre)) "" else as.character(cur$ausgeschlossene_jahre)
+  cur$ausgeschlossene_jahre[is.na(cur$ausgeschlossene_jahre)] <- ""
   hist <- if (file.exists(range_file)) utils::read.csv(range_file, stringsAsFactors = FALSE) else cur[0, ]
+  if (is.null(hist$ausgeschlossene_jahre)) hist$ausgeschlossene_jahre <- ""   # history written before this column
+  hist$ausgeschlossene_jahre <- as.character(hist$ausgeschlossene_jahre)
+  hist$ausgeschlossene_jahre[is.na(hist$ausgeschlossene_jahre)] <- ""
   prev_dates <- unique(hist$snapshot)
   prev_dates <- prev_dates[prev_dates < cur$snapshot]
   prev <- if (length(prev_dates)) hist[hist$snapshot == max(prev_dates), , drop = FALSE][1, ] else NULL
@@ -174,11 +180,17 @@ check_year_range <- function(years_info, range_file, snapshot_date) {
   limited <- nzchar(cur$begrenzt_durch)
   rbind(
     result_row("DQ-S03", "unfaelle", "Vollständigkeit", "WARN",
-               "Das neueste Unfalljahr ist vollständig (mindestens 80 % des Vorjahres) und wird veröffentlicht",
-               "The newest accident year is complete (at least 80 % of the year before) and is published",
+               "Die neuesten Unfalljahre sind vollständig (je mind. 80 % des Vorjahres, ohne Lücke) und veröffentlicht",
+               "The newest accident years are complete (each >= 80 % of the year before, no gap) and are published",
                1, as.integer(isTRUE(cur$teiljahr_ausgeschlossen)), 0,
-               sprintf("%d: %s Unfälle, %d: %s", cur$unfaelle_jahr_max, cur$unfaelle_n_neuestes,
-                       cur$unfaelle_jahr_max - 1L, cur$unfaelle_n_vorjahr),
+               if (nzchar(cur$ausgeschlossene_jahre)) {
+                 sprintf("ausgelassen: %s (neuestes Jahr %d: %s Unfälle, Vorjahr %d: %s)",
+                         gsub(",", ", ", cur$ausgeschlossene_jahre), cur$unfaelle_jahr_max, cur$unfaelle_n_neuestes,
+                         cur$unfaelle_jahr_max - 1L, cur$unfaelle_n_vorjahr)
+               } else {
+                 sprintf("%d: %s Unfälle, %d: %s", cur$unfaelle_jahr_max, cur$unfaelle_n_neuestes,
+                         cur$unfaelle_jahr_max - 1L, cur$unfaelle_n_vorjahr)
+               },
                art = "Historie"),
     result_row("DQ-S04", "unfaelle", "Stabilität", "STOP",
                "Der veröffentlichte Jahresbereich ist gegenüber dem letzten Snapshot nicht kleiner geworden",
