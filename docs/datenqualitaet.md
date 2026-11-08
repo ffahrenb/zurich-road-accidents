@@ -10,6 +10,7 @@ Datenqualität ist hier eine Freigabebedingung (ADR 0005): Jede Prüfung erzeugt
 | `pointblank` | `dq/contracts/<quelle>.yml` | Datenvertrag: Spalten vorhanden, Pflichtfelder, Wertelisten, Bereiche. HTML-Bericht je Quelle in `export/dq/`. |
 | `SQL` | `sql/dq/*.sql` | Fachliche Prüfungen auf raw/staging/mart. Metadaten im Dateikopf. |
 | `Historie` | `R/dq.R` (`check_snapshot_delta`) | Vergleich mit dem letzten Snapshot (`export/dq/snapshot_history.csv`): DQ-S01 (WARN, > 1 % je Jahr), DQ-S02 (STOP, Gesamtbestand um mehr als 10 % geschrumpft). |
+| `Historie` | `R/dq.R` (`check_year_range`) | Jahresbereich (`years.to: auto`, `R/years.R`) gegen `export/dq/jahresbereich.csv`: DQ-S03 (WARN, neuestes Unfalljahr unvollständig und ausgelassen), DQ-S04 (STOP, Bereich kleiner als im letzten Snapshot), DQ-S05 (WARN, eine Jahresquelle hinkt nach). |
 | `Metadaten` | `R/dq.R` (`check_freshness`) | Aktualität gegenüber `cadence_days` in `config/sources.yml`. |
 
 ## Dimensionen
@@ -68,6 +69,9 @@ echten Prüfdateien aus `sql/dq` aus und verfälscht je Test genau einen Wert:
 | Koordinate ausserhalb Zürich | DQ-U04 STOP |
 | Temperatur 99.9 Grad nach Bereinigung | DQ-M05 STOP |
 | Bestand gegenüber letztem Snapshot um > 10 % kleiner | DQ-S02 STOP, DQ-S01 WARN |
+| Jahresbereich kleiner als im letzten Snapshot | DQ-S04 STOP |
+| neuestes Unfalljahr < 80 % des Vorjahres | DQ-S03 WARN (Jahr wird ausgelassen) |
+| Einwohnerzahl des Unfalljahres fehlt, Vorjahr fortgeschrieben | DQ-B03 WARN |
 
 Dazu gelten: saubere Fixtures ergeben nur PASS, ein Defekt löst nur die zuständige Prüfung aus,
 `dq_gate()` bricht bei STOP ab und lässt WARN/PASS durch. Dasselbe Prinzip gilt für das
