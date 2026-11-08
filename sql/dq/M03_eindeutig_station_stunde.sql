@@ -6,5 +6,5 @@
 -- titel_en: Exactly one value per station, hour and parameter
 SELECT
     count(*) AS n_tested,
-    count(*) - count(DISTINCT (datum, standort, parameter)) AS n_failed
+    count(*) - (SELECT count(*) FROM (SELECT DISTINCT datum, standort, parameter FROM raw_meteo)) AS n_failed
 FROM raw_meteo;

@@ -24,8 +24,10 @@ SELECT
     count(veraenderung) AS n_tested,
     count_if(abs(veraenderung) > 0.25) AS n_failed,
     string_agg(
-        CASE WHEN abs(veraenderung) > 0.25
-            THEN jahr || ': ' || round(100 * veraenderung) || ' %' END,
+        CASE
+            WHEN abs(veraenderung) > 0.25
+                THEN jahr || ': ' || round(100 * veraenderung) || ' %'
+        END,
         '; '
     ) AS detail
 FROM d;
