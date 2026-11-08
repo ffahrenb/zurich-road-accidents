@@ -1,0 +1,49 @@
+# sqlfluff 3.4.2 config. SQL files carry {{name}} parameters that R fills in
+# (render_sql in R/db.R). The placeholder templater (custom regex, not jinja, so that a
+# literal "{{...}}" in a comment cannot break parsing) substitutes the dummy values below,
+# so the linter sees valid SQL. Keep this list in sync with build_warehouse() params.
+[sqlfluff]
+dialect = duckdb
+templater = placeholder
+max_line_length = 120
+# Deliberately excluded (style only, no correctness impact; the SQL layer is written in a
+# compact one-line-per-measure style, esp. the DQ checks and spatial joins):
+#   AL03 expression without alias   - compact DQ selects
+#   LT09 select targets on one line - same
+#   LT14 WHERE on new line          - short inline filters
+#   AM04 unknown column count       - SELECT * in raw/staging copy layers is intended
+#   RF02 unqualified column in join - DuckDB itself errors on real ambiguity
+exclude_rules = aliasing.expression, layout.select_targets, layout.keyword_newline, ambiguous.column_count, references.qualification
+
+[sqlfluff:templater:placeholder]
+param_regex = \{\{(?P<param_name>[a-z_]+)\}\}
+unfaelle = ['unfaelle.parquet']
+meteo = ['meteo.csv']
+luft = ['luft.csv']
+bevoelkerung = ['bevoelkerung.csv']
+quartiere = 'quartiere.geojson'
+schulen = 'schulen.geojson'
+tempo = 'tempo.geojson'
+year_from = 2011
+year_to = 2025
+school_radius_m = 100
+tempo_radius_m = 25
+station = Zch_Stampfenbachstrasse
+x_from = 2023
+x_to = 2023
+
+[sqlfluff:indentation]
+indent_unit = space
+tab_space_size = 4
+
+[sqlfluff:rules:capitalisation.keywords]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.functions]
+extended_capitalisation_policy = lower
+
+[sqlfluff:rules:capitalisation.literals]
+capitalisation_policy = upper
+
+[sqlfluff:rules:capitalisation.types]
+extended_capitalisation_policy = upper
