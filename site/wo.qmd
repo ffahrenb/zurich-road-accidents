@@ -9,7 +9,7 @@ source("_helpers.R")
 q <- rd("data/quartier.csv")
 tempo <- rd("data/tempo.csv")
 con <- DBI::dbConnect(duckdb::duckdb())
-u <- DBI::dbGetQuery(con, sprintf("SELECT wochentag, stunde, personenschaden, mit_fussgaenger, mit_velo, nahe_schule FROM read_parquet('%s')", file.path(EX, "data", "unfaelle.parquet")))
+u <- DBI::dbGetQuery(con, sprintf("SELECT wochentag, stunde, personenschaden, mit_fussgaenger, mit_velo, nahe_schule FROM read_parquet('%s')", file.path(export_dir, "data", "unfaelle.parquet")))
 DBI::dbDisconnect(con, shutdown = TRUE)
 ```
 

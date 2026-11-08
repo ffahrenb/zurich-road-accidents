@@ -8,9 +8,9 @@ subtitle: "Alle Ergebnisse als offene Dateien, beschrieben nach dem Schweizer Me
 source("_helpers.R")
 man <- rd("dq/manifest.csv")
 dic <- rd("meta/datenwoerterbuch.csv")
-kat <- jsonlite::fromJSON(file.path(EX, "meta", "katalog.jsonld"), simplifyVector = FALSE)
+kat <- jsonlite::fromJSON(file.path(export_dir, "meta", "katalog.jsonld"), simplifyVector = FALSE)
 dss <- kat[["dcat:dataset"]]
-fsize <- function(p) { b <- file.size(file.path(EX, p)); ifelse(b >= 1e6, paste0(fdec(b / 1e6, 1), " MB"), paste0(fdec(b / 1e3, 0), " kB")) }
+fsize <- function(p) { b <- file.size(file.path(export_dir, p)); ifelse(b >= 1e6, paste0(fdec(b / 1e6, 1), " MB"), paste0(fdec(b / 1e3, 0), " kB")) }
 ```
 
 Alle Dateien liegen unter `export/` und werden bei jedem Lauf der Pipeline neu erzeugt, nach bestandenem Qualitäts-Gate. Sie dürfen unter den Bedingungen unten weiterverwendet werden.

@@ -24,11 +24,13 @@ u <- read.csv(file.path(dst, "data", "jahr.csv"), encoding = "UTF-8")
 n_acc <- sum(u$unfaelle)
 yrs <- range(u$jahr)
 base <- "https://ffahrenb.github.io/zurich-road-accidents/"
-dists <- lapply(ds[["dcat:distribution"]], function(d) list(
-  "@type" = "DataDownload",
-  contentUrl = d[["dcat:downloadURL"]][["@id"]],
-  encodingFormat = basename(d[["dcat:downloadURL"]][["@id"]])
-))
+dists <- lapply(ds[["dcat:distribution"]], function(d) {
+  list(
+    "@type" = "DataDownload",
+    contentUrl = d[["dcat:downloadURL"]][["@id"]],
+    encodingFormat = basename(d[["dcat:downloadURL"]][["@id"]])
+  )
+})
 dists <- c(dists, list(list("@type" = "DataDownload",
   contentUrl = paste0(base, "export/meta/katalog.jsonld"), encodingFormat = "application/ld+json")))
 ld <- list(
@@ -37,7 +39,8 @@ ld <- list(
   name = lang_val(ds[["dct:title"]], "de"),
   alternateName = lang_val(ds[["dct:title"]], "en"),
   description = sprintf(
-    "Strassenverkehrsunfälle in der Stadt Zürich %d–%d (%s Unfälle), angereichert mit Quartier, Tempo und Schulnähe; geprüft durch %d automatische Datenqualitäts-Checks.",
+    paste0("Strassenverkehrsunfälle in der Stadt Zürich %d–%d (%s Unfälle), angereichert mit Quartier, Tempo ",
+           "und Schulnähe; geprüft durch %d automatische Datenqualitäts-Checks."),
     yrs[1], yrs[2], format(n_acc, big.mark = "’"), nrow(dq)),
   url = base,
   identifier = ds[["dct:identifier"]],
@@ -61,15 +64,23 @@ files <- list.files(dst, recursive = TRUE)
 llms <- c(
   "# Unfälle Zürich – Strassenverkehrsunfälle 2011–2024",
   "",
-  sprintf("> Offene Auswertung von %s Strassenverkehrsunfällen der Stadt Zürich (%d–%d). R+SQL-Pipeline (DuckDB), %d automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, offene Exporte. Daten: Stadt Zürich Open Data / ASTRA, CC BY 4.0. Code: MIT.",
+  sprintf(paste0("> Offene Auswertung von %s Strassenverkehrsunfällen der Stadt Zürich (%d–%d). ",
+                 "R+SQL-Pipeline (DuckDB), %d automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, ",
+                 "offene Exporte. Daten: Stadt Zürich Open Data / ASTRA, CC BY 4.0. Code: MIT."),
           format(n_acc, big.mark = "'"), yrs[1], yrs[2], nrow(dq)),
   "",
-  "Hinweise für Maschinen und Menschen: Die Zahl der erfassten Unfälle springt 2015 um +38 % (Änderung der Erfassungspraxis, vor allem Sachschaden), das ist kein realer Anstieg (Prüfung DQ-U07, Status WARN). Das Schweremodell zeigt Zusammenhänge, keine Ursachen, und ist kein Prognosewerkzeug. Wetter-Effekte sind Verhältnisse (IRR) pro Stunde, keine Kausalaussagen.",
+  paste0(
+    "Hinweise für Maschinen und Menschen: Die Zahl der erfassten Unfälle springt 2015 um +38 % ",
+    "(Änderung der Erfassungspraxis, vor allem Sachschaden), das ist kein realer Anstieg ",
+    "(Prüfung DQ-U07, Status WARN). Das Schweremodell zeigt Zusammenhänge, keine Ursachen, ",
+    "und ist kein Prognosewerkzeug. Wetter-Effekte sind Verhältnisse (IRR) pro Stunde, keine Kausalaussagen."
+  ),
   "",
   "## Seiten",
   "",
   paste0("- [Übersicht](", base, "): Kennzahlen und Kernaussagen"),
-  paste0("- [Datenqualität](", base, "datenqualitaet.html): Scorecard, alle Prüfungen, STOP vs. WARN, Strukturbruch 2015"),
+  paste0("- [Datenqualität](", base,
+         "datenqualitaet.html): Scorecard, alle Prüfungen, STOP vs. WARN, Strukturbruch 2015"),
   paste0("- [Karte](", base, "karte.html): interaktive Karte, Quartier-Raten"),
   paste0("- [Wann](", base, "wann.html): Stunde × Wochentag, Jahrestrends"),
   paste0("- [Wo](", base, "wo.html): Quartiere, Tempoklassen, Schulnähe"),
@@ -90,7 +101,8 @@ llms <- c(
   "",
   "## Quelle und Lizenz",
   "",
-  "- Quelle: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0 (Unfälle); weitere Quellen CC0. Bitte bei Weiterverwendung nennen.",
+  paste0("- Quelle: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0 (Unfälle); ",
+         "weitere Quellen CC0. Bitte bei Weiterverwendung nennen."),
   "- Repository: https://github.com/ffahrenb/zurich-road-accidents"
 )
 writeLines(llms, file.path(site, "llms.txt"), useBytes = TRUE)

@@ -54,10 +54,10 @@ cards <- lapply(seq_len(nrow(SRC)), function(i) {
   dims <- d |> group_by(dimension) |> summarise(st = worst(status2), n = n(), .groups = "drop")
   tags$div(class = "card-q",
     tags$h3(SRC$name[i]), tags$div(class = "src", SRC$sub[i]),
-    status_chip(worst(d$status2), label = sprintf("%s · %d %s", STATUS[[worst(d$status2)]]$label, nrow(d), if (nrow(d) == 1) "Prüfung" else "Prüfungen")),
+    status_chip(worst(d$status2), label = sprintf("%s · %d %s", status_defs[[worst(d$status2)]]$label, nrow(d), if (nrow(d) == 1) "Prüfung" else "Prüfungen")),
     tags$ul(lapply(seq_len(nrow(dims)), function(j)
       tags$li(tags$span(class = "d", dims$dimension[j]),
-              tags$span(status_chip(dims$st[j], label = sprintf("%s (%d)", STATUS[[dims$st[j]]]$label, dims$n[j])))))))
+              tags$span(status_chip(dims$st[j], label = sprintf("%s (%d)", status_defs[[dims$st[j]]]$label, dims$n[j])))))))
 })
 tags$div(class = "cards", role = "list", `aria-label` = "Scorecard je Datenquelle", cards)
 ```

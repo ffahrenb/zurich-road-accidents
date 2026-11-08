@@ -94,6 +94,9 @@ jobs:
       - name: Render site
         run: quarto render site/
 
+      - name: Privacy scan of the built site
+        run: Rscript -e 'testthat::test_file("tests/testthat/test-privacy-site.R", stop_on_failure = TRUE)'
+
       - name: Configure Pages
         if: github.event_name != 'pull_request'
         uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
