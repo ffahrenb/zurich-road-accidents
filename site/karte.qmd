@@ -1,6 +1,6 @@
 ---
 title: "Karte"
-subtitle: "Wo sich Unfälle häufen – und welche Quartiere pro Einwohner:in auffallen"
+subtitle: "Unfalldichte und Quartier-Raten"
 ---
 
 ```{r}
@@ -17,7 +17,7 @@ qr <- q |> filter(jahr >= 2015) |>
   arrange(desc(`Rate pro 1’000 und Jahr`))
 ```
 
-Jeder Punkt ist ein Unfall mit seiner Koordinate aus der offenen Quelle. Die Karte zeigt **Jahr, Schwere und beteiligte Gruppen**, mehr nicht. Standardmässig sehen Sie die Dichte (Heatmap); zoomen Sie näher heran, erscheinen die einzelnen Unfälle. Ein Klick auf einen Punkt zeigt Jahr und Schwere.
+Ein Punkt = ein Unfall, mit Koordinate aus der offenen Quelle. Angaben je Punkt: Jahr, Schwere, beteiligte Gruppen. Standard ist die Dichte (Heatmap), beim Zoomen erscheinen Einzelpunkte. Klick auf einen Punkt: Jahr und Schwere.
 
 ```{=html}
 <noscript><p class="note warn">Die Karte braucht JavaScript. Die Quartier-Raten stehen unten als Tabelle, die Unfälle pro Jahr auf der Seite <a href="wann.html">Wann</a>.</p></noscript>
@@ -58,25 +58,21 @@ tags$div(class = "map-wrap", id = "zmap", role = "region",
 <script src="assets/karte.js" defer></script>
 ```
 
-::: {.note}
-**Hinweise zum Lesen.**
+## Grenzen
 
-- **Dichte ≠ Risiko.** Wo viele Menschen fahren oder gehen, passieren mehr Unfälle. Die Karte zeigt, *wo viel passiert*, nicht, *wo es gefährlich ist*.
-- **Quartier-Raten** sind Unfälle mit Personenschaden pro 1’000 Einwohner:innen und Jahr (Mittel `r yr_q`). Ab 2015, weil sich die Erfassung damals geändert hat ([Strukturbruch](datenqualitaet.qmd#der-strukturbruch-2015)). Quartiere mit sehr wenigen Einwohnern (Hochschulen, City, Lindenhof) fallen stark auf, weil dort vor allem Pendler und Besucher verunfallen.
-- **Unfälle ohne Quartier** (`r u05$n_failed` von `r fi(u05$n_tested)`) lassen sich keinem Quartier zuordnen und fehlen in den Quartier-Raten ([DQ-U05](datenqualitaet.qmd#alle-prüfungen)).
-:::
+- Dichte ≠ Risiko: Wo viele Menschen unterwegs sind, passieren mehr Unfälle. Die Karte zeigt, wo viel passiert.
+- Quartier-Raten: Unfälle mit Personenschaden pro 1’000 Einwohner:innen und Jahr (Mittel `r yr_q`), erst ab 2015 ([Strukturbruch 2015](datenqualitaet.qmd#der-strukturbruch-2015)). Hochschulen, City und Lindenhof fallen auf: wenig Wohnbevölkerung, viele Pendler und Besucher.
+- Unfälle ohne Quartier (`r u05$n_failed` von `r fi(u05$n_tested)`) fehlen in den Quartier-Raten ([DQ-U05](datenqualitaet.qmd#alle-prüfungen)).
 
-::: {.note}
-**Kartengrundlage und Datenschutz.** Die Hintergrundkarte kommt von CARTO (Positron bzw. Dark Matter, Daten © OpenStreetMap-Mitwirkende, © CARTO). Dafür fragt Ihr Browser die Kartenkacheln bei CARTO ab; das ist die einzige Verbindung zu Dritten auf dieser Website (siehe [Datenschutz](datenschutz.qmd)). Es werden keine Zugangsschlüssel und keine Cookies verwendet. Die Unfalldaten selbst laden direkt von dieser Website.
-:::
+Hintergrundkarte: CARTO (© OpenStreetMap-Mitwirkende, © CARTO). Ihr Browser fragt die Kacheln dort ab, keine Cookies ([Drittanbieter](datenschutz.qmd#drittanbieter)). Die Unfalldaten laden von dieser Website.
 
-## Als Tabelle (ohne Karte)
+## Tabelle
 
 ```{r}
 tags$details(open = NA, class = "chart-table",
-  tags$summary("Quartier-Raten als Tabelle anzeigen"),
+  tags$summary("Quartier-Raten als Tabelle"),
   html_table(qr, digits = 1, tall = TRUE, label = "Quartier-Raten",
-             caption = paste0("Unfälle mit Personenschaden pro 1’000 Einwohner:innen und Jahr, Mittel ", yr_q, ", absteigend sortiert.")))
+             caption = paste0("Unfälle mit Personenschaden pro 1’000 Einwohner:innen und Jahr, Mittel ", yr_q, ", absteigend.")))
 ```
 
 ```{r}
@@ -85,8 +81,8 @@ yr <- jahr |> group_by(Jahr = jahr) |>
             Schwerverletzte = sum(unfaelle[schwere_kurz == "Schwerverletzte"]), Getötete = sum(unfaelle[schwere_kurz == "Getötete"]),
             `mit Velo` = sum(mit_velo), `mit Fussgänger:in` = sum(mit_fussgaenger), `mit Motorrad` = sum(mit_motorrad), .groups = "drop")
 tags$details(class = "chart-table",
-  tags$summary("Unfälle pro Jahr und Schwere (Summe der Kartenpunkte) als Tabelle anzeigen"),
-  html_table(yr, label = "Unfälle pro Jahr", caption = "Die Kartenpunkte summieren sich zu diesen Zahlen; Unfälle mit mehreren Beteiligten zählen in mehreren Spalten rechts."))
+  tags$summary("Unfälle pro Jahr und Schwere als Tabelle"),
+  html_table(yr, label = "Unfälle pro Jahr", caption = "Summe der Kartenpunkte. Unfälle mit mehreren Gruppen zählen in mehreren Spalten rechts."))
 ```
 
-Die Rohdaten der Karte: [unfaelle_punkte.geojson](export/data/unfaelle_punkte.geojson) (Jahr, Schwere, Velo, Fussgänger, Motorrad je Punkt) und [quartiere.geojson](export/data/quartiere.geojson), beschrieben im [Datenwörterbuch](daten.qmd).
+Rohdaten: [unfaelle_punkte.geojson](export/data/unfaelle_punkte.geojson), [quartiere.geojson](export/data/quartiere.geojson). Beschreibung: [Datenwörterbuch](daten.qmd#datenwörterbuch).

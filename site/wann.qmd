@@ -1,6 +1,6 @@
 ---
 title: "Wann passieren Unfälle?"
-subtitle: "Pendlerzeiten, Nachtstunden und die Entwicklung seit 2011"
+subtitle: "Pendlerzeiten, Nachtstunden, Entwicklung seit 2011"
 ---
 
 ```{r}
@@ -12,7 +12,7 @@ WT <- c("Montag", "Dienstag", "Mittwoch", "Donnerstag", "Freitag", "Samstag", "S
 WTK <- c("Mo", "Di", "Mi", "Do", "Fr", "Sa", "So")
 ```
 
-Die Auswertung kennt für jeden Unfall nur **Jahr, Monat, Wochentag und Stunde**, keine genauen Zeitpunkte. Das ist Absicht (siehe [Datenschutz](datenschutz.qmd)). Für die Frage «Wann?» reicht diese Auflösung.
+Zeitauflösung: Jahr, Monat, Wochentag, Stunde. Genauere Zeitpunkte werden nicht veröffentlicht ([Datenschutz](datenschutz.qmd#schutzschichten)).
 
 ## Wochentag und Tageszeit
 
@@ -37,15 +37,15 @@ plot_heat <- function(v) {
     theme_zh(v) + theme(panel.grid = element_blank())
 }
 chart(plot_heat,
-  headline = sprintf("Werktags häufen sich die Unfälle am Morgen um %d Uhr und am Nachmittag um %d Uhr.", h_morgen, h_abend),
-  alt = sprintf("Heatmap der Unfälle nach Wochentag und Stunde, %s. Dunkle Felder bei Werktagen um %d Uhr und %d Uhr, am Wochenende weniger Unfälle und später am Tag.", yr_span_bis, h_morgen, h_abend),
-  caption = paste0("Anzahl Unfälle ", yr_span, ", summiert über alle Jahre. Dunkler = mehr Unfälle. Fahrten und Verkehrsmenge pro Stunde sind nicht bekannt, die Zahlen zeigen also nicht das Risiko pro Fahrt."),
+  headline = sprintf("Werktags Spitzen um %d und %d Uhr.", h_morgen, h_abend),
+  alt = sprintf("Heatmap der Unfälle nach Wochentag und Stunde, %s. Dunkelste Felder werktags um %d und %d Uhr; am Wochenende weniger Unfälle, später am Tag.", yr_span_bis, h_morgen, h_abend),
+  caption = paste0("Unfälle ", yr_span, ", summiert über alle Jahre. Dunkler = mehr Unfälle. Verkehrsmenge unbekannt, kein Risiko pro Fahrt."),
   tbl = html_table(zm |> mutate(Wochentag = WT[wochentag]) |>
                      select(Wochentag, Stunde = stunde, Unfälle = unfaelle, `mit Personenschaden` = mit_personenschaden), label = "Unfälle nach Wochentag und Stunde"),
   h = 3.6)
 ```
 
-Am Morgen und am späten Nachmittag sind viele Menschen unterwegs, deshalb gibt es dann auch mehr Unfälle. Am Wochenende fehlt die Morgenspitze, dafür sind Samstag und Sonntag in den späten Abend- und Nachtstunden relativ stärker belegt.
+Zu den Pendlerzeiten sind mehr Menschen unterwegs, es gibt mehr Unfälle. Am Wochenende fehlt die Morgenspitze, späte Abend- und Nachtstunden sind relativ stärker belegt. Gezählt wird pro Stunde, nicht pro Fahrt: [Pro Stunde](wetter.qmd#pro-stunde).
 
 ## Schwere nach Tageszeit
 
@@ -72,14 +72,14 @@ plot_hs <- function(v) {
     theme_zh(v)
 }
 chart(plot_hs,
-  headline = sprintf("In den Stunden nach Mitternacht (0–4 Uhr) enden %s der Unfälle mit Verletzten, tagsüber (8–19 Uhr) %s.", fp(h_night), fp(h_day)),
+  headline = sprintf("0–4 Uhr: %s der Unfälle mit Verletzten. 8–19 Uhr: %s.", fp(h_night), fp(h_day)),
   alt = sprintf("Liniendiagramm: Anteil der Unfälle mit Personenschaden je Stunde. Höchster Wert um %d Uhr, tiefster um %d Uhr.", h_hi, h_lo),
-  caption = paste0("Anteil der Unfälle, bei denen mindestens eine Person verletzt oder getötet wurde, je Stunde des Tages, ", yr_span, ". Nachts gibt es wenige Unfälle, die Werte schwanken daher stärker."),
+  caption = paste0("Anteil Unfälle mit verletzten oder getöteten Personen je Stunde, ", yr_span, ". Nachts wenige Unfälle, daher grössere Schwankung."),
   tbl = html_table(hs |> select(Stunde = stunde, Unfälle = n, `mit Personenschaden` = inj, `Anteil %` = anteil), label = "Anteil mit Personenschaden je Stunde"),
   h = 3.4)
 ```
 
-Nachts passieren weniger Unfälle, aber in den Stunden nach Mitternacht endet ein grösserer Teil davon mit Verletzten; am späten Abend und tagsüber liegt der Anteil bei rund einem Viertel. Die Daten zeigen das Muster, nicht den Grund: Fahrzeugmix, Tempo und Sicht spielen vermutlich mit, belegt ist das hier nicht.
+Nachts weniger Unfälle, nach Mitternacht aber ein grösserer Anteil mit Verletzten. Abends und tagsüber rund ein Viertel. Der Grund (Fahrzeugmix, Tempo, Sicht) ist nicht belegt.
 
 ## Entwicklung über die Jahre
 
@@ -113,19 +113,19 @@ plot_js <- function(v) {
     theme_zh(v)
 }
 chart(plot_js,
-  headline = sprintf("Der Sprung 2015 steckt fast nur im Sachschaden (%s %%); Unfälle mit Verletzten stiegen um %s %%.",
+  headline = sprintf("2015: Sachschaden %s %%, Unfälle mit Verletzten %s %%.",
                      paste0("+", round(sach_ch)), paste0("+", round(inj_ch))),
-  alt = paste0("Vier Liniendiagramme mit eigener Skala: Unfälle pro Jahr nach Schwere, ", yr_span_bis, ". Sachschaden springt 2015 deutlich nach oben, Leichtverletzte, Schwerverletzte und Getötete bewegen sich ruhig."),
-  caption = "Unfälle pro Jahr nach schwerster Folge. Jede Teilgrafik hat ihre eigene Skala. Gestrichelte Linie: 2015, Änderung der Erfassungspraxis (Prüfung DQ-U07, siehe Datenqualität).",
+  alt = paste0("Vier Liniendiagramme, je eigene Skala: Unfälle pro Jahr nach Schwere, ", yr_span_bis, ". Nur Sachschaden springt 2015; die übrigen Gruppen bleiben ruhig."),
+  caption = "Unfälle pro Jahr nach schwerster Folge, je Teilgrafik eigene Skala. Gestrichelt: 2015, geänderte Erfassung (DQ-U07).",
   tbl = html_table(jr |> rename(Jahr = jahr), label = "Unfälle pro Jahr nach Schwere"),
   h = 4.6)
 ```
 
 ::: {.note .warn}
-**Strukturbruch 2015.** Die Zahl der erfassten Unfälle springt 2015 um +38 %. Der Anstieg zeigt sich fast nur beim Sachschaden und ist auf eine geänderte Erfassungspraxis zurückzuführen, nicht auf mehr Unfälle auf der Strasse. Die Pipeline meldet ihn automatisch ([DQ-U07](datenqualitaet.qmd#der-strukturbruch-2015)). Zeitreihen über 2015 hinweg bitte nicht ohne diesen Hinweis lesen. Für Vergleiche eignen sich Unfälle mit Personenschaden am besten.
+Strukturbruch 2015: +38 % erfasste Unfälle, fast nur Sachschaden. Ursache ist die Erfassungspraxis. Zeitreihen über 2015 nur mit Unfällen mit Personenschaden vergleichen. Details: [Strukturbruch 2015](datenqualitaet.qmd#der-strukturbruch-2015).
 :::
 
-## Wer ist beteiligt?
+## Beteiligte
 
 ```{r}
 #| include: false
@@ -154,10 +154,10 @@ plot_md <- function(v) {
     theme_zh(v)
 }
 chart(plot_md,
-  headline = sprintf("Unfälle mit Velo-Beteiligung haben sich von %s (%d) auf %s (%d) verdoppelt; Fussgänger- und Motorradunfälle blieben ähnlich.",
+  headline = sprintf("Velo-Unfälle: %s (%d), %s (%d). Fussgänger und Motorrad bleiben ähnlich.",
                      fi(v11), yr_from, fi(v24), yr_to),
-  alt = paste0("Liniendiagramm: Unfälle mit Beteiligung von Velo, Fussgängern und Motorrädern pro Jahr, ", yr_span_bis, ". Die Velo-Linie steigt deutlich, die anderen beiden bleiben ungefähr flach."),
-  caption = "Ein Unfall kann mehrere Gruppen betreffen und zählt dann mehrfach. Die Zunahme bei Velos spiegelt auch mehr Velo- und E-Bike-Verkehr und die Erfassungsänderung 2015; die gefahrenen Kilometer sind nicht bekannt, ein Risiko lässt sich daraus nicht berechnen.",
+  alt = paste0("Liniendiagramm: Unfälle mit Velo, Fussgängern und Motorrädern pro Jahr, ", yr_span_bis, ". Velo steigt deutlich, die beiden anderen bleiben flach."),
+  caption = "Ein Unfall mit mehreren Gruppen zählt mehrfach. Velo-Zunahme: mehr Verkehr und Erfassung 2015; Kilometer unbekannt, kein Risiko ableitbar.",
   tbl = html_table(md |> select(Jahr = jahr, Gruppe = modus, Unfälle = n), label = "Unfälle mit Beteiligung nach Gruppe und Jahr"),
   h = 3.6)
 ```
