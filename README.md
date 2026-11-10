@@ -22,26 +22,21 @@ make all    # build, lint, test, run (tar_make), test, site
 
 ## Grundsätze
 
-- **Reproduzierbar und gepinnt.** Container-Image, Basis-Image per Digest, Abhängigkeiten und
-  Datenstände (Snapshot mit SHA-256) sind festgehalten; `targets` baut nur neu, was sich geändert hat.
-- **Datenqualität vor jeder Veröffentlichung.** Datenverträge, SQL-Prüfungen und Snapshot-Vergleiche
-  laufen automatisch. Eine verletzte STOP-Prüfung bricht die Pipeline ab ([`docs/datenqualitaet.md`](docs/datenqualitaet.md)).
-- **Datenschutz von Anfang an.** Veröffentlicht werden nur Aggregate mit Mindestfallzahl; ein Test
-  erzwingt das bei jedem Lauf und im Pre-Commit-Hook ([`docs/datenschutz.md`](docs/datenschutz.md)).
-  Nicht öffentliche Unfallzeitpunkte fliessen nur als Modellresultate mit Mindestfallzahl ein.
-- **Offene Standards.** CSV, Parquet, GeoJSON; Metadaten als DCAT-AP CH (JSON-LD) plus Datenwörterbuch.
-- **Für Nicht-Fachleute erklärt.** Die Website ordnet jedes Ergebnis ein, nennt Grenzen und
-  Unsicherheiten und zeigt die Qualitätsprüfungen offen.
+- Reproduzierbar: Container-Image, Basis-Image per Digest, Abhängigkeiten und Datenstände (Snapshot mit SHA-256) sind gepinnt. `targets` baut nur Geändertes neu.
+- Datenqualität vor Veröffentlichung: Datenverträge, SQL-Prüfungen und Snapshot-Vergleiche laufen automatisch. Eine verletzte STOP-Prüfung bricht die Pipeline ab ([`docs/datenqualitaet.md`](docs/datenqualitaet.md)).
+- Datenschutz: Veröffentlicht werden nur Aggregate mit Mindestfallzahl. Ein Test erzwingt das bei jedem Lauf und im Pre-Commit-Hook ([`docs/datenschutz.md`](docs/datenschutz.md)). Nicht öffentliche Unfallzeitpunkte fliessen nur als Modellresultate mit Mindestfallzahl ein.
+- Offene Standards: CSV, Parquet, GeoJSON, Metadaten als DCAT-AP CH (JSON-LD) mit Datenwörterbuch.
+- Erklärt für Nicht-Fachleute: Die Website ordnet Ergebnisse ein, nennt Grenzen und zeigt die Prüfungen.
 
 ## Architektur
 
-Drei Schichten, jede ein SQL-Ordner in DuckDB ([ADR 0003](docs/adr/0003-schichten-raw-staging-mart.md)):
+Drei Schichten, je ein SQL-Ordner in DuckDB ([ADR 0003](docs/adr/0003-schichten-raw-staging-mart.md)):
 
-1. `raw` – 1:1-Kopien der heruntergeladenen Dateien, unverändert.
-2. `staging` – typisiert, bereinigt, Codelisten aufgelöst.
-3. `mart` – angereichert (Quartier, Schulnähe, Tempo, Wetter) und aggregiert.
+1. `raw`: 1:1-Kopien der heruntergeladenen Dateien.
+2. `staging`: typisiert, bereinigt, Codelisten aufgelöst.
+3. `mart`: angereichert (Quartier, Schulnähe, Tempo, Wetter) und aggregiert.
 
-Dazwischen sitzt das DQ-Gate; Modelle und Exporte laufen erst danach.
+Dazwischen das DQ-Gate. Modelle und Exporte laufen erst danach.
 
 | Baustein | Werkzeug |
 |----------|----------|
@@ -55,7 +50,7 @@ Ablauf als Diagramm: [`docs/pipeline.md`](docs/pipeline.md).
 
 ## Datenquellen und Lizenzen
 
-Abruf immer direkt beim Herausgeber, Konfiguration in [`config/sources.yml`](config/sources.yml).
+Abruf direkt beim Herausgeber, Konfiguration in [`config/sources.yml`](config/sources.yml).
 
 | Quelle | Herausgeber | Lizenz |
 |--------|-------------|--------|
@@ -64,8 +59,7 @@ Abruf immer direkt beim Herausgeber, Konfiguration in [`config/sources.yml`](con
 | Bevölkerung nach Quartier | Statistik Stadt Zürich | CC0 |
 | Statistische Quartiere, Schulanlagen, Signalisierte Geschwindigkeiten | Stadt Zürich | CC0 |
 
-Quelle: Open Data Zürich, [data.stadt-zuerich.ch](https://data.stadt-zuerich.ch). Die abgeleiteten
-Daten unter `export/data/` stehen unter CC BY 4.0 mit Nennung der Quellen, der Code unter MIT.
+Quelle: Open Data Zürich, [data.stadt-zuerich.ch](https://data.stadt-zuerich.ch). Abgeleitete Daten unter `export/data/`: CC BY 4.0 mit Quellennennung. Code: MIT.
 
 ## Repository-Struktur
 
@@ -76,29 +70,22 @@ dq/contracts/ Datenverträge je Quelle (YAML)
 config/       Quellen, Export-Allowlist, Codebook
 export/       veröffentlichte Ergebnisse: data/ dq/ meta/ modell/ trackx/
 site/         Quarto-Website
-tests/        testthat: DQ-Engine mit absichtlich kaputten Fixtures, Datenschutz, Lint
-tools/        Pre-Commit-Hook (Datenschutz), DQ-Scorecard
+tests/        testthat: DQ-Engine mit absichtlich kaputten Testdaten, Datenschutz, Lint
+tools/        Pre-Commit-Hook (Datenschutz), DQ-Prüfübersicht
 docs/         Dokumentation, Entscheidungen unter docs/adr/
 docker/       Containerfile
 ```
 
-Weiterführend: [`docs/`](docs/) (Pipeline, Datenqualität, Datenschutz) und
-[`docs/adr/`](docs/adr/) (DuckDB, targets, Schichten, zwei Datenpfade, DQ als Freigabe).
+Weiteres: [`docs/`](docs/) (Pipeline, Datenqualität, Datenschutz), [`docs/adr/`](docs/adr/) (DuckDB, targets, Schichten, zwei Datenpfade, DQ als Freigabe).
 
-Nützliche Targets: `make lint`, `make test`, `make run`, `make site`, `make hooks`
-(Pre-Commit-Hook installieren). Die Scorecard entsteht mit `Rscript tools/dq_scorecard.R`.
+Targets: `make lint`, `make test`, `make run`, `make site`, `make hooks` (Pre-Commit-Hook installieren). Die Prüfübersicht entsteht mit `Rscript tools/dq_scorecard.R`.
 
 ## English summary
 
-One pipeline from government data to insight for road accidents in the City of Zurich: Open Data
-Zurich API → DuckDB/SQL → automated data-quality checks with a STOP gate → models → website with
-DCAT-AP CH metadata. Nothing is published while a STOP check fails.
+Road accident data of the City of Zurich, from open data to insight: Open Data Zurich API → DuckDB/SQL → automated data-quality checks with STOP gate → models → website with DCAT-AP CH metadata. Nothing is published while a STOP check fails.
 
 - Reproducible: pinned container image, dated snapshots with SHA-256, `targets` DAG. Run `make all`.
-- Data quality before every release: data contracts, SQL checks, snapshot comparison.
-- Privacy by design: only aggregates with a minimum case count are published, enforced by a test and a
-  pre-commit hook. Non-public accident times appear only as model results with a minimum case count.
-- Open standards: CSV, Parquet, GeoJSON, DCAT-AP CH. Licences: accident data CC BY 4.0 (FEDRO/ASTRA via
-  City of Zurich), other sources CC0.
-- Rebuilt in 2026 from the 2023 CAS Data Engineering (ZHAW) project by Florian Fahrenbach; original team:
-  Flavio Clausen, Christoph Kälin, Florian Fahrenbach.
+- Data quality: data contracts, SQL checks, snapshot comparison.
+- Privacy: only aggregates with a minimum case count are published, enforced by a test and a pre-commit hook. Non-public accident times appear only as model results with a minimum case count.
+- Open standards: CSV, Parquet, GeoJSON, DCAT-AP CH. Licences: accident data CC BY 4.0 (FEDRO/ASTRA via City of Zurich), other sources CC0.
+- Rebuilt in 2026 from the 2023 CAS Data Engineering (ZHAW) project by Florian Fahrenbach; original team: Flavio Clausen, Christoph Kälin, Florian Fahrenbach.

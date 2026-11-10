@@ -1,6 +1,6 @@
 ---
-title: "Unfallschwere: Was geht mit Verletzten einher?"
-subtitle: "Wie viel Komplexität braucht ein Modell, das Zusammenhänge sichtbar macht – und wo hört der Nutzen auf?"
+title: "Unfallschwere"
+subtitle: "Acht Modelle mit steigender Komplexität im Vergleich"
 ---
 
 ```{r}
@@ -49,28 +49,25 @@ pp <- function(x) fdec(100 * x, 1)   # Prozentpunkte / Prozent aus Anteil
 prev <- V(BASE, "avg_precision")
 ```
 
-::: {.note .warn}
-**Bitte zuerst lesen.**
+## Fragestellung
 
-- **Frage:** Bei welchen Unfällen gibt es Verletzte oder Tote, bei welchen bleibt es beim Sachschaden? Das Modell beurteilt, ob ein *bereits geschehener* Unfall Personenschaden hatte (`r fp(100 * prev, 1)` aller Unfälle im Testzeitraum).
-- **Es zeigt Zusammenhänge, keine Ursachen.** Dass Velo-Unfälle öfter Verletzte fordern, heisst nicht, dass Velo fahren «die Ursache» ist. Auch die Meldepraxis spielt mit: Ein Velo-Sturz ohne Verletzte wird vermutlich seltener erfasst als ein Blechschaden zwischen Autos.
-- **Es ist kein Prognosewerkzeug.** Es kann weder einen künftigen Unfall noch dessen Schwere im Einzelfall vorhersagen und darf nicht für Entscheide über Personen oder Orte verwendet werden.
-- **Hauptbefund:** Fast der ganze Gewinn steckt in drei Merkmalen: Velo, Fussgänger:in oder Motorrad beteiligt. Rechenintensivere Verfahren holen danach noch etwas heraus, aber weit weniger.
-:::
+Zielgrösse: Personenschaden (Verletzte oder Tote) bei einem bereits geschehenen Unfall. Anteil im Testzeitraum: `r fp(100 * prev, 1)`.
 
-## Frage und Vorgehen
+Verglichen werden acht Modelle, von «immer den Durchschnitt raten» bis zu Boosting-Bäumen. Hauptbefund: Fast der ganze Gewinn steckt in drei Merkmalen (Velo, Fussgänger:in oder Motorrad beteiligt). Komplexere Verfahren holen danach nur noch wenig heraus.
 
-Diese Seite vergleicht **acht Modelle mit steigender Komplexität**, von «immer den Durchschnitt raten» bis zu Boosting-Bäumen. Gefragt ist nicht «welches ist das beste?», sondern: **Wie viel bringt jede Stufe Komplexität, und ist der Unterschied grösser als der Zufall?**
+Die Modelle zeigen Zusammenhänge, keine Ursachen und keine Prognosen (siehe [Grenzen](#grenzen)).
 
-Damit der Vergleich ehrlich bleibt:
+## Vorgehen
 
-- **Zeitlicher Test.** Trainiert und abgestimmt wurde mit den Jahren `r train_span`, getestet auf den neusten drei Jahren (`r test_span`, `r fi(round(n_test, -2))` Unfälle). Ein zufälliger Split würde Unfälle desselben Jahres auf Training und Test verteilen und damit prüfen, wie gut ein Modell *bekannte* Jahre nachzeichnet. Der zeitliche Test prüft, wie es auf *neue* Jahre übertragbar ist, und das ist die ehrlichere Frage. Der Zufallssplit läuft zusätzlich mit, um die Wirkung des Split-Verfahrens zu zeigen.
-- **Fester Vergleichsmassstab vorab.** Die Differenzen unten beziehen sich auf «`r REF`», ein einfaches Modell, das vor der Auswertung festgelegt wurde, nicht auf das nachträglich beste.
-- **Test erst am Schluss.** Alle Hyperparameter wurden nur mit den Trainingsjahren abgestimmt (wachsendes Fenster, Validierung `r val_span`). Die Testjahre wurden erst danach ein einziges Mal ausgewertet.
-- **Ein Jahres-Schalter statt Jahrestrend.** Seit 2015 werden mehr reine Sachschaden-Unfälle erfasst, der Anteil mit Verletzten sinkt dadurch (siehe [Datenqualität](datenqualitaet.qmd)). Alle Modelle erhalten deshalb nur ein Ja/Nein-Merkmal «ab 2015» und keinen Jahrestrend, den sie in die Zukunft fortschreiben könnten.
-- **Hauptkennzahl: Brier-Skill.** Der Brier-Score misst, wie weit die vorhergesagten Wahrscheinlichkeiten im Mittel (quadratisch) von der Wirklichkeit entfernt sind. Der **Brier-Skill** drückt das relativ zum Raten des Durchschnitts aus: 0 % = nicht besser als Raten, 100 % = perfekt. ROC-AUC, Average Precision und Log-Loss stehen in den Tabellen zu den Diagrammen.
+- Zeitlicher Test: Training und Abstimmung mit den Jahren `r train_span`, Test auf den drei neusten Jahren (`r test_span`, `r fi(round(n_test, -2))` Unfälle). Das prüft die Übertragbarkeit auf neue Jahre. Ein Zufallssplit läuft zur Kontrolle mit.
+- Vergleichsmassstab vorab festgelegt: «`r REF`», nicht das nachträglich beste Modell.
+- Test einmalig und erst nach der Abstimmung (Validierung `r val_span`, wachsendes Fenster).
+- Annahme: Ab 2015 werden mehr Sachschaden-Unfälle erfasst ([Strukturbruch](datenqualitaet.qmd#der-strukturbruch-2015)). Alle Modelle erhalten ein Ja/Nein-Merkmal «ab 2015», keinen Jahrestrend.
+- Hauptkennzahl: Brier-Skill. 0 % = nicht besser als Raten des Durchschnitts, 100 % = perfekt. ROC-AUC, Average Precision und Log-Loss stehen in den Tabellen.
 
-## Wie viel bringt Komplexität?
+## Modellvergleich
+
+Stufen: (1) Durchschnitt raten; (2) Regel: Anteil mit Verletzten je Anzahl beteiligter ungeschützter Gruppen; (3) logistische Regression (LR) ohne Unfalltyp; (4) LR voll, mit allen Merkmalen; (5) Elastic Net; (6) GAM (glatte Kurven für Stunde und Monat); (7) Random Forest; (8) XGBoost.
 
 ```{r}
 #| label: c-leiter
@@ -89,11 +86,11 @@ plot_leiter <- function(v) {
 b_rule <- V(RULE, "brier_skill"); b_best <- max(vg$wert[vg$split == "zeitlich" & vg$auswertung == "alle" & vg$metrik == "brier_skill"])
 b_best_m <- lad$modell[which.max(lad$wert)]
 chart(plot_leiter,
-  headline = sprintf("Eine einfache Regel erreicht bereits %s %% Brier-Skill, das beste Modell (%s) %s %%: Komplexität bringt rund %s Prozentpunkte dazu.",
+  headline = sprintf("Einfache Regel: %s %% Brier-Skill. Bestes Modell (%s): %s %%. Komplexität bringt rund %s Prozentpunkte.",
                      pp(b_rule), b_best_m, pp(b_best), fdec(100 * (b_best - b_rule), 0)),
-  alt = sprintf("Punktdiagramm mit Intervallen: Brier-Skill von acht Modellen auf den Testjahren. Basislinie 0 %%, Regel %s %%, %s, Random Forest %s %%. Die Intervalle sind schmal und überlappen zwischen LR voll, Elastic Net und GAM sowie zwischen Random Forest und XGBoost.",
+  alt = sprintf("Punktdiagramm: Brier-Skill der acht Modelle auf den Testjahren. Basislinie 0 %%, Regel %s %%, %s, Random Forest %s %%. Intervalle überlappen bei Random Forest und XGBoost.",
                 pp(b_rule), paste0(sprintf("LR ohne Unfalltyp %s %%, LR voll %s %%", pp(V(REF, "brier_skill")), pp(V("LR voll", "brier_skill")))), pp(V("Random Forest", "brier_skill"))),
-  caption = sprintf("Die Stufen: (1) immer den Durchschnitt raten; (2) Regel: Anteil mit Verletzten je Anzahl beteiligter ungeschützter Gruppen (Velo, Fussgänger:in, Motorrad); (3) logistische Regression ohne Unfalltyp; (4) logistische Regression mit allen Merkmalen; (5) Elastic Net (logistische Regression mit Straffunktion, abgestimmt); (6) GAM (glatte Kurven für Stunde und Monat); (7) Random Forest und (8) XGBoost (Entscheidungsbäume, abgestimmt). Balken: 95-%%-Intervall aus %s gepaarten Neuziehungen der Testunfälle; es zeigt das Rauschen der Testmenge, nicht Unsicherheit über künftige Jahre.", fi(lauf$bootstrap_n)),
+  caption = sprintf("Zeitlicher Test. Balken: 95-%%-Intervall aus %s gepaarten Neuziehungen der Testunfälle (Testrauschen, nicht Unsicherheit über künftige Jahre).", fi(lauf$bootstrap_n)),
   tbl = html_table({
     vg |> filter(split == "zeitlich", auswertung == "alle") |>
       mutate(txt = fmt_m(metrik, wert, ki_low, ki_high)) |>
@@ -105,11 +102,11 @@ chart(plot_leiter,
   w = 5.6, h = 4.2)
 ```
 
-Zwei Dinge fallen auf. Erstens steckt der **grösste Sprung in der einfachsten Stufe**: Wer weiss, ob ein Velo, ein:e Fussgänger:in oder ein Motorrad beteiligt war, ist schon weit vom blossen Raten weg. Zweitens bringen **abgestimmte Bäume** (Stufen 7 und 8) noch einmal einen sichtbaren Schritt, die «raffinierteren» linearen Varianten (Elastic Net, GAM) dagegen praktisch nichts gegenüber der einfachen logistischen Regression. Die Kennzahl Average Precision (Trefferquote bei wenigen Fehlalarmen) zeigt dasselbe Bild; für die Basislinie entspricht sie dem Anteil der Unfälle mit Verletzten (`r fdec(prev, 3)`).
+Der grösste Sprung steckt in der einfachsten Stufe: Wer weiss, ob Velo, Fussgänger:in oder Motorrad beteiligt war, liegt weit über dem Raten. Abgestimmte Bäume (Stufen 7 und 8) bringen noch einmal einen sichtbaren Schritt. Elastic Net und GAM bringen gegenüber der einfachen logistischen Regression praktisch nichts. Average Precision zeigt dasselbe Bild; für die Basislinie entspricht sie dem Anteil mit Verletzten (`r fdec(prev, 3)`).
 
-## Ist der Unterschied echt?
+## Differenzen
 
-Eine Differenz von ein paar Prozentpunkten kann Zufall der Testmenge sein. Deshalb wurden alle Modelle auf **denselben** Neuziehungen der Testunfälle bewertet (gepaart). So lässt sich für jede Differenz ein Intervall angeben: Liegt die Null ausserhalb, ist der Unterschied grösser als das Rauschen der Testmenge.
+Alle Modelle sind auf denselben Neuziehungen der Testunfälle bewertet (gepaart). Liegt die Null ausserhalb des Intervalls, ist die Differenz grösser als das Rauschen der Testmenge.
 
 ```{r}
 #| label: c-diff
@@ -135,11 +132,11 @@ plot_diff <- function(v) {
 d_t <- D("Random Forest", "LR voll"); d_x <- D("XGBoost", "LR voll"); d_e <- D("Elastic Net", "LR voll"); d_g <- D("GAM", "LR voll")
 d_typ <- D("LR voll", REF); d_rule <- D(REF, RULE)
 chart(plot_diff,
-  headline = sprintf("Bäume liegen %s bis %s Prozentpunkte vor der logistischen Regression, deutlich ausserhalb des Rauschens; Elastic Net und GAM unterscheiden sich praktisch nicht.",
+  headline = sprintf("Bäume liegen %s bis %s Prozentpunkte vor der logistischen Regression, ausserhalb des Rauschens. Elastic Net und GAM: kein Unterschied.",
                      pp(min(d_t$differenz, d_x$differenz)), pp(max(d_t$differenz, d_x$differenz))),
-  alt = sprintf("Zwei Punktdiagramme mit Intervallen. Oben der Brier-Skill-Unterschied aller Modelle gegenüber der Referenz LR ohne Unfalltyp: alle positiv, Regel wegen der grossen Distanz negativ. Unten gegenüber LR voll: Elastic Net und GAM um null, Random Forest %s und XGBoost %s Prozentpunkte darüber.",
+  alt = sprintf("Zwei Punktdiagramme: Brier-Skill-Differenz gegenüber LR ohne Unfalltyp (oben, ausser der Regel alle positiv) und gegenüber LR voll (unten). Elastic Net und GAM um null, Random Forest %s und XGBoost %s Prozentpunkte darüber.",
                 pp(d_t$differenz), pp(d_x$differenz)),
-  caption = sprintf("Gepaarte Neuziehungen der Testunfälle (%s), 95-%%-Intervall. Gefüllter Punkt: Null liegt ausserhalb des Intervalls; Ring: Null liegt im Intervall. Beim GAM ist das Intervall winzig und der Unterschied (%s Prozentpunkte) praktisch bedeutungslos, auch wenn die Null knapp ausserhalb liegt. Das Intervall berücksichtigt nur das Rauschen der Testunfälle, nicht dass Unfälle am selben Ort oder Tag nicht unabhängig sind.", fi(lauf$bootstrap_n), pp(d_g$differenz)),
+  caption = sprintf("%s Neuziehungen, 95-%%-Intervall. Gefüllt: Null ausserhalb; Ring: Null im Intervall. GAM: Differenz (%s Prozentpunkte) praktisch bedeutungslos.", fi(lauf$bootstrap_n), pp(d_g$differenz)),
   tbl = html_table(df |> filter(auswertung == "alle", metrik %in% c("brier_skill", "roc_auc", "avg_precision", "brier", "log_loss")) |>
     transmute(Referenz = referenz, Modell = modell, Split = ifelse(split == "zeitlich", "zeitlich", "zufällig"), Kennzahl = MET[metrik],
               `Differenz (95-%-Intervall)` = ifelse(metrik == "brier_skill", sprintf("%s (%s bis %s) Pp", fdec(100 * differenz, 2), fdec(100 * ki_low, 2), fdec(100 * ki_high, 2)),
@@ -148,11 +145,11 @@ chart(plot_diff,
   w = 5.6, h = 4.6)
 ```
 
-Der Schritt vom Modell ohne Unfalltyp zu «LR voll» (der Unfalltyp kommt dazu) bringt `r pp(d_typ$differenz)` Prozentpunkte. Von dort an gilt: **Random Forest und XGBoost lassen sich nicht auseinanderhalten.** Ihre Vorsprünge gegenüber «LR voll» (`r pp(d_t$differenz)` bzw. `r pp(d_x$differenz)` Prozentpunkte) haben weitgehend überlappende Intervalle. Dass Bäume vorn liegen, ist also kein Zufall der Testmenge; welcher Baum-Algorithmus es ist, aber nicht belegbar.
+Der Unfalltyp (LR voll gegenüber LR ohne Unfalltyp) bringt `r pp(d_typ$differenz)` Prozentpunkte. Random Forest und XGBoost lassen sich nicht auseinanderhalten: Ihre Vorsprünge gegenüber LR voll (`r pp(d_t$differenz)` bzw. `r pp(d_x$differenz)` Prozentpunkte) haben überlappende Intervalle. Dass Bäume vorn liegen, ist belegt, welcher Baum-Algorithmus, nicht.
 
 ## Schwierige Fälle
 
-Ein Teil der Unfälle ist leicht: Bei einem Parkierunfall oder Tierunfall gibt es fast nie Verletzte (rund 2.5 %). Diese Fälle machen jedes Modell besser aussehen, als es bei den eigentlich offenen Fällen ist.
+Bei Parkier- und Tierunfällen gibt es fast nie Verletzte (rund 2.5 %). Diese Fälle lassen jedes Modell besser aussehen.
 
 ```{r}
 #| label: c-schwierig
@@ -181,17 +178,17 @@ sub_tab <- function(sp, aus) {
 }
 s_all <- V("Random Forest", "brier_skill"); s_hard <- V("Random Forest", "brier_skill", au = "ohne_parkier_tier")
 chart(sub_plot("zeitlich", c("alle", "ohne_parkier_tier"), 1:2),
-  headline = sprintf("Ohne Parkier- und Tierunfälle sinkt der Brier-Skill des Random Forest von %s %% auf %s %%, die Rangfolge der Modelle bleibt gleich.", pp(s_all), pp(s_hard)),
-  alt = "Punktdiagramm mit Intervallen: Brier-Skill der sieben Modelle für alle Unfälle und für alle Unfälle ohne Parkier- und Tierunfälle, zeitlicher Test. Die zweite Gruppe liegt bei jedem Modell etwa vier Prozentpunkte tiefer, die Reihenfolge der Modelle ist gleich.",
-  caption = "Zeitlicher Test. Der Brier-Skill wird in jeder Gruppe relativ zum Raten des Durchschnitts berechnet. Dieselben Modelle und Neuziehungen, nur die Testunfälle werden gefiltert (nicht neu trainiert).",
+  headline = sprintf("Ohne Parkier- und Tierunfälle sinkt der Brier-Skill des Random Forest von %s %% auf %s %%. Rangfolge gleich.", pp(s_all), pp(s_hard)),
+  alt = "Punktdiagramm, zeitlicher Test: Brier-Skill der sieben Modelle für alle Unfälle und ohne Parkier- und Tierunfälle. Die zweite Gruppe liegt etwa vier Prozentpunkte tiefer, die Reihenfolge bleibt gleich.",
+  caption = "Zeitlicher Test. Brier-Skill je Gruppe relativ zum Raten. Gleiche Modelle, gefilterte Testunfälle, nicht neu trainiert.",
   tbl = sub_tab("zeitlich", c("alle", "ohne_parkier_tier")), w = 5.6, h = 4.8)
 ```
 
-Die Zahlen sind auf den schwierigeren Fällen etwas tiefer, die Aussage ändert sich nicht: dieselbe Rangfolge, derselbe Abstand der Baum-Modelle.
+Auf den schwierigeren Fällen sind die Werte tiefer. Rangfolge und Abstand der Baum-Modelle bleiben.
 
 ### Vor und nach 2015
 
-Ab 2015 werden mehr Sachschaden-Unfälle erfasst. Hat sich dadurch auch die Qualität der Modelle verändert? Diese Auswertung ist nur im **Zufallssplit** möglich (der zeitliche Test enthält nur Jahre ab 2022) und läuft deshalb nur für die fünf Modelle, die auch im Zufallssplit gerechnet wurden.
+Nur im Zufallssplit auswertbar: Der zeitliche Test enthält nur Jahre ab 2022. Vier Modelle, ohne Basislinie.
 
 ```{r}
 #| label: c-regime
@@ -200,18 +197,18 @@ r_vor <- rg_all$wert[rg_all$modell == "Random Forest" & rg_all$auswertung == "vo
 r_ab <- rg_all$wert[rg_all$modell == "Random Forest" & rg_all$auswertung == "ab_2015"]
 r_zeit <- V("Random Forest", "brier_skill"); r_zuf <- V("Random Forest", "brier_skill", sp = "zufaellig")
 chart(sub_plot("zufaellig", c("vor_2015", "ab_2015"), 1:2),
-  headline = sprintf("Im Zufallssplit ist der Brier-Skill bis 2014 und ab 2015 praktisch gleich (Random Forest %s %% bzw. %s %%), die Modelle schneiden vor und nach 2015 ähnlich ab (Konfidenzintervalle überlappen; kein formaler Test).", pp(r_vor), pp(r_ab)),
-  alt = "Punktdiagramm mit Intervallen, Zufallssplit: Brier-Skill von vier Modellen bis 2014 und ab 2015. Die beiden Gruppen liegen bei jedem Modell nahe beieinander, die Intervalle der kleineren Gruppe bis 2014 sind breiter.",
-  caption = sprintf("Nur Zufallssplit, mit fünf Modellen gerechnet; die Gruppe bis 2014 ist mit %s Unfällen deutlich kleiner als die Gruppe ab 2015 (%s), daher die breiteren Intervalle. Ein Vergleich mit dem zeitlichen Test ist nicht möglich: Der Unterschied zwischen beiden (Random Forest: %s %% zeitlich, %s %% zufällig) ist die Summe aus Veränderung über die Zeit und einer anderen Testmenge, nicht reiner Drift.",
-                    fi(unique(rg_all$n[rg_all$auswertung == "vor_2015"])), fi(unique(rg_all$n[rg_all$auswertung == "ab_2015"])), pp(r_zeit), pp(r_zuf)),
+  headline = sprintf("Zufallssplit: Brier-Skill bis 2014 und ab 2015 praktisch gleich (Random Forest %s %% bzw. %s %%). Intervalle überlappen, kein formaler Test.", pp(r_vor), pp(r_ab)),
+  alt = "Punktdiagramm, Zufallssplit: Brier-Skill von vier Modellen bis 2014 und ab 2015. Beide Gruppen liegen bei jedem Modell nahe beieinander, die Intervalle bis 2014 sind breiter.",
+  caption = sprintf("Nur Zufallssplit. Bis 2014: %s Unfälle, ab 2015: %s; daher breitere Intervalle. Alle Unfälle: %s %% zufällig, %s %% zeitlich.",
+                    fi(unique(rg_all$n[rg_all$auswertung == "vor_2015"])), fi(unique(rg_all$n[rg_all$auswertung == "ab_2015"])), pp(r_zuf), pp(r_zeit)),
   tbl = sub_tab("zufaellig", c("alle", "ohne_parkier_tier", "vor_2015", "ab_2015")), w = 5.6, h = 4.2)
 ```
 
-Der Zufallssplit liefert fast dieselben Zahlen wie der zeitliche Test (alle Unfälle, Random Forest: `r pp(r_zuf)` % zufällig, `r pp(r_zeit)` % zeitlich). Ein Teil der Differenz ist eine echte Veränderung über die Zeit, ein Teil schlicht eine andere Auswahl an Unfällen im Test. Beides lässt sich aus diesen Daten nicht trennen, deshalb ist der zeitliche Test die Hauptauswertung und der Zufallssplit nur Kontrolle.
+Random Forest, zufällig gegen zeitlich: Die Differenz mischt echte Veränderung über die Zeit mit einer anderen Testmenge; beides lässt sich nicht trennen. Der zeitliche Test bleibt deshalb die Hauptauswertung, der Zufallssplit die Kontrolle.
 
-## Stimmen die Wahrscheinlichkeiten?
+## Kalibrierung
 
-Ein Modell kann Fälle gut ordnen und trotzdem falsche Prozentzahlen nennen. Die Kalibrierung prüft das: Unfälle werden nach vorhergesagter Wahrscheinlichkeit in Gruppen eingeteilt und mit dem tatsächlichen Anteil mit Verletzten verglichen. Ideal wäre die Diagonale.
+Ein Modell kann gut ordnen und trotzdem falsche Prozentzahlen nennen. Geprüft wird: vorhergesagte Wahrscheinlichkeit gegen tatsächlichen Anteil mit Verletzten. Ideal ist die Diagonale.
 
 ```{r}
 #| label: c-kalibrierung
@@ -235,18 +232,20 @@ plot_kal <- function(v) {
     theme_zh(v, base = 10.5)
 }
 chart(plot_kal,
-  headline = sprintf("Die Baum-Modelle weichen höchstens %s Prozentpunkte von der Wirklichkeit ab, die logistische Regression bis zu %s: In der Mitte sagt sie rund %s %% voraus, wo tatsächlich %s %% passieren.", fdec(100 * rf_dev, 0), fdec(100 * lin_dev, 0), fdec(100 * mid_pred, 0), fdec(100 * mid_obs, 0)),
-  alt = "Acht kleine Kalibrierungsdiagramme, eines je Modell. Bei Random Forest und XGBoost liegen die Punkte nahe der Diagonale. Bei LR voll und beim GAM liegen die Punkte im mittleren Bereich (vorhergesagt etwa 0,3 bis 0,6) deutlich über der Diagonale: der tatsächliche Anteil mit Verletzten ist dort höher als vorhergesagt. Bei LR ohne Unfalltyp liegen sie näher an der Diagonale, beim Elastic Net streuen sie im mittleren Bereich. Die Basislinie ist ein einzelner Punkt.",
-  caption = "Zeitlicher Test, Unfälle gruppiert in Zehnerbereiche der vorhergesagten Wahrscheinlichkeit; Bereiche mit weniger als 10 Unfällen entfallen. Ein Punkt über der gestrichelten Diagonale heisst: Es passiert öfter, als das Modell sagt. Die lineare Form der logistischen Regression kann die «entweder-oder»-Struktur der Daten (mit Velo fast immer Verletzte, ohne selten) nicht abbilden; das ist ein Grund für ihren grösseren Brier-Score.",
+  headline = sprintf("Baum-Modelle weichen höchstens %s Prozentpunkte ab, die logistische Regression bis %s: In der Mitte sagt sie rund %s %% voraus, tatsächlich sind es %s %%.", fdec(100 * rf_dev, 0), fdec(100 * lin_dev, 0), fdec(100 * mid_pred, 0), fdec(100 * mid_obs, 0)),
+  alt = "Acht Kalibrierungsdiagramme, eines je Modell. Random Forest und XGBoost liegen nahe der Diagonale. LR voll und GAM liegen im mittleren Bereich (0,3 bis 0,6) deutlich darüber: tatsächlich mehr Verletzte als vorhergesagt.",
+  caption = "Zeitlicher Test, Zehnerbereiche; Bereiche mit weniger als 10 Unfällen entfallen. Über der Diagonale: öfter Verletzte als vorhergesagt.",
   tbl = html_table(kal |> transmute(Modell = modell, Split = ifelse(split == "zeitlich", "zeitlich", "zufällig"), Bereich = bin, Vorhergesagt = vorhergesagt, Beobachtet = beobachtet, Unfälle = n), digits = 3, tall = TRUE, label = "Kalibrierung aller Modelle"),
   w = 5.6, h = 6.2)
 ```
 
-## Was treibt das Risiko?
+Ursache bei der logistischen Regression: Ihre lineare Form bildet die «Entweder-oder»-Struktur nicht ab (mit Velo fast immer Verletzte, ohne selten). Das erhöht auch ihren Brier-Score.
 
-### Chancenverhältnisse (logistische Regression)
+## Einflussgrössen
 
-Die logistische Regression liefert **Chancenverhältnisse (Odds Ratios)**. Ein Wert von `r round(orr$odds_ratio[orr$term == "mit_velo"])` bei «Velo beteiligt» heisst: Die *Chance* auf Personenschaden ist bei einem Velo-Unfall rund `r round(orr$odds_ratio[orr$term == "mit_velo"])`-mal so hoch wie bei einem Unfall ohne Velo, bei sonst gleichen Merkmalen. Ein Wert von 1 heisst: kein Zusammenhang; unter 1: seltener Personenschaden. Die Chancenverhältnisse stammen aus «`r REF`»: Der Unfalltyp (z. B. «Fussgängerunfall») überlappt mit «Fussgänger:in beteiligt», was die Werte instabil machen würde. Die Balken sind 95-%-Intervalle.
+### Chancenverhältnisse
+
+Chancenverhältnis (Odds Ratio) `r round(orr$odds_ratio[orr$term == "mit_velo"])` bei «Velo beteiligt»: Die Chance auf Personenschaden ist bei einem Velo-Unfall rund `r round(orr$odds_ratio[orr$term == "mit_velo"])`-mal so hoch wie ohne Velo, bei sonst gleichen Merkmalen. 1 = kein Zusammenhang, unter 1 = seltener Personenschaden. Quelle ist «`r REF`»: Der Unfalltyp überlappt mit «Fussgänger:in beteiligt» und würde die Werte instabil machen. Referenz: Strassenart «andere», Tempo 30 oder tiefer. Die Stadtkreise haben sehr breite Intervalle, weil der Referenzkreis wenige Unfälle hat.
 
 ```{r}
 #| label: c-odds
@@ -272,16 +271,16 @@ plot_or <- function(v) {
     theme_zh(v, base = 10.5)
 }
 chart(plot_or,
-  headline = sprintf("Fussgänger:in (×%s), Velo (×%s) und Motorrad (×%s) stechen heraus; Stunde und Monat zeigen praktisch keinen Zusammenhang.", round(or_fuss), round(or_velo), round(or_mot)),
-  alt = "Forest-Plot der Chancenverhältnisse auf logarithmischer Skala. Ganz rechts Fussgänger:in, Velo und Motorrad mit Werten zwischen 12 und 158. Hauptstrasse, Nebenstrasse und Tempo-Klassen liegen zwischen 1.4 und 3.3. Stunde, Monat und Nähe zur Schule liegen bei 1; Erfasst ab 2015 liegt bei etwa 0.5.",
-  caption = "Logistische Regression ohne Unfalltyp, angepasst auf den Trainingsjahren. Referenz: Strassenart «andere», Tempo 30 oder tiefer. «Erfasst ab 2015» (um 0.5) spiegelt den Strukturbruch: Seither werden mehr reine Sachschaden-Unfälle erfasst, der Anteil mit Verletzten sinkt dadurch. Wochentag und Stadtkreis stehen nur in der Tabelle; die Kreise haben extrem breite Intervalle, weil ein Referenzkreis sehr wenige Unfälle hat.",
+  headline = sprintf("Fussgänger:in (×%s), Velo (×%s) und Motorrad (×%s) stechen heraus. Stunde und Monat: praktisch kein Zusammenhang.", round(or_fuss), round(or_velo), round(or_mot)),
+  alt = "Chancenverhältnisse, logarithmische Skala. Rechts Fussgänger:in, Velo und Motorrad mit 12 bis 158. Strassenarten und Tempo-Klassen zwischen 1.4 und 3.3. Stunde, Monat und Schulnähe bei 1, «Erfasst ab 2015» bei etwa 0.5.",
+  caption = "LR ohne Unfalltyp, Trainingsjahre. «Erfasst ab 2015» (um 0.5) zeigt den Strukturbruch. Wochentag und Stadtkreis nur in der Tabelle.",
   tbl = html_table(orr |> transmute(Merkmal = term, `Chancenverhältnis` = odds_ratio, `Intervall von` = ci_low, `Intervall bis` = ci_high, `p-Wert` = p_value), digits = 3, tall = TRUE, label = "Chancenverhältnisse"),
   w = 5.6, h = 5.2)
 ```
 
-### Wichtigkeit der Merkmale (für alle Modelle gleich gemessen)
+### Wichtigkeit der Merkmale
 
-Chancenverhältnisse gibt es nur für die logistische Regression. Damit auch die Bäume vergleichbar sind, wird für jedes Modell dasselbe getan: Die Werte eines Merkmals werden in den Testdaten durcheinandergewürfelt, und es wird gemessen, **wie stark der Brier-Score dadurch schlechter wird**. Wichtige Merkmale schaden beim Durcheinanderwürfeln viel.
+Chancenverhältnisse gibt es nur für die logistische Regression. Für alle Modelle gleich gemessen: Werte eines Merkmals in den Testdaten durchmischen, Anstieg des Brier-Scores ablesen. Wichtige Merkmale schaden beim Durchmischen viel. Ersetzbare Merkmale (z. B. Unfalltyp und «Fussgänger:in beteiligt») teilen sich die Wichtigkeit; ein kleiner Wert heisst dann nicht «bedeutungslos».
 
 ```{r}
 #| label: c-wichtigkeit
@@ -305,9 +304,9 @@ plot_imp <- function(v) {
 }
 imp_rf <- imp[imp$modell == "Random Forest", ] |> arrange(-wichtigkeit)
 chart(plot_imp,
-  headline = sprintf("In jedem Modell dominiert «Velo beteiligt», danach folgen Unfalltyp und Motorrad; Stunde und Stadtkreis zählen in keinem Modell."),
-  alt = "Punktdiagramm mit Intervallen: Wichtigkeit der sieben wichtigsten Merkmale für vier Modelle. Velo beteiligt hat bei allen Modellen den grössten Wert, danach folgen Unfalltyp, Motorrad und Fussgänger:in. Tempo-Klasse, Stunde und Stadtkreis liegen nahe null.",
-  caption = sprintf("Zeitlicher Test, %s zufällige Durchmischungen je Merkmal auf einer Stichprobe von bis zu %s Testunfällen. Das Intervall zeigt das Rauschen des Durchmischens, nicht das der Testmenge. Merkmale, die einander ersetzen können (z. B. Unfalltyp und «Fussgänger:in beteiligt»), teilen sich die Wichtigkeit; ein kleiner Wert heisst dann nicht «bedeutungslos». Alle Merkmale und Modelle stehen in der Tabelle.",
+  headline = sprintf("In jedem Modell dominiert «Velo beteiligt», danach Unfalltyp und Motorrad. Stunde und Stadtkreis zählen in keinem."),
+  alt = "Punktdiagramm: Wichtigkeit der sieben wichtigsten Merkmale für vier Modelle. Velo beteiligt ist überall am grössten, dann Unfalltyp, Motorrad, Fussgänger:in. Tempo-Klasse, Stunde und Stadtkreis nahe null.",
+  caption = sprintf("Zeitlicher Test, %s Durchmischungen je Merkmal, Stichprobe bis %s Testunfälle. Intervall = Durchmischungsrauschen, nicht Testrauschen.",
                     unique(imp$n_wiederholungen)[1], fi(5000)),
   tbl = html_table(imp |> transmute(Modell = modell, Merkmal = IL[merkmal], Wichtigkeit = wichtigkeit, `Intervall von` = ki_low, `Intervall bis` = ki_high), digits = 4, tall = TRUE, label = "Wichtigkeit aller Merkmale"),
   w = 5.6, h = 4.8)
@@ -315,7 +314,7 @@ chart(plot_imp,
 
 ### Effektverläufe: Stunde und Monat
 
-Wie verändert sich die vorhergesagte Wahrscheinlichkeit mit der Tageszeit oder dem Monat, wenn alle anderen Merkmale im Durchschnitt belassen werden (Partial Dependence)?
+Vorhergesagte Wahrscheinlichkeit nach Tageszeit und Monat, alle anderen Merkmale im Durchschnitt (Partial Dependence).
 
 ```{r}
 #| label: c-effekte
@@ -339,17 +338,17 @@ plot_eff <- function(v) {
     theme_zh(v)
 }
 chart(plot_eff,
-  headline = sprintf("Über den Tag und das Jahr ändert sich die vorhergesagte Wahrscheinlichkeit um höchstens %s Prozentpunkte: Die Tageszeit sagt kaum etwas über die Schwere.", fdec(100 * max(ef_range$r), 0)),
-  alt = "Zwei Liniendiagramme, links nach Stunde des Tages, rechts nach Monat, mit vier Linien für vier Modelle. Alle Linien verlaufen beinahe waagrecht um etwa 24 bis 26 Prozent; die Baum-Modelle zeigen leichte Schwankungen, die linearen Modelle sind fast glatt.",
-  caption = sprintf("Zeitlicher Test, Stichprobe von %s Testunfällen. Die vertikale Achse reicht bewusst von 0 bis 50 %%, damit die Grössenordnung stimmt: Zum Vergleich ändert sich die vorhergesagte Wahrscheinlichkeit des Random Forest von %s %% ohne Velo auf %s %% mit Velo. Die Zickzack-Muster der Baum-Modelle sind Rauschen, kein Tagesrhythmus. Verläufe für Tempo-Klasse, Velo, Fussgänger:in und Motorrad stehen in der Tabelle.",
+  headline = sprintf("Über Tag und Jahr ändert sich die vorhergesagte Wahrscheinlichkeit um höchstens %s Prozentpunkte. Die Tageszeit sagt kaum etwas über die Schwere.", fdec(100 * max(ef_range$r), 0)),
+  alt = "Zwei Liniendiagramme, links nach Stunde, rechts nach Monat, vier Modelle. Alle Linien verlaufen fast waagrecht bei etwa 24 bis 26 Prozent; die Baum-Modelle schwanken leicht.",
+  caption = sprintf("Zeitlicher Test, Stichprobe von %s Testunfällen. Achse 0–50 %%: Random Forest ohne Velo %s %%, mit Velo %s %%. Zickzack der Bäume ist Rauschen.",
                     fi(unique(eff$n_zeilen)[1]), fdec(100 * vel$pdp[vel$wert == "0"], 0), fdec(100 * vel$pdp[vel$wert == "1"], 0)),
   tbl = html_table(eff |> transmute(Modell = modell, Merkmal = merkmal, Wert = wert, `Vorhergesagte Wahrscheinlichkeit` = pdp), digits = 3, tall = TRUE, label = "Effektverläufe"),
   w = 5.6, h = 3.8)
 ```
 
-## Was wurde abgestimmt?
+## Abstimmung
 
-Jedes Modell mit einstellbaren Stellschrauben («Hyperparametern») wurde **nur auf den Trainingsjahren** abgestimmt, mit Validierung in den vier Jahren `r val_span` (jeweils trainiert auf allen Jahren davor). Zielgrösse war der Brier-Score. Die gewählten Werte wurden dann eingefroren, bevor die Testjahre angefasst wurden.
+Hyperparameter wurden nur auf den Trainingsjahren abgestimmt (Validierung `r val_span`, je auf allen Jahren davor trainiert), Zielgrösse Brier-Score. Die gewählten Werte standen fest, bevor die Testjahre ausgewertet wurden. Random Forest und XGBoost: Vorauswahl mit ANOVA-Racing, schwache Kandidaten fallen früh aus.
 
 ```{r}
 #| include: false
@@ -359,13 +358,13 @@ en <- ch[ch$modell == "Elastic Net", ]
 htab <- bind_rows(
   tibble(Modell = "Elastic Net", Split = "zeitlich", Verfahren = sprintf("Gitter mit %d Kandidaten (Strafstärke × Mischung Lasso/Ridge)", lauf$kandidaten$elastic_net_grid),
          Gewählt = sprintf("Strafstärke %s, Mischung %s%s", signif(en$penalty, 2), en$mixture, ifelse(en$mixture == 1, " (reines Lasso)", ""))),
-  tibble(Modell = "Random Forest", Split = "zeitlich", Verfahren = sprintf("%d Kandidaten, Racing (schwache werden früh ausgeschieden), %d Bäume", lauf$kandidaten$random_forest, lauf$baeume$random_forest),
+  tibble(Modell = "Random Forest", Split = "zeitlich", Verfahren = sprintf("%d Kandidaten mit Vorauswahl, %d Bäume", lauf$kandidaten$random_forest, lauf$baeume$random_forest),
          Gewählt = sprintf("Merkmale pro Aufteilung (mtry) %s, Mindestgrösse eines Blatts (min_n) %s", pv("Random Forest", "zeitlich", "mtry"), pv("Random Forest", "zeitlich", "min_n"))),
-  tibble(Modell = "XGBoost", Split = "zeitlich", Verfahren = sprintf("%d Kandidaten, Racing, höchstens %d Runden mit frühem Abbruch", lauf$kandidaten$xgboost, lauf$baeume$xgboost_max),
+  tibble(Modell = "XGBoost", Split = "zeitlich", Verfahren = sprintf("%d Kandidaten mit Vorauswahl, höchstens %d Runden mit frühem Abbruch", lauf$kandidaten$xgboost, lauf$baeume$xgboost_max),
          Gewählt = sprintf("%s Runden, Tiefe %s, Lernrate %s, min_n %s, Mindestgewinn %s, Stichprobenanteil %s, mtry-Anteil %s", lauf$baeume$xgboost_runden_gewaehlt,
                            pv("XGBoost", "zeitlich", "tree_depth"), pv("XGBoost", "zeitlich", "learn_rate"), pv("XGBoost", "zeitlich", "min_n"),
                            pv("XGBoost", "zeitlich", "loss_reduction"), pv("XGBoost", "zeitlich", "sample_size"), pv("XGBoost", "zeitlich", "mtry"))),
-  tibble(Modell = "Random Forest", Split = "zufällig", Verfahren = "wie oben, getrennt auf dem Zufallssplit (5 Teile) abgestimmt",
+  tibble(Modell = "Random Forest", Split = "zufällig", Verfahren = "wie oben, getrennt auf dem Zufallssplit (5 Teile)",
          Gewählt = sprintf("mtry %s, min_n %s", pv("Random Forest", "zufaellig", "mtry"), pv("Random Forest", "zufaellig", "min_n")))
 )
 ```
@@ -389,9 +388,9 @@ plot_tune <- function(v) {
     theme_zh(v)
 }
 chart(plot_tune,
-  headline = sprintf("Das Optimum ist flach: Von keiner bis mittlerer Strafe bleibt der Validierungs-Brier-Score zwischen %s und %s; erst starke Glättung verschlechtert ihn.", fdec(min(flat$brier_cv), 4), fdec(max(flat$brier_cv), 4)),
-  alt = "Liniendiagramm: Brier-Score in der Validierung über der Strafstärke des Elastic Net auf logarithmischer Achse, drei Linien für drei Mischungen. Links verlaufen die Linien waagrecht auf fast gleicher Höhe, ganz rechts bei starker Strafe steigen sie an. Das gewählte Optimum liegt im flachen Bereich.",
-  caption = sprintf("Elastic Net, Validierung in den Jahren %s, Mittel über vier Validierungsjahre. Dreieck: gewählte Einstellung. Je flacher die Kurve, desto weniger kommt es auf die genaue Wahl an: Dass das Elastic Net kaum besser ist als die einfache logistische Regression, liegt nicht an schlechtem Abstimmen. Die Tabelle zeigt die Kandidaten, die das Racing überstanden haben, auch die des Random Forest und von XGBoost (abgebrochene Kandidaten sind nicht exportiert).", val_span),
+  headline = sprintf("Flaches Optimum: Von keiner bis mittlerer Strafe bleibt der Validierungs-Brier-Score zwischen %s und %s. Erst starke Glättung verschlechtert ihn.", fdec(min(flat$brier_cv), 4), fdec(max(flat$brier_cv), 4)),
+  alt = "Liniendiagramm: Validierungs-Brier-Score über der Strafstärke des Elastic Net (logarithmisch), drei Mischungen. Links fast waagrecht, rechts bei starker Strafe ansteigend. Das gewählte Optimum liegt im flachen Bereich.",
+  caption = sprintf("Elastic Net, Validierung %s. Dreieck: gewählte Einstellung. Tabelle: auch Random Forest und XGBoost; abgebrochene Kandidaten fehlen.", val_span),
   tbl = html_table(tu |> transmute(Modell = modell, Split = ifelse(split == "zeitlich", "zeitlich", "zufällig"), Kandidat = kandidat,
                                    Strafstärke = signif(penalty, 3), Mischung = mixture, mtry = mtry, min_n = min_n, Tiefe = tree_depth,
                                    Lernrate = learn_rate, Mindestgewinn = loss_reduction, Stichprobenanteil = sample_size,
@@ -405,25 +404,21 @@ chart(plot_tune,
 html_table(htab, label = "Gewählte Hyperparameter", html_cols = character())
 ```
 
-Die übrigen Modelle haben keine abgestimmten Einstellungen: Basislinie, Regel, die beiden logistischen Regressionen und das GAM (mit festen, glatten Kurven für Stunde und Monat) wurden direkt angepasst.
+Ohne Abstimmung direkt angepasst: Basislinie, Regel, beide logistischen Regressionen, GAM.
 
-## Fazit und Grenzen
+## Grenzen {#grenzen}
 
-**Was folgt:**
+Kein Prognosewerkzeug: Einzelne Unfälle und deren Schwere lassen sich nicht vorhersagen. Kein Einsatz für Entscheide über Personen oder Orte.
 
-- **Die einfache Regel «Velo, Fussgänger:in oder Motorrad beteiligt?» erklärt den grössten Teil.** Alle komplexeren Modelle holen darauf aufbauend zusätzlich `r fdec(100 * (V("LR voll", "brier_skill") - b_rule), 0)` (mit Unfalltyp, logistisch) bis `r fdec(100 * (b_best - b_rule), 0)` Prozentpunkte (abgestimmte Bäume) Brier-Skill heraus.
-- **Der Mehrwert der Bäume ist echt, aber an eine Bedingung geknüpft:** Sie fangen Wechselwirkungen ein (z. B. Unfalltyp × Beteiligte), die die logistische Regression nur als Summe von Einzeleffekten sieht. Darum sind sie auch besser kalibriert.
-- **Raffiniertere lineare Verfahren (Elastic Net, GAM) bringen nichts**, und zwischen Random Forest und XGBoost gibt es keinen belegbaren Unterschied.
-- **Wer Verkehrssicherheit nach Schweregrad betrachtet, sollte ungeschützte Verkehrsteilnehmende (zu Fuss, Velo, Motorrad) gesondert anschauen.** Tageszeit, Wochentag und Quartier tragen fast nichts bei.
+- Nur Assoziation: Kein Modell sieht Verkehrsmenge, Strassenzustand oder Unfallhergang. Ursachen bleiben offen.
+- Meldepraxis: Ein Velo-Sturz ohne Verletzte wird vermutlich seltener erfasst als ein Blechschaden zwischen Autos. Der Verletztenanteil bei Velo-Unfällen steigt dadurch.
+- Daraus folgt nicht, dass Tempo 50 gefährlicher ist als Tempo 30: Die Chancenverhältnisse vergleichen verschiedene Strassen (siehe [Wo](wo.qmd)). Quartier und Uhrzeit haben im Modell fast keinen Einfluss. Ob sie keine Rolle spielen, bleibt offen.
+- Die Frage «Was verhindert Verletzte?» braucht andere Daten und Methoden.
+- Intervalle sind Testrauschen: `r fi(lauf$bootstrap_n)` Neuziehungen statt üblicher 2 000 (Laufzeitbudget). Nicht erfasst: Neutraining und Abhängigkeit von Unfällen am selben Ort oder Tag. Die Intervalle sind eher zu schmal.
+- Kleiner Suchraum: `r lauf$kandidaten$random_forest` Kandidaten für Random Forest und XGBoost (üblich 20 oder mehr). Zufallssplit nur für `r length(lauf$modelle_zufallssplit)` der acht Modelle (ohne Elastic Net, GAM, XGBoost). Gesamtlauf `r fdec(lauf$laufzeit_sekunden$gesamt / 60, 0)` Minuten auf `r lauf$threads` Kernen. Ein grösserer Suchraum könnte die Bäume leicht verbessern.
+- Eine Testperiode (`r test_span`), ein Split: Die Stabilität der Rangfolge in anderen Perioden ist offen.
+- Bäume erfassen Wechselwirkungen (z. B. Unfalltyp × Beteiligte), die die logistische Regression nur als Summe von Einzeleffekten sieht.
 
-**Was nicht folgt:** dass sich Schweregrade im Einzelfall vorhersagen lassen; dass Tempo 50 «gefährlicher» ist als Tempo 30 (die Chancenverhältnisse sind Zusammenhänge zwischen verschiedenen Strassen, siehe [Wo](wo.qmd)); dass Quartiere oder Uhrzeiten keine Rolle spielen (das Modell sieht weder Verkehrsmenge noch Unfallhergang). Die Frage «Was verhindert Verletzte?» braucht andere Daten und Methoden als dieses Modell.
+Gewinn über die einfache Regel hinaus: `r fdec(100 * (V("LR voll", "brier_skill") - b_rule), 0)` Prozentpunkte (LR voll) bis `r fdec(100 * (b_best - b_rule), 0)` Prozentpunkte (abgestimmte Bäume). Wer Schwere betrachtet, schaut ungeschützte Verkehrsteilnehmende (zu Fuss, Velo, Motorrad) gesondert an.
 
-**Grenzen dieses Vergleichs:**
-
-- **Das Intervall ist Testrauschen.** Die 95-%-Intervalle stammen aus `r fi(lauf$bootstrap_n)` gepaarten Neuziehungen der Testunfälle (reduziert gegenüber dem üblichen 2 000, um das Laufzeitbudget einzuhalten). Sie erfassen nicht, dass die Modelle neu trainiert andere Werte liefern würden, und auch nicht, dass Unfälle am selben Ort oder Tag nicht unabhängig sind. Die Intervalle sind deshalb eher zu schmal.
-- **Das Wichtigkeits-Intervall ist Durchmischungs-Rauschen** (`r unique(imp$n_wiederholungen)[1]` Wiederholungen), nicht Testrauschen.
-- **Eingeschränkter Suchraum.** Racing mit nur `r lauf$kandidaten$random_forest` Kandidaten für Random Forest und XGBoost (üblich wären 20 oder mehr), der Zufallssplit nur für `r length(lauf$modelle_zufallssplit)` der acht Modelle (Elastic Net, GAM und XGBoost entfallen dort). Das spart Rechenzeit (gesamter Lauf `r fdec(lauf$laufzeit_sekunden$gesamt / 60, 0)` Minuten auf `r lauf$threads` Prozessorkernen) und dürfte die Aussagen kaum verändern; ein grösserer Suchraum könnte die Bäume noch etwas verbessern.
-- **Eine Testperiode, ein Split.** Die Testjahre `r test_span` sind eine einzige Stichprobe der Zukunft; wie stabil die Rangfolge in anderen Perioden wäre, zeigt diese Auswertung nicht.
-- **Nur Assoziation.** Kein Modell sieht Verkehrsmenge, Strassenzustand oder Unfallhergang.
-
-Das Vorgehen ist vollständig dokumentiert und reproduzierbar ([Pipeline & Methode](pipeline.qmd), Entscheid [ADR 0007](https://github.com/ffahrenb/zurich-road-accidents/blob/main/docs/adr/0007-modellvergleich-protokoll.md)). Alle Ergebnisse als Dateien: [Daten & Metadaten](daten.qmd).
+Vorgehen: [Pipeline & Methode](pipeline.qmd), [ADR 0007](https://github.com/ffahrenb/zurich-road-accidents/blob/main/docs/adr/0007-modellvergleich-protokoll.md). Ergebnisse als Dateien: [Daten & Metadaten](daten.qmd).

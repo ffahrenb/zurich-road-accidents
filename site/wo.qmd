@@ -1,6 +1,6 @@
 ---
 title: "Wo passieren Unfälle?"
-subtitle: "Quartiere, signalisierte Geschwindigkeit und Schulnähe"
+subtitle: "Quartiere, Tempo, Schulnähe"
 ---
 
 ```{r}
@@ -13,7 +13,7 @@ u <- DBI::dbGetQuery(con, sprintf("SELECT wochentag, stunde, personenschaden, mi
 DBI::dbDisconnect(con, shutdown = TRUE)
 ```
 
-Eine Karte mit den einzelnen Unfallorten finden Sie auf der Seite [Karte](karte.qmd). Hier stehen die Vergleiche.
+Unfallorte einzeln: [Karte](karte.qmd).
 
 ## Quartiere
 
@@ -44,15 +44,15 @@ plot_q <- function(v) {
     theme_zh(v, base = 10.5) + theme(panel.grid.major.y = element_blank(), legend.direction = "vertical")
 }
 chart(plot_q,
-  headline = sprintf("Am höchsten ist die Rate in %s – dort wohnen kaum Menschen, es sind viele unterwegs.", paste(top_klein, collapse = ", ")),
-  alt = sprintf("Balkendiagramm der 34 Stadtquartiere nach Unfällen mit Personenschaden pro 1000 Einwohner und Jahr, Durchschnitt %s. Spitzenreiter sind %s, mit grossem Abstand.", yr_q_bis, paste(top_klein, collapse = ", ")),
-  caption = sprintf("Mittel der jährlichen Raten %s (Unfälle mit Personenschaden je 1’000 Einwohner:innen). Orange: Quartiere mit weniger als 2’000 Einwohner:innen; dort teilen wenige Menschen viele Unfälle von Pendlern und Besuchern, die Rate sagt wenig über das Risiko der Wohnbevölkerung. Unter den übrigen Quartieren führen %s.", yr_q, paste(top_w, collapse = ", ")),
+  headline = sprintf("Höchste Rate in %s: wenig Wohnbevölkerung, viel Verkehr.", paste(top_klein, collapse = ", ")),
+  alt = sprintf("Balkendiagramm der 34 Stadtquartiere: Unfälle mit Personenschaden pro 1000 Einwohner und Jahr, Mittel %s. %s liegen mit grossem Abstand vorn.", yr_q_bis, paste(top_klein, collapse = ", ")),
+  caption = sprintf("Mittlere Jahresrate %s, Unfälle mit Personenschaden je 1’000 Einwohner:innen. Orange: unter 2’000 Einwohner:innen, Rate wenig aussagekräftig. Übrige Quartiere: %s vorn.", yr_q, paste(top_w, collapse = ", ")),
   tbl = html_table(qr |> transmute(Quartier = quartier, `Rate pro 1’000` = rate, `Einwohner (Mittel)` = einw, !!col_faelle_q := faelle), digits = 1, tall = TRUE, label = "Raten nach Quartier"),
   h = 8.2, inv = "opacity:.5;")
 ```
 
 ::: {.note}
-**Warum «pro Einwohner»?** Damit grosse und kleine Quartiere vergleichbar werden. Der Nachteil: Die Rate misst Unfälle *am Ort*, geteilt durch die Menschen, die dort *wohnen*. Wer im Quartier verunfallt, muss nicht dort wohnen. Darum sind Innenstadtquartiere mit wenig Bewohnern rechnerisch «gefährlich». Sie zeigen vor allem, wo viel Verkehr ist. Die Raten beginnen erst 2015 und zählen nur Unfälle mit Personenschaden, wegen des [Strukturbruchs 2015](datenqualitaet.qmd#der-strukturbruch-2015).
+Die Rate teilt Unfälle am Ort durch die Wohnbevölkerung. Wer verunfallt, wohnt nicht unbedingt dort. Innenstadtquartiere mit wenig Bewohnern fallen darum auf und zeigen vor allem viel Verkehr. Raten erst ab 2015, nur Unfälle mit Personenschaden ([Strukturbruch 2015](datenqualitaet.qmd#der-strukturbruch-2015)).
 :::
 
 ## Signalisierte Geschwindigkeit
@@ -78,16 +78,19 @@ plot_t <- function(v) {
     theme_zh(v) + theme(panel.grid.major.x = element_blank())
 }
 chart(plot_t,
-  headline = sprintf("Bei Tempo 50 enden %s der Unfälle mit Verletzten, bei Tempo 30 oder tiefer %s.", fp(t50, 1), fp(t30, 1)),
+  headline = sprintf("Tempo 50: %s der Unfälle mit Verletzten. Tempo 30 oder tiefer: %s.", fp(t50, 1), fp(t30, 1)),
   alt = sprintf("Balkendiagramm: Anteil der Unfälle mit Personenschaden nach signalisierter Geschwindigkeit. Tempo 30 oder tiefer %s, Tempo 50 %s, Tempo 60 und mehr %s, unbekannt %s.",
                 fp(t30, 1), fp(t50, 1), fp(tp$anteil_personenschaden_pct[3], 1), fp(tp$anteil_personenschaden_pct[4], 1)),
-  caption = paste0("Anteil der Unfälle mit Personenschaden an allen Unfällen der Klasse, ", yr_span, ". Die Klasse folgt dem nächsten Strassenabschnitt mit signalisierter Geschwindigkeit (höchstens 25 m entfernt); 6 % der Unfälle lassen sich keinem Abschnitt zuordnen («unbekannt», Prüfung DQ-U06)."),
+  caption = paste0("Anteil Personenschaden je Klasse, ", yr_span, ". Klasse = nächster Abschnitt, höchstens 25 m entfernt. 6 % ohne Abschnitt («unbekannt», DQ-U06)."),
   tbl = html_table(tp |> transmute(Klasse = tempo_klasse, Unfälle = unfaelle, `mit Personenschaden` = mit_personenschaden, `Anteil %` = anteil_personenschaden_pct), label = "Unfälle nach Tempoklasse"),
   h = 3.6)
 ```
 
 ::: {.note .warn}
-**Kein Beweis für die Wirkung von Tempo 30.** Tempo-30-Strassen sind meist Quartierstrassen mit wenig Verkehr, Tempo-50-Strassen sind Hauptachsen mit Trams, Lastwagen und Velos. Die Zahlen vergleichen also verschiedene Strassen, nicht dieselbe Strasse vor und nach einer Tempoänderung. Ausserdem stammen die Tempozonen aus dem aktuellen Geodatensatz, nicht aus dem Stand am Unfalltag.
+Kein Beleg für die Wirkung von Tempo 30:
+
+- Tempo 30 gilt meist auf Quartierstrassen, Tempo 50 auf Hauptachsen mit Tram, Lastwagen und Velos. Der Vergleich betrifft verschiedene Strassen.
+- Die Tempozonen stammen aus dem aktuellen Geodatensatz, nicht vom Unfalltag.
 :::
 
 ## Nähe zu Schulen
@@ -118,11 +121,11 @@ plot_s <- function(v) {
     theme_zh(v) + theme(panel.grid.major.x = element_blank())
 }
 chart(plot_s,
-  headline = sprintf("Rund jeder fünfte Unfall (%s) liegt nahe einer Volksschule; schwerer sind diese Unfälle nicht.", fp(share_near, 0)),
-  alt = "Gruppierte Balken: Anteil der Unfälle mit Personenschaden, mit Fussgängerbeteiligung und mit Velobeteiligung, getrennt nach Unfällen bis 200 Meter von einer Volksschule und weiter weg. Die Werte sind in beiden Gruppen fast gleich.",
-  caption = "Schulnähe = Volksschule im Umkreis von 200 m des Unfallorts (Luftlinie). Der Vergleich sagt nichts über den Schulweg: Wir kennen weder Alter der Beteiligten noch Verkehrsmenge.",
+  headline = sprintf("%s der Unfälle liegen nahe einer Volksschule. Nicht schwerer als andere.", fp(share_near, 0)),
+  alt = "Gruppierte Balken: Anteil Unfälle mit Personenschaden, Fussgänger- und Velobeteiligung, bis 200 Meter von einer Volksschule und weiter weg. Beide Gruppen fast gleich.",
+  caption = "Schulnähe: Volksschule bis 200 m Luftlinie vom Unfallort. Alter der Beteiligten und Verkehrsmenge sind unbekannt.",
   tbl = html_table(scl |> transmute(Gruppe = grp, Kennzahl = mass, `Anteil %` = pct, `Unfälle in Gruppe` = n), label = "Schulnähe"),
   h = 3.6)
 ```
 
-Auch zu typischen Schulwegzeiten (Montag bis Freitag, 7–9 Uhr und 15–17 Uhr) liegt der Anteil der Unfälle nahe Schulen bei `r fp(sw, 0)`, also nicht höher als sonst. Ein Radius von 200 m um alle Volksschulen deckt einen grossen Teil des dicht bebauten Stadtgebiets ab; deshalb ist die Aussage schwach. Wer Schulwege beurteilen will, braucht feinere Daten (Wegnetz, Alter, Verkehrsmenge).
+Zu Schulwegzeiten (Mo–Fr, 7–9 und 15–17 Uhr) liegt der Anteil nahe Schulen bei `r fp(sw, 0)`, nicht höher als sonst. Ein Radius von 200 m deckt viel dicht bebautes Gebiet ab, die Aussage ist schwach. Für Schulwege fehlen Wegnetz, Alter und Verkehrsmenge.

@@ -1,6 +1,6 @@
 ---
 title: "Daten & Metadaten"
-subtitle: "Alle Ergebnisse als offene Dateien, beschrieben nach dem Schweizer Metadatenstandard DCAT-AP CH"
+subtitle: "Alle Ergebnisse als offene Dateien, beschrieben nach DCAT-AP CH"
 ---
 
 ```{r}
@@ -13,36 +13,36 @@ dss <- kat[["dcat:dataset"]]
 fsize <- function(p) { b <- file.size(file.path(export_dir, p)); ifelse(b >= 1e6, paste0(fdec(b / 1e6, 1), " MB"), paste0(fdec(b / 1e3, 0), " kB")) }
 ```
 
-Alle Dateien liegen unter `export/` und werden bei jedem Lauf der Pipeline neu erzeugt, nach bestandenem Qualitäts-Gate. Sie dürfen unter den Bedingungen unten weiterverwendet werden.
+Alle Dateien liegen unter `export/`, neu erzeugt bei jedem Lauf nach bestandenem Qualitäts-Gate. Bedingungen: [Quellen, Lizenzen, Zitierung](#lizenzen).
 
 ## Downloads
 
 ```{r}
 D <- tibble::tribble(
   ~grp, ~path, ~what,
-  "Daten", "data/unfaelle.parquet", "Alle Unfälle, 19 Spalten (Jahr, Monat, Wochentag, Stunde, Schwere, Beteiligte, Quartier, Tempo, Koordinate). Parquet.",
-  "Daten", "data/jahr.csv", "Unfälle pro Jahr und Schwere, mit Velo/Fussgänger/Motorrad",
+  "Daten", "data/unfaelle.parquet", "Alle Unfälle, 19 Spalten. Parquet.",
+  "Daten", "data/jahr.csv", "Unfälle pro Jahr und Schwere",
   "Daten", "data/zeitmuster.csv", "Unfälle nach Wochentag und Stunde",
   "Daten", "data/quartier.csv", "Unfälle, Einwohner und Raten je Quartier und Jahr",
   "Daten", "data/tempo.csv", "Unfälle nach signalisierter Geschwindigkeit",
   "Daten", "data/wetter_monat.csv", "Monatswerte: Unfälle, Temperatur, Regenstunden",
-  "Daten", "data/unfaelle_punkte.geojson", "Kartenpunkte (Jahr, Schwere, Beteiligte), GeoJSON",
+  "Daten", "data/unfaelle_punkte.geojson", "Kartenpunkte, GeoJSON",
   "Daten", "data/quartiere.geojson", "Quartier-Polygone mit Rate, GeoJSON",
-  "Modelle", "modell/schwere_vergleich.csv", "Schweremodelle: acht Modelle, Kennzahlen mit 95-%-Intervall (zeitlicher Test, Zufallssplit, Teilgruppen)",
+  "Modelle", "modell/schwere_vergleich.csv", "Acht Schweremodelle, Kennzahlen mit 95-%-Intervall",
   "Modelle", "modell/schwere_differenzen.csv", "Unterschiede zu den Referenzmodellen mit gepaartem 95-%-Intervall",
-  "Modelle", "modell/schwere_tuning.csv", "Abgestimmte Hyperparameter: alle Kandidaten mit Validierungs-Brier-Score",
+  "Modelle", "modell/schwere_tuning.csv", "Hyperparameter: Kandidaten mit Validierungs-Brier-Score",
   "Modelle", "modell/schwere_kalibrierung.csv", "Kalibrierung aller Modelle (Zehnerbereiche)",
   "Modelle", "modell/schwere_wichtigkeit.csv", "Permutationswichtigkeit aller Modelle mit Intervall",
-  "Modelle", "modell/schwere_effekte.csv", "Effektverläufe (Partial Dependence) aller Modelle",
+  "Modelle", "modell/schwere_effekte.csv", "Effektverläufe (Partial Dependence)",
   "Modelle", "modell/schwere_odds_ratios.csv", "Chancenverhältnisse der logistischen Regression",
-  "Modelle", "modell/schwere_lauf.json", "Laufprotokoll: Zeiträume, Laufzeit, Kandidaten, Abstriche am Budget",
+  "Modelle", "modell/schwere_lauf.json", "Laufprotokoll: Zeiträume, Laufzeit, Kandidaten",
   "Wetter (Modellergebnisse)", "trackx/wetter_effekt.csv", "Regen- und Temperatur-Effekte (IRR) mit Intervallen",
   "Wetter (Modellergebnisse)", "trackx/wetter_klassen.csv", "Unfälle pro Stunde nach Regen × Temperatur-Klasse",
   "Wetter (Modellergebnisse)", "trackx/wetter_modell.json", "Modellbeschreibung",
-  "Qualität", "dq/dq_ergebnisse.csv", "Alle Datenqualitäts-Prüfungen des letzten Laufs",
+  "Qualität", "dq/dq_ergebnisse.csv", "Alle Prüfungen des letzten Laufs",
   "Qualität", "dq/dq_verlauf.csv", "Verlauf der Prüfergebnisse je Lauf",
   "Qualität", "dq/snapshot_history.csv", "Unfälle je Jahr pro Snapshot (Stabilitätsprüfung)",
-  "Qualität", "dq/jahresbereich.csv", "Veröffentlichter Jahresbereich je Snapshot (Prüfung DQ-S04: nie kleiner als zuvor)",
+  "Qualität", "dq/jahresbereich.csv", "Jahresbereich je Snapshot (Prüfung DQ-S04: nie kleiner als zuvor)",
   "Qualität", "dq/manifest.csv", "Quelldateien mit SHA-256-Prüfsumme",
   "Qualität", "dq/vertrag_unfaelle.html", "Datenvertrag Unfälle (pointblank-Bericht)",
   "Qualität", "dq/vertrag_meteo.html", "Datenvertrag Meteo (pointblank-Bericht)",
@@ -58,13 +58,9 @@ tagList(lapply(unique(D$grp), function(g) {
 }))
 ```
 
-Alle Spalten, Einheiten und Codes: siehe [Datenwörterbuch](#datenwörterbuch). Prüfen Sie heruntergeladene Quelldateien mit der Prüfsumme im [Manifest](#manifest).
-
 ## Metadaten: DCAT-AP CH
 
-Der **Datenkatalog** [katalog.jsonld](export/meta/katalog.jsonld) beschreibt die `r length(dss)` veröffentlichten Datensätze nach **DCAT-AP CH**, dem Schweizer Anwendungsprofil des europäischen Standards DCAT für offene Verwaltungsdaten. Er ist als JSON-LD aufgebaut und für Portale wie [I14Y](https://www.i14y.admin.ch/) und [opendata.swiss](https://opendata.swiss/) vorbereitet, deren Metadaten dasselbe Profil nutzen. Eine Einreichung bei diesen Portalen ist **nicht** erfolgt; der Katalog zeigt, wie die Beschreibung aussehen würde.
-
-Der Katalog enthält je Datensatz Titel und Beschreibung (Deutsch und Englisch), Herausgeber, Kontakt, Thema (Verkehr), Stichwörter, räumliche und zeitliche Abdeckung, Aktualisierungsrhythmus, Herkunft (`prov:wasDerivedFrom` verweist auf die offenen Quelldatensätze der Stadt Zürich), Lizenz und die einzelnen Download-Dateien mit Format und Grösse.
+Der Datenkatalog [katalog.jsonld](export/meta/katalog.jsonld) beschreibt die `r length(dss)` Datensätze nach DCAT-AP CH (JSON-LD), vorbereitet für [I14Y](https://www.i14y.admin.ch/) und [opendata.swiss](https://opendata.swiss/). Eingereicht ist er nicht.
 
 ```{r}
 cat_tbl <- do.call(rbind, lapply(dss, function(d) {
@@ -76,12 +72,12 @@ cat_tbl <- do.call(rbind, lapply(dss, function(d) {
 html_table(cat_tbl, label = "Datensätze im Katalog")
 ```
 
-## Nutzungsbedingungen und Quellenangabe
+## Quellen, Lizenzen, Zitierung {#lizenzen}
 
 ::: {.note}
-**Bitte so zitieren:** Quelle: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0
+Zitierung: Quelle: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0
 
-Abgeleitete Dateien in `export/` behalten die Pflichten der Eingangsquelle: Für die Unfalldaten ist die Quellenangabe nötig.
+Abgeleitete Dateien behalten die Pflichten der Quelle: Quellenangabe für die Unfalldaten.
 :::
 
 ```{r}
@@ -99,7 +95,7 @@ tagList(html_table(LIC, label = "Quellen und Lizenzen"),
   tags$p("Code: MIT-Lizenz. Die Auswertungen und Texte dieser Website stehen unter denselben Bedingungen wie die Unfalldaten (CC BY 4.0)."))
 ```
 
-Die Hintergrundkarte auf der [Kartenseite](karte.qmd) stammt von CARTO, Daten © OpenStreetMap-Mitwirkende.
+Hintergrundkarte: CARTO, Daten © OpenStreetMap-Mitwirkende ([Drittanbieter](datenschutz.qmd#drittanbieter)).
 
 ## Datenwörterbuch {#datenwörterbuch}
 
@@ -111,7 +107,7 @@ html_table(dic |> transmute(Datensatz = datensatz, Spalte = spalte, Beschreibung
 
 ## Manifest: Quelldateien mit Prüfsumme {#manifest}
 
-Jede heruntergeladene Quelldatei wird mit **SHA-256** festgehalten. Wer dieselbe Datei von der Quelle lädt und eine andere Prüfsumme erhält, weiss, dass sich die Quelle geändert hat.
+Weicht die SHA-256-Prüfsumme einer neu geladenen Datei ab, hat sich die Quelle geändert.
 
 ```{r}
 mf <- man |> mutate(Grösse = ifelse(bytes >= 1e6, paste0(fdec(bytes / 1e6, 1), " MB"), paste0(fdec(bytes / 1e3, 0), " kB")),

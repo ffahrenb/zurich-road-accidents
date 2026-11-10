@@ -1,6 +1,6 @@
 ---
 title: "Road accidents in Zurich {{< var yr_span >}}"
-subtitle: "English summary. The full site is in German; all data files and the data catalogue are bilingual."
+subtitle: "English summary of the German site"
 lang: en
 pagetitle: "Zurich road accidents – English summary"
 ---
@@ -32,29 +32,29 @@ tiles(
 )
 ```
 
-This site turns the open road-accident data of the City of Zurich and the Swiss Federal Roads Office (FEDRO/ASTRA) into a **quality-checked** analysis. A pipeline in R and SQL (DuckDB) downloads the sources, runs automated data-quality checks, and only if no blocking (STOP) check fails does it build models, exports and this website. Where the data have limits, the limit is stated next to the chart. The site is aimed at both citizens and professionals in official statistics. The pages are in German; this page summarises the essentials.
+Open road-accident data of the City of Zurich and the Federal Roads Office (FEDRO/ASTRA), quality-checked. An R and SQL (DuckDB) pipeline downloads the sources and runs automated checks. Models, exports and this site are built only if no blocking (STOP) check fails. The pages are in German; data files and the catalogue are bilingual.
 
-## Key findings
+## Findings
 
 ::: {.findings-en}
-- **Data quality is a release condition.** `r n_chk` automated checks (`r n_stop` with STOP effect, which would abort the pipeline) ran on the latest snapshot; none is violated. `r if (n_warn == 1) "One warning remains" else "Warnings remain"` visible on purpose: the **structural break of 2015**`r if (n_warn == 1) "" else " is one of them"`. The number of recorded accidents jumps by +`r ch("n", 2015)` % that year, while accidents with injuries rise by only +`r ch("i", 2015)` % and property-damage-only accidents by +`r ch("s", 2015)` %. This reflects a change in recording practice, not a real increase on the roads. Time series across 2015 must be read with that caveat. [German page: Datenqualität](../datenqualitaet.qmd)
-- **Detect, repair, verify.** Errors are never silently corrected: a check finds them (e.g. 9 invalid geometries, 40 impossible weather readings), a documented repair in the staging layer fixes them (`ST_MakeValid`; setting impossible values to NULL), and a second STOP check on the cleaned data proves the repair worked.
-- **When.** On weekdays accidents peak in the morning and late afternoon commute; after midnight there are fewer accidents but a larger share involves injuries. [Wann](../wann.qmd)
-- **Weather.** In rain there are about **+`r round(100 * (ra$irr - 1))` % more accidents per hour** (95 % CI +`r round(100 * (ra$ci_low - 1))` % to +`r round(100 * (ra$ci_high - 1))` %), +`r round(100 * (ri$irr - 1))` % for accidents with injuries, at the same time of day, season and temperature (negative-binomial model, incident rate ratios). For bicycle accidents there is no detectable rain effect (IRR `r fdec(rv$irr, 2)`, CI includes 1). Warmth goes with many more bicycle accidents. This is per hour, not per trip: exposure (traffic volume) is unknown. [Wetter](../wetter.qmd)
-- **Severity.** Eight models of increasing complexity, from guessing the base rate to boosted trees, tested on the most recent three years (temporal split, tuned on earlier years only). A simple rule ("bicycle, motorcycle or pedestrian involved?") already reaches a Brier skill of `r fdec(100 * mv("Regel (verletzliche Gruppen)", "brier_skill"), 0)` % (0 % = guessing the base rate); tuned tree models reach `r fdec(100 * mv("Random Forest", "brier_skill"), 0)` % (random forest) and `r fdec(100 * mv("XGBoost", "brier_skill"), 0)` % (XGBoost), a gap larger than the test-set noise, while elastic net and GAM add nothing over plain logistic regression (ROC-AUC `r fdec(mv("Random Forest", "roc_auc"), 2)` for the random forest, `r fdec(mv("LR voll", "roc_auc"), 2)` for logistic regression). It shows association, not causation, and is not a prediction tool. [Schwere](../schwere.qmd)
-- **Where.** Per resident, small inner-city quarters (Hochschulen, City, Lindenhof) have the highest rates because few people live there and many pass through. Rates start in 2015 because of the structural break. [Wo](../wo.qmd), [Karte](../karte.qmd)
+- Data quality: `r n_chk` automated checks (`r n_stop` with STOP effect) ran on the latest snapshot; none is violated. `r if (n_warn == 1) "One warning remains" else "Warnings remain"` on purpose`r if (n_warn == 1) ": the" else ", among them the"` 2015 structural break. Recorded accidents rise +`r ch("n", 2015)` % that year, accidents with injuries +`r ch("i", 2015)` %, property damage only +`r ch("s", 2015)` %. Cause: a change in recording practice. [Datenqualität](../datenqualitaet.qmd#der-strukturbruch-2015)
+- Repairs: a check finds the error (9 invalid geometries, 40 impossible weather readings), a documented staging step repairs it (`ST_MakeValid`; impossible values set to NULL), a second STOP check confirms the repair.
+- Time: weekday peaks at the morning and late-afternoon commute. After midnight fewer accidents, but a larger share with injuries. [Wann](../wann.qmd)
+- Weather: rain brings +`r round(100 * (ra$irr - 1))` % accidents per hour (95 % CI +`r round(100 * (ra$ci_low - 1))` % to +`r round(100 * (ra$ci_high - 1))` %), +`r round(100 * (ri$irr - 1))` % for accidents with injuries, at the same time of day, season and temperature (negative-binomial model, incident rate ratios). Bicycle accidents: no rain effect (IRR `r fdec(rv$irr, 2)`, CI includes 1). Warmth goes with more bicycle accidents. Per hour, not per trip: [Pro Stunde](../wetter.qmd#pro-stunde).
+- Severity: eight models, tested on the last three years (temporal split, tuned on earlier years only). The rule "bicycle, motorcycle or pedestrian involved?" reaches a Brier skill of `r fdec(100 * mv("Regel (verletzliche Gruppen)", "brier_skill"), 0)` % (0 % = base rate). Tuned trees reach `r fdec(100 * mv("Random Forest", "brier_skill"), 0)` % (random forest) and `r fdec(100 * mv("XGBoost", "brier_skill"), 0)` % (XGBoost). Elastic net and GAM add nothing over logistic regression (ROC-AUC `r fdec(mv("Random Forest", "roc_auc"), 2)` random forest, `r fdec(mv("LR voll", "roc_auc"), 2)` logistic regression). Association, no causation, no forecasting tool: [Grenzen](../schwere.qmd#grenzen).
+- Place: per resident, small inner-city quarters (Hochschulen, City, Lindenhof) rank highest. Rates start in 2015. [Wo](../wo.qmd), [Karte](../karte.qmd)
 :::
 
-## Method in brief
+## Method
 
-- **Layers:** raw (untouched copy) → staging (typed, documented cleaning) → mart (enriched, aggregated). Only marts are exported.
-- **Quality gate:** checks come from three sources: data contracts (pointblank), SQL checks with metadata in the file header, and history checks against the previous snapshot. Each is STOP or WARN, optionally with a tolerance. Checks are themselves tested with deliberately broken fixtures.
-- **Reproducibility:** container image pinned by digest, R packages from a dated snapshot (2025-10-30), `{targets}` for orchestration, dated data snapshots with SHA-256 manifest, GitHub Actions with SHA-pinned actions. [Pipeline & Methode](../pipeline.qmd)
-- **Metadata:** DCAT-AP CH catalogue (JSON-LD) prepared for I14Y / opendata.swiss (not submitted), bilingual data dictionary. [Daten & Metadaten](../daten.qmd)
-- **Privacy by design:** only year, month, weekday and hour are published, never exact dates. A non-public file with exact timestamps is used only inside the pipeline; only model coefficients and coarse classes with at least 10 cases leave it, enforced by an automated, self-testing privacy gate. No cookies, no tracking, no web fonts; the map background (CARTO) is the only third-party request. [Datenschutz](../datenschutz.qmd)
+- Layers: raw (untouched copy), staging (typed, documented cleaning), mart (enriched, aggregated). Only marts are exported.
+- Quality gate: data contracts (pointblank), SQL checks, history checks against the previous snapshot. Each is STOP or WARN. The checks are tested with deliberately broken test data ([all checks](../datenqualitaet.qmd#alle-prüfungen)).
+- Reproducibility: container image pinned by digest, R packages from a dated snapshot (2025-10-30), `{targets}`, dated data snapshots with SHA-256 manifest, SHA-pinned GitHub Actions. [Pipeline & Methode](../pipeline.qmd)
+- Metadata: DCAT-AP CH catalogue (JSON-LD) prepared for I14Y / opendata.swiss, not submitted. [Daten & Metadaten](../daten.qmd)
+- Privacy: only year, month, weekday and hour are published. A non-public file with exact timestamps stays inside the pipeline; only model coefficients and classes with at least 10 cases leave it ([layers](../datenschutz.qmd#schutzschichten)). No cookies, no tracking. The map background is a third-party request ([CARTO](../datenschutz.qmd#drittanbieter)).
 
 ## Data and licence
 
-Download everything from [Daten & Metadaten](../daten.qmd) (CSV, Parquet, GeoJSON, JSON-LD). The machine-readable catalogue is [katalog.jsonld](../export/meta/katalog.jsonld); a plain-text summary for software agents is [llms.txt](../llms.txt).
+Downloads: [Daten & Metadaten](../daten.qmd) (CSV, Parquet, GeoJSON, JSON-LD), catalogue [katalog.jsonld](../export/meta/katalog.jsonld), plain-text summary [llms.txt](../llms.txt).
 
-**Please cite:** Source: City of Zurich, Open Data / Federal Roads Office FEDRO (ASTRA), CC BY 4.0. Other sources (weather, population, geodata): City of Zurich, CC0. Code: MIT.
+Citation: City of Zurich, Open Data / Federal Roads Office FEDRO (ASTRA), CC BY 4.0. Weather, population, geodata: City of Zurich, CC0. Code: MIT. Details: [Lizenzen](../daten.qmd#lizenzen).
