@@ -157,7 +157,7 @@ chart(plot_md,
   headline = sprintf("Velo-Unfälle: %s (%d), %s (%d). Fussgänger und Motorrad bleiben ähnlich.",
                      fi(v11), yr_from, fi(v24), yr_to),
   alt = paste0("Liniendiagramm: Unfälle mit Velo, Fussgängern und Motorrädern pro Jahr, ", yr_span_bis, ". Velo steigt deutlich, die beiden anderen bleiben flach."),
-  caption = "Ein Unfall mit mehreren Gruppen zählt mehrfach. Velo-Zunahme: mehr Verkehr und Erfassung 2015; Kilometer unbekannt, kein Risiko ableitbar.",
+  caption = "Ein Unfall mit mehreren Gruppen zählt mehrfach. Velo-Zunahme: mehr Velo- und E-Bike-Verkehr, Erfassung 2015; Kilometer unbekannt, kein Risiko ableitbar.",
   tbl = html_table(md |> select(Jahr = jahr, Gruppe = modus, Unfälle = n), label = "Unfälle mit Beteiligung nach Gruppe und Jahr"),
   h = 3.6)
 ```

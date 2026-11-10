@@ -72,8 +72,8 @@ llms <- c(
           format(n_acc, big.mark = "'"), yrs[1], yrs[2], nrow(dq)),
   "",
   paste0(
-    "Hinweise: 2015 steigt die Zahl der erfassten Unfälle um +38 %, wegen geänderter Erfassung ",
-    "(DQ-U07, WARN). Das Schweremodell zeigt Zusammenhänge, kein Prognosewerkzeug. ",
+    "Hinweise: 2015 steigt die Zahl der erfassten Unfälle um 38 %, wegen geänderter Erfassung ",
+    "(DQ-U07, WARN). Das Schweremodell zeigt Zusammenhänge und ist kein Prognosewerkzeug. ",
     "Wetter-Effekte sind Verhältnisse (IRR) pro Stunde."
   ),
   "",

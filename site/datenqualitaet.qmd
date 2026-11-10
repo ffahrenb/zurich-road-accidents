@@ -62,7 +62,7 @@ cards <- lapply(seq_len(nrow(SRC)), function(i) {
 tags$div(class = "cards", role = "list", `aria-label` = "Prüfübersicht je Datenquelle", cards)
 ```
 
-Zahl in Klammern: Anzahl Prüfungen. Jede Zelle zeigt den schlechtesten Status. Nicht geprüfte Dimensionen fehlen.
+Zahl in Klammern: Anzahl Prüfungen; jede Zelle zeigt den schlechtesten Status.
 
 ## Alle Prüfungen
 
@@ -98,7 +98,7 @@ Als Datei: [dq_ergebnisse.csv](export/dq/dq_ergebnisse.csv).
 ::::
 :::::
 
-Die Schwere legt die Fachseite fest (ADR 0005). Im Zweifel WARN: Zu strenge STOP-Regeln blockieren Läufe bei harmlosen Quelländerungen. Toleranz, z. B. 1 %: Bis dahin gilt die Prüfung als bestanden, die Auffälligkeiten bleiben sichtbar. Läuft eine Prüfung nicht, gilt sie als nicht bestanden.
+Die Schwere legt die Fachseite fest (ADR 0005). Im Zweifel WARN: Zu strenge STOP-Regeln blockieren harmlose Läufe. Toleranz, z. B. 1 %: Bis dahin gilt die Prüfung als bestanden, die Auffälligkeiten bleiben sichtbar. Läuft eine Prüfung nicht, gilt sie als nicht bestanden.
 
 ## Erkennen, reparieren, prüfen
 
@@ -166,9 +166,8 @@ chart(plot_bruch,
 
 Die Prüfung DQ-U07 (WARN) meldet jede Jahresveränderung über ±25 %. Sie schlägt einmal an: 2015, +38 %.
 
-- Der Sprung betrifft fast nur Sachschaden-Unfälle (`r paste0("+", round(sach15), " %")`). Unfälle mit Verletzten: `r paste0("+", round(inj15), " %")`. Annahme: Die Erfassungspraxis hat sich geändert, es werden mehr Unfälle mit reinem Sachschaden aufgenommen. Ein echter Anstieg zeigte sich auch bei den Verletzten.
-- Das Niveau bleibt danach hoch.
-- Folge: Zeitvergleiche über 2015 mit Personenschaden-Unfällen. Die Quartier-Raten auf der Karte beginnen deshalb 2015 und zählen nur diese.
+- Der Sprung betrifft fast nur Sachschaden-Unfälle (`r paste0("+", round(sach15), " %")`). Unfälle mit Verletzten: `r paste0("+", round(inj15), " %")`. Annahme: Die Erfassungspraxis hat sich geändert, es werden mehr Unfälle mit reinem Sachschaden aufgenommen.
+- Folge: Zeitvergleiche über 2015 nur mit Unfällen mit Personenschaden. Die Quartier-Raten auf der Karte beginnen deshalb 2015 und zählen nur diese.
 
 Der Bruch liegt in der Quelle und wird nicht korrigiert. Das Gate lässt ihn als WARN durch.
 

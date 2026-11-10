@@ -27,13 +27,12 @@ Genaue Unfallzeitpunkte sind nicht öffentlich, Wetterwerte schon. Die Pipeline 
 - Zielgrösse: Unfälle pro Stunde in Abhängigkeit von Regen und Temperatur.
 - Herausgerechnet: Tageszeit (Werktag und Wochenende getrennt), Monat, Jahr.
 - Wetterdaten: Messstation Stampfenbachstrasse.
-- Dritte können die Rechnung nicht nachvollziehen, die Zeitpunkte bleiben bei der Stadt Zürich.
 
 IRR: Verhältnis der erwarteten Unfälle pro Stunde. IRR 1.12 bei Regen = 12 % mehr Unfälle pro Stunde als ohne Regen, sonst gleiche Bedingungen. IRR 1 = kein Unterschied. Liegt das 95-%-Intervall ganz auf einer Seite der 1, ist der Unterschied kaum Zufall.
 
 ## Pro Stunde, nicht pro Fahrt {#pro-stunde}
 
-Alle Werte zählen Unfälle pro Stunde. Die Verkehrsmenge ist unbekannt, daher gibt es kein Risiko pro Person oder Fahrt. Beispiel: Bei Regen sind weniger Menschen mit dem Velo unterwegs. Das Modell zeigt Zusammenhänge, keine Ursachen (siehe [Grenzen](schwere.qmd#grenzen)).
+Alle Werte zählen Unfälle pro Stunde. Die Verkehrsmenge ist unbekannt, daher gibt es kein Risiko pro Person oder Fahrt. Das Modell zeigt Zusammenhänge, keine Ursachen (siehe [Grenzen](schwere.qmd#grenzen)).
 
 ## Regen
 
@@ -141,7 +140,7 @@ chart(plot_kl,
 
 ## Monatswerte
 
-Quelle: öffentliche Monatswerte (mittlere Temperatur, Regenstunden, Station Stampfenbachstrasse). Keine privaten Zeitpunkte.
+Quelle: öffentliche Monatswerte (mittlere Temperatur, Regenstunden, Station Stampfenbachstrasse).
 
 Warme Stunden liegen häufiger am Tag und im Sommer. Darum zeigt das Modell oben das bereinigte Bild, die Rohwerte nicht.
 
@@ -202,5 +201,3 @@ chart(plot_ws,
   tbl = html_table(w |> transmute(Monat = mon, `Temperatur °C` = temperatur_c, `Unfälle mit Personenschaden` = mit_personenschaden, `Unfälle mit Velo` = mit_velo), digits = 1, tall = TRUE, label = "Monatswerte"),
   h = 3.8)
 ```
-
-Das Stundenmodell zeigt dieselben Zusammenhänge genauer: Es trennt Tageszeit und Jahreszeit, der Monatsvergleich nicht.

@@ -20,29 +20,29 @@ Alle Dateien liegen unter `export/`, neu erzeugt bei jedem Lauf nach bestandenem
 ```{r}
 D <- tibble::tribble(
   ~grp, ~path, ~what,
-  "Daten", "data/unfaelle.parquet", "Alle Unfälle, 19 Spalten (Jahr, Monat, Wochentag, Stunde, Schwere, Beteiligte, Quartier, Tempo, Koordinate). Parquet.",
-  "Daten", "data/jahr.csv", "Unfälle pro Jahr und Schwere, mit Velo/Fussgänger/Motorrad",
+  "Daten", "data/unfaelle.parquet", "Alle Unfälle, 19 Spalten. Parquet.",
+  "Daten", "data/jahr.csv", "Unfälle pro Jahr und Schwere",
   "Daten", "data/zeitmuster.csv", "Unfälle nach Wochentag und Stunde",
   "Daten", "data/quartier.csv", "Unfälle, Einwohner und Raten je Quartier und Jahr",
   "Daten", "data/tempo.csv", "Unfälle nach signalisierter Geschwindigkeit",
   "Daten", "data/wetter_monat.csv", "Monatswerte: Unfälle, Temperatur, Regenstunden",
-  "Daten", "data/unfaelle_punkte.geojson", "Kartenpunkte (Jahr, Schwere, Beteiligte), GeoJSON",
+  "Daten", "data/unfaelle_punkte.geojson", "Kartenpunkte, GeoJSON",
   "Daten", "data/quartiere.geojson", "Quartier-Polygone mit Rate, GeoJSON",
-  "Modelle", "modell/schwere_vergleich.csv", "Acht Schweremodelle, Kennzahlen mit 95-%-Intervall (zeitlicher Test, Zufallssplit, Teilgruppen)",
+  "Modelle", "modell/schwere_vergleich.csv", "Acht Schweremodelle, Kennzahlen mit 95-%-Intervall",
   "Modelle", "modell/schwere_differenzen.csv", "Unterschiede zu den Referenzmodellen mit gepaartem 95-%-Intervall",
-  "Modelle", "modell/schwere_tuning.csv", "Hyperparameter: alle Kandidaten mit Validierungs-Brier-Score",
+  "Modelle", "modell/schwere_tuning.csv", "Hyperparameter: Kandidaten mit Validierungs-Brier-Score",
   "Modelle", "modell/schwere_kalibrierung.csv", "Kalibrierung aller Modelle (Zehnerbereiche)",
   "Modelle", "modell/schwere_wichtigkeit.csv", "Permutationswichtigkeit aller Modelle mit Intervall",
-  "Modelle", "modell/schwere_effekte.csv", "Effektverläufe (Partial Dependence) aller Modelle",
+  "Modelle", "modell/schwere_effekte.csv", "Effektverläufe (Partial Dependence)",
   "Modelle", "modell/schwere_odds_ratios.csv", "Chancenverhältnisse der logistischen Regression",
-  "Modelle", "modell/schwere_lauf.json", "Laufprotokoll: Zeiträume, Laufzeit, Kandidaten, Abstriche am Budget",
+  "Modelle", "modell/schwere_lauf.json", "Laufprotokoll: Zeiträume, Laufzeit, Kandidaten",
   "Wetter (Modellergebnisse)", "trackx/wetter_effekt.csv", "Regen- und Temperatur-Effekte (IRR) mit Intervallen",
   "Wetter (Modellergebnisse)", "trackx/wetter_klassen.csv", "Unfälle pro Stunde nach Regen × Temperatur-Klasse",
   "Wetter (Modellergebnisse)", "trackx/wetter_modell.json", "Modellbeschreibung",
   "Qualität", "dq/dq_ergebnisse.csv", "Alle Prüfungen des letzten Laufs",
   "Qualität", "dq/dq_verlauf.csv", "Verlauf der Prüfergebnisse je Lauf",
   "Qualität", "dq/snapshot_history.csv", "Unfälle je Jahr pro Snapshot (Stabilitätsprüfung)",
-  "Qualität", "dq/jahresbereich.csv", "Veröffentlichter Jahresbereich je Snapshot (Prüfung DQ-S04: nie kleiner als zuvor)",
+  "Qualität", "dq/jahresbereich.csv", "Jahresbereich je Snapshot (Prüfung DQ-S04: nie kleiner als zuvor)",
   "Qualität", "dq/manifest.csv", "Quelldateien mit SHA-256-Prüfsumme",
   "Qualität", "dq/vertrag_unfaelle.html", "Datenvertrag Unfälle (pointblank-Bericht)",
   "Qualität", "dq/vertrag_meteo.html", "Datenvertrag Meteo (pointblank-Bericht)",
@@ -58,13 +58,9 @@ tagList(lapply(unique(D$grp), function(g) {
 }))
 ```
 
-Spalten, Einheiten, Codes: [Datenwörterbuch](#datenwörterbuch). Prüfsummen der Quelldateien: [Manifest](#manifest).
-
 ## Metadaten: DCAT-AP CH
 
 Der Datenkatalog [katalog.jsonld](export/meta/katalog.jsonld) beschreibt die `r length(dss)` Datensätze nach DCAT-AP CH (JSON-LD), vorbereitet für [I14Y](https://www.i14y.admin.ch/) und [opendata.swiss](https://opendata.swiss/). Eingereicht ist er nicht.
-
-Je Datensatz: Titel, Beschreibung (de, en), Herausgeber, Kontakt, Thema, Abdeckung, Aktualisierungsrhythmus, Herkunft (`prov:wasDerivedFrom`), Lizenz, Downloads.
 
 ```{r}
 cat_tbl <- do.call(rbind, lapply(dss, function(d) {
@@ -111,7 +107,7 @@ html_table(dic |> transmute(Datensatz = datensatz, Spalte = spalte, Beschreibung
 
 ## Manifest: Quelldateien mit Prüfsumme {#manifest}
 
-Jede Quelldatei wird mit SHA-256 festgehalten. Weicht die Prüfsumme einer neu geladenen Datei ab, hat sich die Quelle geändert.
+Weicht die SHA-256-Prüfsumme einer neu geladenen Datei ab, hat sich die Quelle geändert.
 
 ```{r}
 mf <- man |> mutate(Grösse = ifelse(bytes >= 1e6, paste0(fdec(bytes / 1e6, 1), " MB"), paste0(fdec(bytes / 1e3, 0), " kB")),

@@ -38,7 +38,7 @@ tiles(
 )
 ```
 
-Stadt Zürich und ASTRA veröffentlichen jedes Jahr die Strassenverkehrsunfälle auf Stadtgebiet. Das Projekt macht daraus eine geprüfte Auswertung: Zahlen, Karte und Modelle entstehen erst, wenn alle Qualitätsregeln bestanden sind. Grenzen der Daten stehen neben der Grafik. Beispiel: 2015 steigt die Zahl der erfassten Unfälle um +`r y15` %, weil sich die Erfassung geändert hat (siehe [Strukturbruch 2015](datenqualitaet.qmd#der-strukturbruch-2015)).
+Die Stadt Zürich und das ASTRA veröffentlichen jedes Jahr die Strassenverkehrsunfälle auf Stadtgebiet. Das Projekt macht daraus eine geprüfte Auswertung: Zahlen, Karte und Modelle entstehen erst, wenn alle Qualitätsregeln bestanden sind. Grenzen der Daten stehen neben der Grafik. Beispiel: 2015 steigt die Zahl der erfassten Unfälle um +`r y15` %, weil sich die Erfassung geändert hat (siehe [Strukturbruch 2015](datenqualitaet.qmd#der-strukturbruch-2015)).
 
 Stand der Daten: `r snap`.
 
@@ -61,7 +61,7 @@ Verlässlichkeit prüfen
 find <- function(title, text, href, link) tags$li(tags$strong(title), text, " ", tags$a(href = href, link))
 tags$ul(class = "findings",
   find(if (n_warn == 1) "Alle Prüfungen bestanden, eine Warnung." else sprintf("Alle Prüfungen bestanden, %d Warnungen.", n_warn),
-       sprintf("%d Prüfungen, alle %d mit STOP-Wirkung bestanden. Warnung: Strukturbruch 2015 (+%d %% Unfälle, aber nur +%d %% mit Verletzten).", n_chk, n_stop, y15, i15),
+       sprintf("%d Prüfungen, alle %d mit STOP-Wirkung bestanden. %s der Strukturbruch 2015 (+%d %% Unfälle, aber nur +%d %% mit Verletzten).", n_chk, n_stop, if (n_warn == 1) "Die Warnung ist" else "Eine davon ist", y15, i15),
        "datenqualitaet.html", "Datenqualität"),
   find("Unfälle häufen sich zu Pendlerzeiten.",
        sprintf("Werktags um %d und %d Uhr. Nachts weniger Unfälle, aber ein grösserer Anteil mit Verletzten.", h_m, h_a),

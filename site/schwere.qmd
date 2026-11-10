@@ -199,12 +199,12 @@ r_zeit <- V("Random Forest", "brier_skill"); r_zuf <- V("Random Forest", "brier_
 chart(sub_plot("zufaellig", c("vor_2015", "ab_2015"), 1:2),
   headline = sprintf("Zufallssplit: Brier-Skill bis 2014 und ab 2015 praktisch gleich (Random Forest %s %% bzw. %s %%). Intervalle überlappen, kein formaler Test.", pp(r_vor), pp(r_ab)),
   alt = "Punktdiagramm, Zufallssplit: Brier-Skill von vier Modellen bis 2014 und ab 2015. Beide Gruppen liegen bei jedem Modell nahe beieinander, die Intervalle bis 2014 sind breiter.",
-  caption = sprintf("Nur Zufallssplit. Bis 2014: %s Unfälle, ab 2015: %s; daher breitere Intervalle.",
-                    fi(unique(rg_all$n[rg_all$auswertung == "vor_2015"])), fi(unique(rg_all$n[rg_all$auswertung == "ab_2015"]))),
+  caption = sprintf("Nur Zufallssplit. Bis 2014: %s Unfälle, ab 2015: %s; daher breitere Intervalle. Alle Unfälle: %s %% zufällig, %s %% zeitlich.",
+                    fi(unique(rg_all$n[rg_all$auswertung == "vor_2015"])), fi(unique(rg_all$n[rg_all$auswertung == "ab_2015"])), pp(r_zuf), pp(r_zeit)),
   tbl = sub_tab("zufaellig", c("alle", "ohne_parkier_tier", "vor_2015", "ab_2015")), w = 5.6, h = 4.2)
 ```
 
-Random Forest, alle Unfälle: `r pp(r_zuf)` % zufällig, `r pp(r_zeit)` % zeitlich. Die Differenz mischt echte Veränderung über die Zeit mit einer anderen Testmenge; beides lässt sich nicht trennen. Der zeitliche Test bleibt deshalb die Hauptauswertung, der Zufallssplit die Kontrolle.
+Random Forest, zufällig gegen zeitlich: Die Differenz mischt echte Veränderung über die Zeit mit einer anderen Testmenge; beides lässt sich nicht trennen. Der zeitliche Test bleibt deshalb die Hauptauswertung, der Zufallssplit die Kontrolle.
 
 ## Kalibrierung
 

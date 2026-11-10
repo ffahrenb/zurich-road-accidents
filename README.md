@@ -82,7 +82,7 @@ Targets: `make lint`, `make test`, `make run`, `make site`, `make hooks` (Pre-Co
 
 ## English summary
 
-Open data to insight for road accidents in the City of Zurich: Open Data Zurich API → DuckDB/SQL → automated data-quality checks with STOP gate → models → website with DCAT-AP CH metadata. Nothing is published while a STOP check fails.
+Road accident data of the City of Zurich, from open data to insight: Open Data Zurich API → DuckDB/SQL → automated data-quality checks with STOP gate → models → website with DCAT-AP CH metadata. Nothing is published while a STOP check fails.
 
 - Reproducible: pinned container image, dated snapshots with SHA-256, `targets` DAG. Run `make all`.
 - Data quality: data contracts, SQL checks, snapshot comparison.

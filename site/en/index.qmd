@@ -32,7 +32,7 @@ tiles(
 )
 ```
 
-Open road-accident data of the City of Zurich and the Federal Roads Office (FEDRO/ASTRA), quality-checked. An R and SQL (DuckDB) pipeline downloads the sources and runs automated checks. Models, exports and this site are built only if no blocking (STOP) check fails. Limits of the data are stated next to each chart. The pages are in German; data files and the catalogue are bilingual.
+Open road-accident data of the City of Zurich and the Federal Roads Office (FEDRO/ASTRA), quality-checked. An R and SQL (DuckDB) pipeline downloads the sources and runs automated checks. Models, exports and this site are built only if no blocking (STOP) check fails. The pages are in German; data files and the catalogue are bilingual.
 
 ## Findings
 
@@ -41,8 +41,8 @@ Open road-accident data of the City of Zurich and the Federal Roads Office (FEDR
 - Repairs: a check finds the error (9 invalid geometries, 40 impossible weather readings), a documented staging step repairs it (`ST_MakeValid`; impossible values set to NULL), a second STOP check confirms the repair.
 - Time: weekday peaks at the morning and late-afternoon commute. After midnight fewer accidents, but a larger share with injuries. [Wann](../wann.qmd)
 - Weather: rain brings +`r round(100 * (ra$irr - 1))` % accidents per hour (95 % CI +`r round(100 * (ra$ci_low - 1))` % to +`r round(100 * (ra$ci_high - 1))` %), +`r round(100 * (ri$irr - 1))` % for accidents with injuries, at the same time of day, season and temperature (negative-binomial model, incident rate ratios). Bicycle accidents: no rain effect (IRR `r fdec(rv$irr, 2)`, CI includes 1). Warmth goes with more bicycle accidents. Per hour, not per trip: [Pro Stunde](../wetter.qmd#pro-stunde).
-- Severity: eight models, tested on the last three years (temporal split, tuned on earlier years only). The rule "bicycle, motorcycle or pedestrian involved?" reaches a Brier skill of `r fdec(100 * mv("Regel (verletzliche Gruppen)", "brier_skill"), 0)` % (0 % = base rate). Tuned trees reach `r fdec(100 * mv("Random Forest", "brier_skill"), 0)` % (random forest) and `r fdec(100 * mv("XGBoost", "brier_skill"), 0)` % (XGBoost), a gap above test-set noise. Elastic net and GAM add nothing over logistic regression (ROC-AUC `r fdec(mv("Random Forest", "roc_auc"), 2)` random forest, `r fdec(mv("LR voll", "roc_auc"), 2)` logistic regression). Association, no causation, no forecasting tool: [Grenzen](../schwere.qmd#grenzen).
-- Place: per resident, small inner-city quarters (Hochschulen, City, Lindenhof) rank highest: few residents, many passers-through. Rates start in 2015. [Wo](../wo.qmd), [Karte](../karte.qmd)
+- Severity: eight models, tested on the last three years (temporal split, tuned on earlier years only). The rule "bicycle, motorcycle or pedestrian involved?" reaches a Brier skill of `r fdec(100 * mv("Regel (verletzliche Gruppen)", "brier_skill"), 0)` % (0 % = base rate). Tuned trees reach `r fdec(100 * mv("Random Forest", "brier_skill"), 0)` % (random forest) and `r fdec(100 * mv("XGBoost", "brier_skill"), 0)` % (XGBoost). Elastic net and GAM add nothing over logistic regression (ROC-AUC `r fdec(mv("Random Forest", "roc_auc"), 2)` random forest, `r fdec(mv("LR voll", "roc_auc"), 2)` logistic regression). Association, no causation, no forecasting tool: [Grenzen](../schwere.qmd#grenzen).
+- Place: per resident, small inner-city quarters (Hochschulen, City, Lindenhof) rank highest. Rates start in 2015. [Wo](../wo.qmd), [Karte](../karte.qmd)
 :::
 
 ## Method
@@ -50,7 +50,7 @@ Open road-accident data of the City of Zurich and the Federal Roads Office (FEDR
 - Layers: raw (untouched copy), staging (typed, documented cleaning), mart (enriched, aggregated). Only marts are exported.
 - Quality gate: data contracts (pointblank), SQL checks, history checks against the previous snapshot. Each is STOP or WARN. The checks are tested with deliberately broken test data ([all checks](../datenqualitaet.qmd#alle-prüfungen)).
 - Reproducibility: container image pinned by digest, R packages from a dated snapshot (2025-10-30), `{targets}`, dated data snapshots with SHA-256 manifest, SHA-pinned GitHub Actions. [Pipeline & Methode](../pipeline.qmd)
-- Metadata: DCAT-AP CH catalogue (JSON-LD) prepared for I14Y / opendata.swiss, not submitted. Bilingual data dictionary. [Daten & Metadaten](../daten.qmd)
+- Metadata: DCAT-AP CH catalogue (JSON-LD) prepared for I14Y / opendata.swiss, not submitted. [Daten & Metadaten](../daten.qmd)
 - Privacy: only year, month, weekday and hour are published. A non-public file with exact timestamps stays inside the pipeline; only model coefficients and classes with at least 10 cases leave it ([layers](../datenschutz.qmd#schutzschichten)). No cookies, no tracking. The map background is a third-party request ([CARTO](../datenschutz.qmd#drittanbieter)).
 
 ## Data and licence

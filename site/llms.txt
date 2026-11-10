@@ -2,7 +2,7 @@
 
 > Offene Auswertung von 66'051 Strassenverkehrsunfällen der Stadt Zürich (2011–2024). R+SQL-Pipeline (DuckDB), 37 automatische Datenqualitäts-Prüfungen mit STOP-Gate, Modelle, offene Exporte. Daten: Stadt Zürich Open Data / ASTRA, CC BY 4.0. Code: MIT.
 
-Hinweise: 2015 steigt die Zahl der erfassten Unfälle um +38 %, wegen geänderter Erfassung (DQ-U07, WARN). Das Schweremodell zeigt Zusammenhänge, kein Prognosewerkzeug. Wetter-Effekte sind Verhältnisse (IRR) pro Stunde.
+Hinweise: 2015 steigt die Zahl der erfassten Unfälle um 38 %, wegen geänderter Erfassung (DQ-U07, WARN). Das Schweremodell zeigt Zusammenhänge und ist kein Prognosewerkzeug. Wetter-Effekte sind Verhältnisse (IRR) pro Stunde.
 
 ## Seiten
 

@@ -9,7 +9,7 @@ source("_helpers.R")
 REPO <- "https://github.com/ffahrenb/zurich-road-accidents"
 ```
 
-R steuert und prüft, die Fachlogik steht als SQL in DuckDB. Ein Befehl baut alles von den Rohdaten bis zur Website.
+R steuert und prüft, die Fachlogik steht als SQL in DuckDB. Ein Befehl baut alles von den Rohdaten bis zur Website. Code: [Repository](`r REPO`).
 
 ## Datenfluss
 
@@ -45,7 +45,7 @@ flowchart LR
 - `staging`: Typen, deutsche Spaltennamen, Geometrie in LV95, dokumentierte Bereinigung.
 - `mart`: Anreicherung (Quartier, Schulnähe, Tempo, Wetter), Aggregate. Nur Marts werden exportiert.
 
-Jeder Fehler lässt sich einer Schicht zuordnen. [ADR 0003](`r REPO`/blob/main/docs/adr/0003-schichten-raw-staging-mart.md).
+Fehler lassen sich einer Schicht zuordnen. [ADR 0003](`r REPO`/blob/main/docs/adr/0003-schichten-raw-staging-mart.md).
 
 ## Reproduzierbarkeit
 
@@ -53,6 +53,7 @@ Jeder Fehler lässt sich einer Schicht zuordnen. [ADR 0003](`r REPO`/blob/main/d
 |---|---|
 | Laufzeitumgebung | Container-Image `rocker/geospatial:4.5.1`, per Digest fixiert (`sha256:3c1eba86…`) |
 | R-Pakete | datierter Snapshot (Posit Package Manager, 30.10.2025) |
+| Datenbank-Erweiterungen | `spatial`, `icu`, beim Image-Bau installiert |
 | Orchestrierung | [`{targets}`](`r REPO`/blob/main/docs/adr/0002-targets.md): nur betroffene Schritte laufen neu |
 | Daten | datierter Snapshot mit [Manifest und Prüfsummen](daten.qmd#manifest); derselbe Tag, derselbe Snapshot |
 | Stille Quelländerungen | Historienprüfungen ([Datenqualität](datenqualitaet.qmd#verlauf-und-stabilität)) |
@@ -62,7 +63,7 @@ Ein Befehl: `make run`. Mit Prüfungen und Website: `make all`.
 
 ## Tests
 
-- Unit-Tests (testthat) für Prüf-Engine, SQL-Vorlagen und Datenschutz-Gate. Die Prüfungen laufen zusätzlich gegen absichtlich kaputte Testdaten ([Datenqualität](datenqualitaet.qmd#die-prüfungen-werden-selbst-getestet)).
+- Unit-Tests (testthat) für Prüf-Engine, SQL-Vorlagen und Datenschutz-Gate. Die Prüfungen laufen auch gegen absichtlich kaputte Testdaten ([Datenqualität](datenqualitaet.qmd#die-prüfungen-werden-selbst-getestet)).
 - Lint: `lintr` für R, `sqlfluff` (Version 3.4.2) für SQL.
 - CI (GitHub Actions): bei jedem Push, Pull Request und monatlich Lint, Tests, Pipeline, Datenschutz-Gate, Website-Bau. Veröffentlicht wird nur vom Hauptzweig. Der monatliche Lauf nimmt neue Datenjahre auf und schreibt `export/` ins Repository zurück.
 
@@ -73,13 +74,13 @@ Wichtige Entscheide als *Architecture Decision Records*.
 ```{r}
 A <- tibble::tribble(
   ~nr, ~file, ~titel, ~kurz,
-  "0001", "0001-duckdb.md", "DuckDB als Analyse-Datenbank", "Kein Server, SQL für die Fachlogik, räumliche Verknüpfungen, jederzeit neu baubar.",
-  "0002", "0002-targets.md", "{targets} als Orchestrierung", "Inkrementelle, reproduzierbare Läufe; das Qualitäts-Gate ist ein Knoten im Graph.",
-  "0003", "0003-schichten-raw-staging-mart.md", "Schichten raw, staging, mart", "Fehler dort finden, wo sie entstehen; nur geprüfte Marts werden exportiert.",
+  "0001", "0001-duckdb.md", "DuckDB als Analyse-Datenbank", "Kein Server, SQL für die Fachlogik, jederzeit neu baubar.",
+  "0002", "0002-targets.md", "{targets} als Orchestrierung", "Inkrementelle Läufe; das Qualitäts-Gate ist ein Knoten im Graph.",
+  "0003", "0003-schichten-raw-staging-mart.md", "Schichten raw, staging, mart", "Fehler dort finden, wo sie entstehen.",
   "0004", "0004-zwei-datenpfade-datenschutz.md", "Zwei Datenpfade und Datenschutz", "Öffentlicher Pfad in CI; privater Pfad nur lokal, veröffentlicht werden nur Modellergebnisse.",
   "0005", "0005-datenqualitaet-als-freigabe.md", "Datenqualität als Freigabe-Gate", "STOP bricht ab, WARN macht sichtbar; erkennen, reparieren, verifizieren.",
-  "0006", "0006-automatische-aktualisierung-und-persistenz.md", "Automatische Aktualisierung und Persistenz", "Jahresbereich aus den Quellen, nie rückwärts; der monatliche Lauf schreibt export/ ins Repository zurück.",
-  "0007", "0007-modellvergleich-protokoll.md", "Protokoll für den Modellvergleich", "Zeitlicher Test, vorab festes Referenzmodell, gepaarter Bootstrap, Abstriche am Budget im Laufprotokoll."
+  "0006", "0006-automatische-aktualisierung-und-persistenz.md", "Automatische Aktualisierung und Persistenz", "Jahresbereich aus den Quellen, nie rückwärts; export/ wird ins Repository zurückgeschrieben.",
+  "0007", "0007-modellvergleich-protokoll.md", "Protokoll für den Modellvergleich", "Zeitlicher Test, festes Referenzmodell, gepaarter Bootstrap."
 )
 tags$div(class = "dl", lapply(seq_len(nrow(A)), function(i)
   tags$a(href = paste0(REPO, "/blob/main/docs/adr/", A$file[i]), tags$strong(paste("ADR", A$nr[i], "·", A$titel[i])), tags$span(A$kurz[i]))))
@@ -87,6 +88,6 @@ tags$div(class = "dl", lapply(seq_len(nrow(A)), function(i)
 
 ## Grenzen der Methode
 
-- Wetter-Ergebnisse beruhen auf einer nicht öffentlichen Datei ([Datenschutz](datenschutz.qmd#schutzschichten)). Dritte können sie nicht nachrechnen; veröffentlicht sind Methode, Koeffizienten, grobe Klassen.
+- Wetter-Ergebnisse beruhen auf einer nicht öffentlichen Datei ([Datenschutz](datenschutz.qmd#schutzschichten)).
 - Das Schweremodell erklärt, es prognostiziert nicht ([Schwere](schwere.qmd#grenzen)).
 - Strukturbruch 2015: liegt in der Quelle, die Pipeline macht ihn sichtbar ([Datenqualität](datenqualitaet.qmd#der-strukturbruch-2015)).
