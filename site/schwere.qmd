@@ -188,7 +188,7 @@ Auf den schwierigeren Fällen sind die Werte tiefer. Rangfolge und Abstand der B
 
 ### Vor und nach 2015
 
-Nur im Zufallssplit auswertbar: Der zeitliche Test enthält nur Jahre ab 2022. Fünf Modelle.
+Nur im Zufallssplit auswertbar: Der zeitliche Test enthält nur Jahre ab 2022. Vier Modelle, ohne Basislinie.
 
 ```{r}
 #| label: c-regime
@@ -412,7 +412,7 @@ Kein Prognosewerkzeug: Einzelne Unfälle und deren Schwere lassen sich nicht vor
 
 - Nur Assoziation: Kein Modell sieht Verkehrsmenge, Strassenzustand oder Unfallhergang. Ursachen bleiben offen.
 - Meldepraxis: Ein Velo-Sturz ohne Verletzte wird vermutlich seltener erfasst als ein Blechschaden zwischen Autos. Der Verletztenanteil bei Velo-Unfällen steigt dadurch.
-- Tempo 50 ist nicht «gefährlicher» als Tempo 30: Die Chancenverhältnisse vergleichen verschiedene Strassen (siehe [Wo](wo.qmd)). Quartier und Uhrzeit haben im Modell fast keinen Einfluss. Ob sie keine Rolle spielen, bleibt offen.
+- Daraus folgt nicht, dass Tempo 50 gefährlicher ist als Tempo 30: Die Chancenverhältnisse vergleichen verschiedene Strassen (siehe [Wo](wo.qmd)). Quartier und Uhrzeit haben im Modell fast keinen Einfluss. Ob sie keine Rolle spielen, bleibt offen.
 - Die Frage «Was verhindert Verletzte?» braucht andere Daten und Methoden.
 - Intervalle sind Testrauschen: `r fi(lauf$bootstrap_n)` Neuziehungen statt üblicher 2 000 (Laufzeitbudget). Nicht erfasst: Neutraining und Abhängigkeit von Unfällen am selben Ort oder Tag. Die Intervalle sind eher zu schmal.
 - Kleiner Suchraum: `r lauf$kandidaten$random_forest` Kandidaten für Random Forest und XGBoost (üblich 20 oder mehr). Zufallssplit nur für `r length(lauf$modelle_zufallssplit)` der acht Modelle (ohne Elastic Net, GAM, XGBoost). Gesamtlauf `r fdec(lauf$laufzeit_sekunden$gesamt / 60, 0)` Minuten auf `r lauf$threads` Kernen. Ein grösserer Suchraum könnte die Bäume leicht verbessern.

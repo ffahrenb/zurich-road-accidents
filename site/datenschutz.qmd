@@ -23,7 +23,7 @@ Zusätzlich: eine nicht öffentliche Datei der Stadt Zürich mit exakten Unfallz
 Daher zwei Datenpfade:
 
 - Öffentlich: nur offene Quellen.
-- Privat: Datei nur lokal und lesend, nie im Repository, Image oder in der Pipeline. Veröffentlicht werden nur Modellergebnisse und Aggregate aus den exakten Zeitpunkten: Koeffizienten und grobe Klassen (Regen × Temperatur) mit mindestens 10 Fällen. Keine Einzeldaten, Datumsangaben oder Stundenreihen.
+- Privat: Datei nur lokal und lesend, nie im Repository, im Image oder in der automatischen Pipeline (CI). Veröffentlicht werden nur Modellergebnisse und Aggregate aus den exakten Zeitpunkten: Koeffizienten und grobe Klassen (Regen × Temperatur) mit mindestens 10 Fällen. Keine Einzeldaten, Datumsangaben oder Stundenreihen.
 
 ## Schutzschichten {#schutzschichten}
 
