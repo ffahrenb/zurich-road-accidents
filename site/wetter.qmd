@@ -1,6 +1,6 @@
 ---
 title: "Wetter und Unfälle"
-subtitle: "Was Regen und Temperatur mit der Zahl der Unfälle pro Stunde zu tun haben"
+subtitle: "Regen, Temperatur und Unfälle pro Stunde"
 ---
 
 ```{r}
@@ -16,18 +16,24 @@ pc <- function(irr) round(100 * (irr - 1))
 ```
 
 ::: {.note}
-**In einem Satz.** Bei Regen passieren pro Stunde rund **12 % mehr Unfälle** als bei trockenem Wetter, bei gleicher Tageszeit, Jahreszeit und Temperatur. Bei Velo-Unfällen ist kein Regeneffekt erkennbar. Wärme hängt vor allem mit mehr Velo-Unfällen zusammen.
+Regen: +12 % Unfälle pro Stunde, bei gleicher Tageszeit, Jahreszeit und Temperatur. Velo-Unfälle: kein Regeneffekt. Wärme: mehr Velo-Unfälle.
 :::
 
-## Wie wurde gerechnet?
+## Modell
 
-Die genauen Unfallzeitpunkte sind nicht öffentlich, die Wetterwerte sind es. Die Pipeline verbindet beides **nur intern** und veröffentlicht allein das **Ergebnis eines Modells**: Verhältniszahlen und grobe Klassen, keine einzelnen Stunden und keine Daten (siehe [Datenschutz](datenschutz.qmd)). Das Modell (`r mod$modell`) schätzt für `r fi(mod$n_stunden)` Stunden der Jahre `r mod$zeitraum`, wie viele Unfälle pro Stunde zu erwarten sind, abhängig von Regen und Temperatur; Tageszeit (getrennt für Werktag und Wochenende), Monat und Jahr sind herausgerechnet. Wetterdaten: Messstation Stampfenbachstrasse. Weil die Eingangsdatei mit den genauen Zeitpunkten nicht öffentlich ist, können Dritte diese Rechnung nicht nachrechnen; Methode und Ergebnisse sind dokumentiert, die Einzeldaten bleiben bei der Stadt Zürich.
+Genaue Unfallzeitpunkte sind nicht öffentlich, Wetterwerte schon. Die Pipeline verbindet beides nur intern und veröffentlicht nur Modellergebnisse: Verhältniszahlen und grobe Klassen ([Schutzschichten](datenschutz.qmd#schutzschichten)).
 
-**Was ist ein «IRR»?** Das Verhältnis der erwarteten Unfälle pro Stunde. Ein IRR von 1.12 bei Regen heisst: *bei Regen sind es 12 % mehr Unfälle pro Stunde als ohne Regen*, sonst gleiche Bedingungen. Ein IRR von 1 heisst: kein Unterschied. Der Balken um den Punkt ist das **95-%-Intervall**: Liegt er ganz auf einer Seite der 1, ist der Unterschied kaum Zufall.
+- Modell: `r mod$modell`, `r fi(mod$n_stunden)` Stunden, `r mod$zeitraum`.
+- Zielgrösse: Unfälle pro Stunde in Abhängigkeit von Regen und Temperatur.
+- Herausgerechnet: Tageszeit (Werktag und Wochenende getrennt), Monat, Jahr.
+- Wetterdaten: Messstation Stampfenbachstrasse.
+- Dritte können die Rechnung nicht nachvollziehen, die Zeitpunkte bleiben bei der Stadt Zürich.
 
-::: {.note .warn}
-**Zwei Grenzen.** (1) «Pro Stunde» ist nicht «pro Fahrt»: Bei Regen sind weniger Menschen mit dem Velo unterwegs. Wir kennen die Verkehrsmenge nicht und können daher kein Risiko pro Person berechnen. (2) Das Modell zeigt Zusammenhänge, keine Ursachen.
-:::
+IRR: Verhältnis der erwarteten Unfälle pro Stunde. IRR 1.12 bei Regen = 12 % mehr Unfälle pro Stunde als ohne Regen, sonst gleiche Bedingungen. IRR 1 = kein Unterschied. Liegt das 95-%-Intervall ganz auf einer Seite der 1, ist der Unterschied kaum Zufall.
+
+## Pro Stunde, nicht pro Fahrt {#pro-stunde}
+
+Alle Werte zählen Unfälle pro Stunde. Die Verkehrsmenge ist unbekannt, daher gibt es kein Risiko pro Person oder Fahrt. Beispiel: Bei Regen sind weniger Menschen mit dem Velo unterwegs. Das Modell zeigt Zusammenhänge, keine Ursachen (siehe [Grenzen](schwere.qmd#grenzen)).
 
 ## Regen
 
@@ -58,14 +64,14 @@ plot_rain <- function(v) {
     theme_zh(v)
 }
 chart(plot_rain,
-  headline = sprintf("Bei Regen: %s %% Unfälle pro Stunde (alle), %s %% bei Verletzten, bei Velo-Unfällen kein erkennbarer Effekt.", paste0("+", pc(r_all$irr)), paste0("+", pc(r_inj$irr))),
-  alt = sprintf("Forest-Plot der Regen-Effekte als Faktor mit 95-Prozent-Intervall auf logarithmischer Skala. Alle Unfälle %s, Unfälle mit Personenschaden %s, Unfälle mit Velo %s; nur der letzte Wert schliesst die 1 ein.", fdec(r_all$irr, 2), fdec(r_inj$irr, 2), fdec(r_velo$irr, 2)),
-  caption = sprintf("IRR (Verhältnis der erwarteten Unfälle pro Stunde) bei Regen im Vergleich zu keinem Regen, Modell für %s–%s. Gefüllter Punkt: statistisch deutlich; offener Punkt: mit den Daten nicht von «kein Effekt» zu unterscheiden.", substr(mod$zeitraum, 1, 4), substr(mod$zeitraum, 6, 9)),
+  headline = sprintf("Regen: %s %% Unfälle pro Stunde, %s %% bei Verletzten, bei Velo-Unfällen kein Effekt.", paste0("+", pc(r_all$irr)), paste0("+", pc(r_inj$irr))),
+  alt = sprintf("Forest-Plot der Regen-Effekte (IRR, 95-%%-Intervall, logarithmische Skala). Alle Unfälle %s, mit Personenschaden %s, mit Velo %s. Nur der Velo-Wert schliesst die 1 ein.", fdec(r_all$irr, 2), fdec(r_inj$irr, 2), fdec(r_velo$irr, 2)),
+  caption = sprintf("IRR bei Regen gegenüber trocken, Modell %s–%s. Gefüllt: statistisch deutlich. Offen: von «kein Effekt» nicht unterscheidbar.", substr(mod$zeitraum, 1, 4), substr(mod$zeitraum, 6, 9)),
   tbl = html_table(rain |> transmute(Ergebnis = zielgroesse, IRR = irr, `Intervall von` = ci_low, `Intervall bis` = ci_high, `p-Wert` = p_value, Stunden = n_stunden), digits = 3, label = "Regen-Effekte"),
   h = 3.3, inv = "opacity:.6;")
 ```
 
-Bei Unfällen mit Verletzten ist der Regeneffekt mit `r paste0("+", pc(r_inj$irr), " %")` etwas grösser als bei allen Unfällen (`r paste0("+", pc(r_all$irr), " %")`). Bei Velo-Unfällen (`r fdec(r_velo$irr, 2)`) zeigt sich keiner: Das passt dazu, dass bei Regen weniger Velo gefahren wird, der Mechanismus ist aber nicht gemessen.
+Unfälle mit Verletzten: `r paste0("+", pc(r_inj$irr), " %")`, alle Unfälle: `r paste0("+", pc(r_all$irr), " %")`. Velo-Unfälle (IRR `r fdec(r_velo$irr, 2)`): kein Effekt. Das passt zu weniger Velofahrten bei Regen; gemessen ist der Mechanismus nicht.
 
 ## Temperatur
 
@@ -95,16 +101,16 @@ plot_temp <- function(v) {
     theme_zh(v)
 }
 chart(plot_temp,
-  headline = sprintf("Je wärmer, desto mehr Unfälle pro Stunde – bei Velos am stärksten: ab 25 °C %s×, unter 0 °C nur %s× so viele wie bei 10–15 °C.", fdec(hot_velo, 1), fdec(cold_velo, 1)),
-  alt = "Forest-Plot der Temperatureffekte für drei Ergebnisgrössen auf logarithmischer Skala, Referenz 10 bis 15 Grad. Unter 10 Grad liegen alle Werte unter 1, ab 15 Grad darüber. Die Velo-Werte sind am extremsten.",
-  caption = "IRR je Temperaturklasse gegenüber der Referenzklasse 10–15 °C (nicht abgebildet), gleiche Modellannahmen wie oben. Jede Farbe ist eine Ergebnisgrösse; Balken = 95-%-Intervall.",
+  headline = sprintf("Je wärmer, desto mehr Unfälle pro Stunde, bei Velos am stärksten: ab 25 °C %s×, unter 0 °C %s× gegenüber 10–15 °C.", fdec(hot_velo, 1), fdec(cold_velo, 1)),
+  alt = "Forest-Plot der Temperatureffekte für drei Ergebnisgrössen, logarithmische Skala, Referenz 10 bis 15 Grad. Unter 10 Grad alle Werte unter 1, ab 15 Grad darüber. Velo am stärksten.",
+  caption = "IRR je Temperaturklasse gegenüber 10–15 °C (nicht abgebildet), Modell wie oben. Balken: 95-%-Intervall.",
   tbl = html_table(temp |> arrange(zielgroesse, desc(bin)) |> transmute(Ergebnis = zielgroesse, `Temperatur °C` = as.character(bin), IRR = irr, `Intervall von` = ci_low, `Intervall bis` = ci_high, `p-Wert` = p_value), digits = 3, label = "Temperatur-Effekte"),
   h = 5.2, inv = "opacity:.5;")
 ```
 
-Wärme bedeutet mehr Menschen draussen und auf dem Velo. Vermutlich steigen deshalb die Unfälle mit der Temperatur; das Modell misst nicht, wie viel davon an der Verkehrsmenge liegt.
+Annahme: Bei Wärme sind mehr Menschen draussen und auf dem Velo. Wie viel der Anstieg an der Verkehrsmenge liegt, misst das Modell nicht.
 
-## Rohwerte: Temperatur × Regen
+## Rohwerte
 
 ```{r}
 #| include: false
@@ -126,16 +132,18 @@ plot_kl <- function(v) {
     theme_zh(v) + theme(panel.grid.major.x = element_blank())
 }
 chart(plot_kl,
-  headline = sprintf("Roh gerechnet steigen die Unfälle pro Stunde mit der Temperatur von %s (trocken, unter 0 °C) auf %s (trocken, ab 25 °C).", fdec(d_cold, 2), fdec(d_hot, 2)),
-  alt = "Gruppierte Balken: Unfälle pro Stunde nach Temperaturklasse, getrennt nach trocken und Regen. Die Balken wachsen mit der Temperatur von etwa 0.3 auf etwa 0.9.",
-  caption = "Unfälle pro Stunde in der jeweiligen Klasse (Regen × Temperatur), 2011–2021. Nicht um Tageszeit und Jahreszeit bereinigt: Warme Stunden liegen häufiger am Tag und im Sommer, wenn ohnehin mehr los ist. Das bereinigte Bild liefert das Modell oben. Klassen mit weniger als 10 Stunden oder 10 Unfällen werden nicht veröffentlicht.",
+  headline = sprintf("Roh: %s Unfälle pro Stunde trocken unter 0 °C, %s trocken ab 25 °C.", fdec(d_cold, 2), fdec(d_hot, 2)),
+  alt = "Gruppierte Balken: Unfälle pro Stunde nach Temperaturklasse, trocken und Regen getrennt. Die Balken wachsen mit der Temperatur von etwa 0.3 auf 0.9.",
+  caption = "Unfälle pro Stunde je Klasse, 2011–2021, nicht um Tages- und Jahreszeit bereinigt. Klassen mit weniger als 10 Stunden oder 10 Unfällen entfallen.",
   tbl = html_table(kl2 |> transmute(`Temperatur °C` = as.character(temp), Wetter = as.character(regen), Stunden = stunden, Unfälle = unfaelle, `Unfälle pro Stunde` = unfaelle_pro_stunde), digits = 3, label = "Unfälle pro Stunde nach Wetterklasse"),
   h = 3.6)
 ```
 
-## Monatswerte der öffentlichen Wetterdaten
+## Monatswerte
 
-Die folgenden zwei Grafiken benutzen nur öffentliche Monatswerte (mittlere Temperatur und Regenstunden pro Monat, Station Stampfenbachstrasse) und keine privaten Zeitpunkte.
+Quelle: öffentliche Monatswerte (mittlere Temperatur, Regenstunden, Station Stampfenbachstrasse). Keine privaten Zeitpunkte.
+
+Warme Stunden liegen häufiger am Tag und im Sommer. Darum zeigt das Modell oben das bereinigte Bild, die Rohwerte nicht.
 
 ```{r}
 #| include: false
@@ -159,9 +167,9 @@ plot_wz <- function(v) {
     labs(x = NULL, y = NULL) + theme_zh(v) + theme(legend.position = "none")
 }
 chart(plot_wz,
-  headline = "Temperatur und Unfälle mit Verletzten schwingen im Jahresrhythmus mit, die Unfälle etwas flacher.",
-  alt = paste0("Zwei übereinander stehende Liniendiagramme mit eigener Skala: oben die mittlere Monatstemperatur ", yr_span_bis, " mit klarem Sommer-Winter-Muster, unten die monatlichen Unfälle mit Personenschaden mit schwächerem Muster."),
-  caption = "Oben die mittlere Monatstemperatur, unten die Unfälle mit Personenschaden pro Monat. Zwei getrennte Felder statt einer Grafik mit zwei Skalen, damit nichts durch die Wahl der Achsen suggeriert wird.",
+  headline = "Temperatur und Unfälle mit Verletzten folgen dem Jahresrhythmus, die Unfälle flacher.",
+  alt = paste0("Zwei Liniendiagramme mit eigener Skala, ", yr_span_bis, ": oben mittlere Monatstemperatur mit klarem Sommer-Winter-Muster, unten Unfälle mit Personenschaden pro Monat, schwächer ausgeprägt."),
+  caption = "Oben mittlere Monatstemperatur, unten Unfälle mit Personenschaden pro Monat. Getrennte Skalen.",
   tbl = html_table(w |> transmute(Jahr = jahr, Monat = monat, `Temperatur °C` = temperatur_c, Regenstunden = regenstunden, `Unfälle mit Personenschaden` = mit_personenschaden, `Unfälle mit Velo` = mit_velo), digits = 1, tall = TRUE, label = "Monatswerte"),
   h = 4.2)
 ```
@@ -189,10 +197,10 @@ plot_ws <- function(v) {
 }
 chart(plot_ws,
   headline = sprintf("Pro 10 °C wärmer: rund %s Velo-Unfälle und %s Unfälle mit Personenschaden mehr pro Monat.", round(10 * fit_v), round(10 * fit_i)),
-  alt = "Streudiagramm: Monatstemperatur gegen Unfälle pro Monat, für Unfälle mit Personenschaden und für Velo-Unfälle, mit Trendgerade. Beide Punktwolken steigen mit der Temperatur, die Velo-Wolke steiler im Verhältnis.",
-  caption = sprintf("Jeder Punkt ist ein Monat %s (n = %d). Gerade: lineare Anpassung. Korrelation Temperatur und Unfälle mit Personenschaden: r = %s. Reine Monatswerte, nicht um die Erfassungsänderung 2015 bereinigt; für Unfälle mit Personenschaden ist sie klein.", yr_span, nrow(wm), fdec(cor_inj, 2)),
+  alt = "Streudiagramm: Monatstemperatur gegen Unfälle pro Monat, für Personenschaden und Velo, mit Trendgerade. Beide steigen mit der Temperatur, Velo im Verhältnis steiler.",
+  caption = sprintf("Ein Punkt = ein Monat %s (n = %d). Gerade: lineare Anpassung. Korrelation Personenschaden: r = %s. Nicht um 2015 bereinigt.", yr_span, nrow(wm), fdec(cor_inj, 2)),
   tbl = html_table(w |> transmute(Monat = mon, `Temperatur °C` = temperatur_c, `Unfälle mit Personenschaden` = mit_personenschaden, `Unfälle mit Velo` = mit_velo), digits = 1, tall = TRUE, label = "Monatswerte"),
   h = 3.8)
 ```
 
-Dieselben Zusammenhänge, die das Stundenmodell zeigt, sind auch auf Monatsebene sichtbar. Der Monatsvergleich ist grob; das Modell oben ist genauer, weil es Tageszeit und Jahreszeit auseinanderhält.
+Das Stundenmodell zeigt dieselben Zusammenhänge genauer: Es trennt Tageszeit und Jahreszeit, der Monatsvergleich nicht.

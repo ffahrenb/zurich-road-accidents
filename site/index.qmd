@@ -1,6 +1,6 @@
 ---
 title: "Strassenverkehrsunfälle in Zürich {{< var yr_span >}}"
-subtitle: "Offene Daten, automatisch geprüft. Eine Auswertung, die zeigt, wie viel Sorgfalt hinter einer Zahl steckt."
+subtitle: "Offene Daten, automatisch geprüft"
 pagetitle: "Unfälle Zürich – Übersicht"
 toc: false
 include-in-header: _dataset-jsonld.html
@@ -31,60 +31,60 @@ i15 <- round(100 * (tj$i[tj$jahr == 2015] / tj$i[tj$jahr == 2014] - 1))
 
 ```{r}
 tiles(
-  tile(fi(tot), sprintf("Unfälle %d–%d", yrs[1], yrs[2]), "Strassenverkehrsunfälle auf Stadtgebiet, mit Sach- oder Personenschaden"),
+  tile(fi(tot), sprintf("Unfälle %d–%d", yrs[1], yrs[2]), "auf Stadtgebiet, mit Sach- oder Personenschaden"),
   tile(fi(inj), "mit Verletzten oder Toten", sprintf("%s %% aller Unfälle", fdec(100 * inj / tot, 1))),
   tile(fi(fatal), "Unfälle mit Todesfolge", "mindestens eine Person getötet"),
   tile(n_chk, "automatische Prüfungen", sprintf("%d STOP-Verstösse, %d %s", stop_bad, n_warn, if (n_warn == 1) "Warnung" else "Warnungen"))
 )
 ```
 
-Die Stadt Zürich und das Bundesamt für Strassen veröffentlichen jedes Jahr, wo und wann es auf Zürichs Strassen knallt. Dieses Projekt macht aus den offenen Rohdaten eine **geprüfte** Auswertung: Erst wenn alle Qualitätsregeln bestanden sind, entstehen Zahlen, Karte und Modelle. Wo die Daten Grenzen haben, steht das **direkt neben der Grafik**. Zum Beispiel springt die Zahl der erfassten Unfälle 2015 um +`r y15` %, weil sich die Erfassung geändert hat, nicht, weil die Strassen gefährlicher wurden.
+Stadt Zürich und ASTRA veröffentlichen jedes Jahr die Strassenverkehrsunfälle auf Stadtgebiet. Das Projekt macht daraus eine geprüfte Auswertung: Zahlen, Karte und Modelle entstehen erst, wenn alle Qualitätsregeln bestanden sind. Grenzen der Daten stehen neben der Grafik. Beispiel: 2015 steigt die Zahl der erfassten Unfälle um +`r y15` %, weil sich die Erfassung geändert hat (siehe [Strukturbruch 2015](datenqualitaet.qmd#der-strukturbruch-2015)).
 
-Die Seite richtet sich an alle, die Zahlen lesen, vergleichen oder weiterverwenden wollen: Bürgerinnen und Bürger, Verwaltung, Statistik. Stand der Daten: `r snap`.
+Stand der Daten: `r snap`.
 
 ::: {.two}
 ::: {.note}
-**Ich will die Zahlen verstehen**
+Zahlen verstehen
 
-[Karte](karte.qmd) · [Wann passieren Unfälle?](wann.qmd) · [Wo?](wo.qmd) · [Wetter](wetter.qmd)
+[Karte](karte.qmd) · [Wann](wann.qmd) · [Wo](wo.qmd) · [Wetter](wetter.qmd)
 :::
 ::: {.note}
-**Ich will wissen, wie verlässlich sie sind**
+Verlässlichkeit prüfen
 
 [Datenqualität](datenqualitaet.qmd) · [Daten & Metadaten](daten.qmd) · [Pipeline & Methode](pipeline.qmd)
 :::
 :::
 
-## Wichtigste Befunde
+## Befunde
 
 ```{r}
 find <- function(title, text, href, link) tags$li(tags$strong(title), text, " ", tags$a(href = href, link))
 tags$ul(class = "findings",
-  find(if (n_warn == 1) "Die Daten bestehen ihre Prüfungen – mit einer sichtbaren Warnung." else sprintf("Die Daten bestehen ihre Prüfungen – mit %d sichtbaren Warnungen.", n_warn),
-       sprintf("%d Prüfungen, alle %d mit STOP-Wirkung bestanden. %s der Strukturbruch 2015 (+%d %%): Die Erfassungspraxis hat sich geändert, die Zahl der Unfälle mit Verletzten stieg im selben Jahr nur um %d %%.", n_chk, n_stop, if (n_warn == 1) "Die eine Warnung ist" else "Eine der Warnungen ist", y15, i15),
-       "datenqualitaet.html", "Zur Datenqualität"),
-  find("Unfälle häufen sich in den Pendlerzeiten.",
-       sprintf("Werktags um %d Uhr und um %d Uhr passieren die meisten Unfälle. Nach Mitternacht sind es weniger, aber ein grösserer Teil davon hat Verletzte zur Folge.", h_m, h_a),
-       "wann.html", "Wann passieren Unfälle?"),
+  find(if (n_warn == 1) "Alle Prüfungen bestanden, eine Warnung." else sprintf("Alle Prüfungen bestanden, %d Warnungen.", n_warn),
+       sprintf("%d Prüfungen, alle %d mit STOP-Wirkung bestanden. Warnung: Strukturbruch 2015 (+%d %% Unfälle, aber nur +%d %% mit Verletzten).", n_chk, n_stop, y15, i15),
+       "datenqualitaet.html", "Datenqualität"),
+  find("Unfälle häufen sich zu Pendlerzeiten.",
+       sprintf("Werktags um %d und %d Uhr. Nachts weniger Unfälle, aber ein grösserer Anteil mit Verletzten.", h_m, h_a),
+       "wann.html", "Wann"),
   find("Regen: etwa 12 % mehr Unfälle pro Stunde.",
-       sprintf("Bei gleicher Tageszeit, Jahreszeit und Temperatur sind es bei Regen %s %% mehr (95-%%-Intervall %s–%s %%). Bei Velo-Unfällen zeigt sich kein Regeneffekt.", round(100 * (rain$irr - 1)), round(100 * (rain$ci_low - 1)), round(100 * (rain$ci_high - 1))),
-       "wetter.html", "Wetter und Unfälle"),
-  find("Wer ungeschützt unterwegs ist, wird bei einem Unfall viel öfter verletzt.",
-       "Ein Modell findet: Velo, Motorrad und Fussgänger:innen sind der stärkste Hinweis auf Personenschaden. Ein Zusammenhang, kein Beweis für eine Ursache, und kein Prognosewerkzeug.",
+       sprintf("Bei gleicher Tageszeit, Jahreszeit und Temperatur +%s %% (95-%%-Intervall %s–%s %%). Velo-Unfälle: kein Regeneffekt.", round(100 * (rain$irr - 1)), round(100 * (rain$ci_low - 1)), round(100 * (rain$ci_high - 1))),
+       "wetter.html", "Wetter"),
+  find("Ungeschützte Verkehrsteilnehmende werden öfter verletzt.",
+       "Velo, Motorrad und Fussverkehr sind der stärkste Hinweis auf Personenschaden. Zusammenhang, keine Ursache; kein Prognosewerkzeug.",
        "schwere.html", "Unfallschwere"),
-  find("Pro Einwohner:in fallen kleine Innenstadtquartiere auf.",
-       "Hochschulen, City und Lindenhof haben die höchsten Raten, weil dort wenige Menschen wohnen und viele unterwegs sind. Die Karte zeigt Dichte und Quartier-Raten.",
-       "karte.html", "Zur Karte"),
-  find("Alles ist offen und nachprüfbar.",
-       "Daten als CSV, Parquet und GeoJSON, Metadaten im Format DCAT-AP CH, jede Quelle mit Prüfsumme, der gesamte Code auf GitHub.",
+  find("Pro Einwohner:in fallen Innenstadtquartiere auf.",
+       "Hochschulen, City und Lindenhof haben die höchsten Raten: wenig Wohnbevölkerung, viel Verkehr.",
+       "karte.html", "Karte"),
+  find("Daten und Code sind offen.",
+       "CSV, Parquet, GeoJSON, Metadaten in DCAT-AP CH, Prüfsumme je Quelle, Code auf GitHub.",
        "daten.html", "Daten & Metadaten")
 )
 ```
 
-## Was Sie hier nicht finden
+## Nicht enthalten
 
-- **Keine genauen Unfalldaten** (Tag, Uhrzeit). Veröffentlicht werden nur Jahr, Monat, Wochentag und Stunde. Wie das geschützt ist, steht auf der Seite [Datenschutz](datenschutz.qmd).
-- **Keine Risikoangaben pro Person oder pro Kilometer.** Wir kennen die Verkehrsmenge nicht. Alle Zahlen zählen Unfälle, nicht Gefahr.
-- **Keine Ursachen.** Wo ein Zusammenhang gezeigt wird, steht dabei, was er nicht beweist.
+- Genaue Unfalldaten (Tag, Uhrzeit). Veröffentlicht: Jahr, Monat, Wochentag, Stunde. Schutz: [Datenschutz](datenschutz.qmd#schutzschichten).
+- Risiko pro Person oder Kilometer. Die Verkehrsmenge fehlt, die Zahlen zählen Unfälle.
+- Ursachen. Bei jedem Zusammenhang steht, was er nicht belegt.
 
-*Quelle der Unfalldaten: Stadt Zürich, Open Data / Bundesamt für Strassen ASTRA, CC BY 4.0. Weitere Quellen (Wetter, Bevölkerung, Geodaten): Stadt Zürich, CC0.*
+*Quellen: Unfalldaten Stadt Zürich Open Data / ASTRA, CC BY 4.0. Wetter, Bevölkerung, Geodaten: Stadt Zürich, CC0. Details: [Lizenzen](daten.qmd#lizenzen).*
